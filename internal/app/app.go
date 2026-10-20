@@ -90,6 +90,7 @@ func Run() {
 	mygo.BindAs("Onboarding", &Onboarding{cfg: cfg, engines: engines, app: rec})
 	mygo.BindAs("Exporter", &Exporter{cfg: cfg})
 	mygo.BindAs("Summarizer", &Summarizer{cfg: cfg, engines: engines, queue: sumQueue})
+	mygo.BindAs("About", &About{})
 	mygo.BindAs("Models", &Models{dir: modelDir, onReady: func() { resumeAll(cfg, queue, sumQueue) }})
 
 	// The page plays audio and reads peaks.json from the library through media://localhost/<id>/<file>.
