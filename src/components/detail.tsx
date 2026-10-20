@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Download, Replace, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -157,8 +158,12 @@ export function Detail({ rec, templates, jump, live, onChanged }: {
           <span className="flex-1" />
           {!recording && rec.transcript.segments.length > 0 && (
             <>
-              <Button size="sm" variant="outline" onClick={() => setReplacing(true)}>{t.replaceButton()}</Button>
-              <Button size="sm" variant="outline" onClick={() => setExporting(true)}>{t.exportButton()}</Button>
+              <Button size="icon-sm" variant="outline" title={t.replaceButton()} aria-label={t.replaceButton()} onClick={() => setReplacing(true)}>
+                <Replace />
+              </Button>
+              <Button size="icon-sm" variant="outline" title={t.exportButton()} aria-label={t.exportButton()} onClick={() => setExporting(true)}>
+                <Download />
+              </Button>
             </>
           )}
           {!recording && meta.status !== "importing" && <Reprocess id={meta.id} language={meta.language ?? ""} detected={meta.detected} onChanged={onChanged} />}
@@ -230,8 +235,8 @@ function Reprocess({ id, language, detected, onChanged }: { id: string; language
           <option value="openai-compat">{t.engineCompat()}</option>
         </select>
       </label>
-      <Button size="sm" variant="outline" onClick={() => Transcriber.reprocess(id, kind).then(onChanged).catch(fail)}>
-        {t.reprocess()}
+      <Button size="icon-sm" variant="outline" title={t.reprocess()} aria-label={t.reprocess()} onClick={() => Transcriber.reprocess(id, kind).then(onChanged).catch(fail)}>
+        <RotateCw />
       </Button>
     </>
   );
