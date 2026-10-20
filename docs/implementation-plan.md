@@ -10,8 +10,13 @@
 - [ ] P2 whisper-server: large-v3-turbo の日本語 + 英語混在精度と処理速度（実時間比）
 - [ ] P3 sherpa-onnx Go: silero VAD と話者分離が mac で動くか（Windows はビルドのみ）
 - [ ] P4 malgo: 16kHz モノラル録音、固定署名でマイク権限ダイアログ
-- [ ] P5 afconvert: 各形式 → 16kHz WAV、動画の可否
-- [ ] P6 WebView での保存フォルダ内 m4a 再生手段
+- [x] P5 afconvert: 各形式 → 16kHz WAV、動画の可否
+  - m4a / mp3 / aac / wav / caf / mp4 / mov すべて `afconvert in -f WAVE -d LEI16@16000 -c 1 out.wav` で変換できた。動画（mp4 / mov）も音声が取れる → 動画取り込みを MVP に前倒しできる
+  - WAV → m4a は `afconvert in.wav -f m4af -d aac -b 32000 out.m4a`。`-c 1` を付けると失敗し、16kHz モノラルで 64kbps も失敗する。32kbps なら 1 時間約 14MB
+- [x] P6 WebView での保存フォルダ内 m4a 再生手段
+  - `mygo.Protocol.Handle("media", mygo.FileServer(os.DirFS(保存先)))` で配信し、`<audio src="media://localhost/…">` で再生する。FileServer は Range 対応でシークできる見込み（実機での確認は Phase 5 で行う）。Windows は `http://media.localhost/`
+  - 付随して分かったこと: キーチェーンは `mygo.Secrets`、グローバルショートカットは `mygo.GlobalShortcut`、通知は `mygo.NewNotification`、ファイルドロップは `onFileDrop`（mygo-runtime）。`go-keyring` は不要
+  - 分からないこと: マイク権限（P4 で実機確認）、サイドカー起動（標準の `os/exec` を使う）
 
 ## Phase 1: 土台
 
@@ -26,6 +31,7 @@
 - [ ] malgo でマイク録音、数秒ごとの WAV 追記
 - [ ] 停止後の m4a 変換（afconvert）
 - [ ] ファイル取り込み（ドロップ → afconvert で 16kHz WAV 化）
+- [ ] 動画ファイル（mp4 / mov）の取り込み
 - [ ] グローバルショートカット `⌥⌘R`
 - [ ] メニューバーアイコン（開始 / 停止、経過時間、ローカル限定の鍵マーク）
 - [ ] 停止直後 5 秒の「取り消し」トースト
@@ -86,7 +92,6 @@ MVP 完了。
 - [ ] ライブ字幕
 - [ ] テンプレート自動選択
 - [ ] 録音内容への質問チャット
-- [ ] 動画ファイル取り込み
 - [ ] 無音スキップ再生
 - [ ] ローカル限定 ON 中のクラウド同期フォルダ警告
 - [ ] 検索が遅くなったら SQLite FTS 索引

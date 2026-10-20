@@ -38,7 +38,7 @@
 | 話者分離 | クラウド: MAI-Transcribe-2 の diarization。ローカル: sherpa-onnx |
 | 要約 | OpenRouter、または OpenAI 互換 URL（Ollama / LM Studio 等。Ollama は自動検出） |
 | 音声変換 | macOS 標準 `afconvert`。Windows は実装時に再判断 |
-| 秘密情報 | OS キーチェーン（`go-keyring`）。画面ではマスク表示のみ |
+| 秘密情報 | OS キーチェーン（mygo の `mygo.Secrets`）。画面ではマスク表示のみ |
 
 文字起こしと要約のプロバイダは個別に選ぶ。
 
@@ -55,7 +55,7 @@
 | MVP | 録音中は 16kHz モノラル PCM を数秒ごとにディスクへ追記（クラッシュしても直前まで残る） |
 | MVP | 停止後に m4a（AAC）へ変換して保存 |
 | 2 | システム音声録音（mac: Core Audio Tap / Win: WASAPI loopback）。マイクと別トラックで保存 |
-| 2 | 動画ファイル取り込み |
+| MVP | 動画ファイル取り込み（mp4 / mov。`afconvert` で音声を抽出できると P5 で確認済み） |
 
 ### 録音の導線
 
@@ -163,7 +163,7 @@
 ```
 
 - 検索は起動時に読み込んでメモリ上で走査する。千件を超えて遅くなったら SQLite FTS を索引として足す
-- 音声は AAC 64kbps モノラル（1 時間で約 30MB）
+- 音声は AAC 32kbps モノラル（1 時間で約 14MB）
 
 ## 配布
 
