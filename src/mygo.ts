@@ -179,6 +179,10 @@ export const Library = {
   chooseFolder(): Promise<string> {
     return call("Library.ChooseFolder");
   },
+  /** ConfirmDelete asks, then moves a recording to the trash (the list's ✕ button). */
+  confirmDelete(id: string): Promise<void> {
+    return call("Library.ConfirmDelete", id);
+  },
   /**
    * EditSegment changes the text of one transcript line. start is the line's
    * start time as the page has it; the original engine text is kept.

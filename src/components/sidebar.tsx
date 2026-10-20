@@ -5,7 +5,7 @@ import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import type { Messages } from "@/locales";
 import { Library, type Meta } from "@/mygo";
-import { Mic, Square, Upload } from "lucide-react";
+import { Mic, Square, Upload, X } from "lucide-react";
 
 function statusBadge(t: Messages, m: Meta) {
   const label: Record<string, string> = {
@@ -82,8 +82,8 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
             {g.items.map((m) => {
               const badge = statusBadge(t, m);
               return (
+                <div key={m.id} className="group relative">
                 <button
-                  key={m.id}
                   onClick={() => onSelect(m.id)}
                   onContextMenu={(e) => {
                     e.preventDefault();
@@ -99,6 +99,17 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
                     {badge && <Badge variant={badge.variant}>{badge.text}</Badge>}
                   </span>
                 </button>
+                {m.status !== "recording" && m.status !== "importing" && (
+                  <button
+                    aria-label={t.menuDelete()}
+                    title={t.menuDelete()}
+                    onClick={() => void Library.confirmDelete(m.id)}
+                    className="absolute top-1.5 right-1.5 hidden size-5 cursor-pointer items-center justify-center rounded text-muted-foreground hover:bg-background hover:text-destructive group-hover:flex"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
+                </div>
               );
             })}
           </section>
