@@ -23,8 +23,11 @@ import (
 )
 
 const (
-	wavName = "recording.wav"
-	m4aName = "audio.m4a"
+	wavName   = "recording.wav"
+	m4aName   = "audio.m4a" // the mix, or the only track
+	micM4A    = "mic.m4a"
+	systemWAV = "system.wav"
+	systemM4A = "system.m4a"
 	// Samples read per pass: a long recording is planned in windows, not held whole.
 	readLimit = 20 * 60 * transcribe.SampleRate
 	livePoll  = time.Second
@@ -172,7 +175,7 @@ func (q *Queue) process(ctx context.Context, req request) {
 	}
 	if req.restart {
 		_ = st.UpdateTranscript(id, func(t *library.Transcript) { t.Segments = []library.Segment{} })
-		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil, m.Detected, m.Error = 0, "", "" })
+		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil, m.SystemProcessedUntil, m.Detected, m.Error = 0, 0, "", "" })
 	}
 	rec, err := st.Get(id)
 	if err != nil {
@@ -192,24 +195,84 @@ func (q *Queue) process(ctx context.Context, req request) {
 		return
 	}
 
-	wav := filepath.Join(dir, wavName)
-	if _, err := os.Stat(wav); err != nil { // processed before: rebuild it from the m4a
-		if rec.Meta.Status == library.StatusRecording {
-			return
-		}
-		if err := audio.ToWAV16k(filepath.Join(dir, m4aName), wav); err != nil {
-			q.fail(st, id, false, err)
+	tracks := tracksOf(dir, job)
+	var wg sync.WaitGroup
+	ok := make([]bool, len(tracks))
+	for i, tr := range tracks {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ok[i] = q.runTrack(ctx, st, id, dir, job, tr)
+		}()
+	}
+	wg.Wait()
+	for _, done := range ok {
+		if !done {
 			return
 		}
 	}
+	q.finish(st, id, dir)
+}
 
-	done := int(rec.Meta.ProcessedUntil * transcribe.SampleRate)
+// track is one audio file of a recording. A recording made with system audio
+// has two, transcribed side by side: the microphone is "自分", the system
+// track is the others.
+type track struct {
+	wav, m4a string                       // the WAV that is read, and the file it is rebuilt from
+	progress func(*library.Meta) *float64 // where this track's progress is kept
+	speaker  func(engine int) int         // maps the engine's speaker number
+	diarize  bool
+}
+
+func tracksOf(dir string, job Job) []track {
+	_, hasWAV := os.Stat(filepath.Join(dir, systemWAV))
+	_, hasM4A := os.Stat(filepath.Join(dir, systemM4A))
+	if hasWAV != nil && hasM4A != nil {
+		return []track{{wav: filepath.Join(dir, wavName), m4a: filepath.Join(dir, m4aName),
+			progress: func(m *library.Meta) *float64 { return &m.ProcessedUntil },
+			speaker:  func(n int) int { return n }, diarize: job.Diarize}}
+	}
+	return []track{
+		{wav: filepath.Join(dir, wavName), m4a: filepath.Join(dir, micM4A),
+			progress: func(m *library.Meta) *float64 { return &m.ProcessedUntil },
+			speaker:  func(int) int { return library.SpeakerMe }},
+		{wav: filepath.Join(dir, systemWAV), m4a: filepath.Join(dir, systemM4A),
+			progress: func(m *library.Meta) *float64 { return &m.SystemProcessedUntil },
+			speaker: func(n int) int {
+				if n < 0 {
+					return library.SpeakerOthers
+				}
+				return n
+			}, diarize: job.Diarize},
+	}
+}
+
+// runTrack transcribes one track until its audio is all done. It reports
+// whether it got there: false after a failure or when ctx ended.
+func (q *Queue) runTrack(ctx context.Context, st library.Store, id, dir string, job Job, tr track) bool {
+	rec, err := st.Get(id)
+	if err != nil {
+		return false
+	}
+	wav := tr.wav
+	if _, err := os.Stat(wav); err != nil { // processed before: rebuild it from the m4a
+		if rec.Meta.Status == library.StatusRecording {
+			return false
+		}
+		if err := audio.ToWAV16k(tr.m4a, wav); err != nil {
+			q.fail(st, id, false, err)
+			return false
+		}
+	}
+	job.Diarize = tr.diarize
+
+	done := int(*tr.progress(&rec.Meta) * transcribe.SampleRate)
 	for ctx.Err() == nil {
 		// Read the status before the audio: a recording that is no longer
 		// "recording" has all its audio on disk.
 		cur, err := st.Get(id)
 		if err != nil {
-			return
+			return false
 		}
 		live := cur.Meta.Status == library.StatusRecording
 		if !live && cur.Meta.Status != library.StatusProcessing {
@@ -219,30 +282,30 @@ func (q *Queue) process(ctx context.Context, req request) {
 		region, err := audio.ReadPCM(wav, done, readLimit)
 		if err != nil {
 			q.fail(st, id, live, err)
-			return
+			return false
 		}
 		final := !live && len(region) < readLimit
 		spans, _ := transcribe.Plan(region, 0, final, job.Params)
 		resend := false // the chunk lost its tail: plan again from where its text ends
 		for _, sp := range spans {
 			if ctx.Err() != nil {
-				return
+				return false
 			}
 			end := done + sp.End
 			if sp.Speech {
-				covered, err := q.transcribeSpan(ctx, st, id, job, cur.Meta.Language, region[sp.Start:sp.End], done+sp.Start)
+				covered, err := q.transcribeSpan(ctx, st, id, job, tr, cur.Meta.Language, region[sp.Start:sp.End], done+sp.Start)
 				if err != nil {
 					if ctx.Err() == nil {
 						q.fail(st, id, live, err)
 					}
-					return
+					return false
 				}
 				if tail := sp.End - sp.Start - covered; covered >= minCovered && tail > droppedTail && transcribe.HasSpeech(region[sp.Start+covered:sp.End]) {
 					end, resend = done+sp.Start+covered, true
 				}
 			}
 			t := float64(end) / transcribe.SampleRate
-			_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil = t })
+			_, _ = st.UpdateMeta(id, func(m *library.Meta) { *tr.progress(m) = t })
 			q.changed(id)
 			if resend {
 				done = end
@@ -258,17 +321,17 @@ func (q *Queue) process(ctx context.Context, req request) {
 		switch {
 		case live:
 			if !q.cfg.Sleep(ctx, livePoll) {
-				return
+				return false
 			}
 		case len(spans) == 0 && final:
-			q.finish(st, id, dir)
-			return
+			return true
 		}
 	}
+	return false
 }
 
 // transcribeSpan sends one chunk and appends its lines to the transcript.
-func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string, job Job, lang string, pcm []int16, startSample int) (covered int, err error) {
+func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string, job Job, tr track, lang string, pcm []int16, startSample int) (covered int, err error) {
 	req := transcribe.Request{WAV: audio.WAVBytes(pcm, transcribe.SampleRate), Language: lang, Phrases: q.cfg.Phrases(), Diarize: job.Diarize}
 	res, err := q.send(ctx, st, id, job.Engine, req)
 	if err != nil {
@@ -278,8 +341,9 @@ func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string,
 	for i := range res.Segments {
 		res.Segments[i].Start += offset
 		res.Segments[i].End += offset
+		res.Segments[i].Speaker = tr.speaker(res.Segments[i].Speaker)
 	}
-	if err := st.UpdateTranscript(id, func(t *library.Transcript) { t.Segments = append(t.Segments, res.Segments...) }); err != nil {
+	if err := st.AppendSegments(id, res.Segments); err != nil {
 		return 0, err
 	}
 	if n := len(res.Segments); n > 0 {
@@ -363,11 +427,24 @@ func (q *Queue) finish(st library.Store, id, dir string) {
 // peakCount is how many bars the player's waveform has.
 const peakCount = 2000
 
-// savePeaks writes peaks.json from recording.wav, so the page draws the
-// waveform without decoding a long audio file. Call it before CleanupWAV.
+// savePeaks writes peaks.json from the WAVs, so the page draws the waveform
+// without decoding a long audio file. With two tracks the bars are the louder
+// of the two. Call it before CleanupWAV.
 func savePeaks(dir string) {
-	peaks, err := audio.Peaks(filepath.Join(dir, wavName), peakCount)
-	if err != nil || len(peaks) == 0 {
+	var peaks []float32
+	for _, name := range []string{wavName, systemWAV} {
+		p, err := audio.Peaks(filepath.Join(dir, name), peakCount)
+		if err != nil || len(p) == 0 {
+			continue
+		}
+		if peaks == nil {
+			peaks = make([]float32, len(p))
+		}
+		for i := range peaks {
+			peaks[i] = max(peaks[i], p[min(i, len(p)-1)])
+		}
+	}
+	if len(peaks) == 0 {
 		return
 	}
 	for i, p := range peaks { // 3 decimals are plenty for a picture
@@ -380,11 +457,19 @@ func savePeaks(dir string) {
 	}
 }
 
-// CleanupWAV removes recording.wav once the m4a exists and the transcript is
-// done: the m4a is what is kept (the wav is rebuilt from it to reprocess).
+// CleanupWAV removes the WAVs once the m4a files exist and the transcript is
+// done: the m4a files are what is kept (a WAV is rebuilt from them to reprocess).
 func CleanupWAV(dir string) {
 	if _, err := os.Stat(filepath.Join(dir, m4aName)); err != nil {
 		return
 	}
+	if _, err := os.Stat(filepath.Join(dir, systemWAV)); err == nil { // two tracks: each needs its m4a
+		for _, f := range []string{micM4A, systemM4A} {
+			if _, err := os.Stat(filepath.Join(dir, f)); err != nil {
+				return
+			}
+		}
+	}
 	_ = os.Remove(filepath.Join(dir, wavName))
+	_ = os.Remove(filepath.Join(dir, systemWAV))
 }

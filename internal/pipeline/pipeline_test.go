@@ -224,3 +224,29 @@ func TestResendsDroppedTail(t *testing.T) {
 		t.Fatalf("%v calls=%v", r.Meta.Status, p.calls)
 	}
 }
+
+func TestTwoTracksAreMergedInTimeOrder(t *testing.T) {
+	// The microphone has a 5 s chunk; the system track has one chunk after a
+	// 6 s lead-in of near silence, so its line comes later in the transcript.
+	e := setup(t, library.StatusQueued, 5)
+	dir, _ := e.st.Path(e.id)
+	writeAudio(t, filepath.Join(dir, systemWAV), 0.05, 6, 5)
+	r := e.run(t)
+	if r.Meta.Status != library.StatusDone {
+		t.Fatalf("%v %q", r.Meta.Status, r.Meta.Error)
+	}
+	segs := r.Transcript.Segments
+	speakers := map[int]bool{}
+	for i, s := range segs {
+		speakers[s.Speaker] = true
+		if i > 0 && s.Start < segs[i-1].Start {
+			t.Fatalf("not in time order: %+v", segs)
+		}
+	}
+	if !speakers[library.SpeakerMe] || !speakers[library.SpeakerOthers] || len(speakers) != 2 {
+		t.Fatalf("speakers: %+v", segs)
+	}
+	if r.Meta.SystemProcessedUntil < 11 || r.Meta.ProcessedUntil < 5 {
+		t.Fatalf("progress mic=%v system=%v", r.Meta.ProcessedUntil, r.Meta.SystemProcessedUntil)
+	}
+}
