@@ -6,6 +6,7 @@ import { Detail, type Jump } from "@/components/detail";
 import { Search } from "@/components/search";
 import { SettingsDialog } from "@/components/settings";
 import { Sidebar } from "@/components/sidebar";
+import { TitleBar } from "@/components/titlebar";
 import { useMessages } from "@/i18n";
 import type { Messages } from "@/locales";
 import { events, Importer, Library, Models, Recorder, Settings, Summarizer, type Hit, type Meta, type ModelStatus, type Recording, type RecordingState, type Settings as S, type Template } from "@/mygo";
@@ -105,8 +106,10 @@ export function App() {
   if (first) return <><Toaster position="bottom-center" /><Onboarding settings={first} onDone={() => setFirst(null)} /></>;
 
   return (
-    <div className="flex h-screen text-sm">
+    <div className="flex h-screen flex-col text-sm">
       <Toaster position="bottom-center" />
+      <TitleBar onToggleSidebar={() => setSidebar((s) => !s)} onSearch={() => setSearching(true)} onSettings={() => setSettingsOpen(true)} />
+      <div className="flex min-h-0 flex-1">
       {sidebar && (
         <Sidebar
           recordings={recordings}
@@ -117,8 +120,6 @@ export function App() {
           level={state.level}
           onRecord={() => (state.recording ? Recorder.stop() : Recorder.start()).catch(fail)}
           onImport={() => Importer.importDialog().catch(fail)}
-          onSearch={() => setSearching(true)}
-          onSettings={() => setSettingsOpen(true)}
         />
       )}
       <main className="flex min-w-0 flex-1 flex-col">
@@ -138,6 +139,7 @@ export function App() {
           )}
         </div>
       </main>
+      </div>
       <Search open={searching} onOpenChange={setSearching} onPick={pick} />
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} onChanged={() => Summarizer.templates().then(setTemplates).catch(() => {})} />
     </div>

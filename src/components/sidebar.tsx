@@ -4,7 +4,7 @@ import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import type { Messages } from "@/locales";
 import type { Meta } from "@/mygo";
-import { Mic, Search, Settings as Gear, Square, Upload } from "lucide-react";
+import { Mic, Square, Upload } from "lucide-react";
 
 function statusBadge(t: Messages, m: Meta) {
   const label: Record<string, string> = {
@@ -30,7 +30,7 @@ function dayLabel(t: Messages, iso: string) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric", weekday: "short" });
 }
 
-export function Sidebar({ recordings, selected, onSelect, recording, elapsed, level, onRecord, onImport, onSearch, onSettings }: {
+export function Sidebar({ recordings, selected, onSelect, recording, elapsed, level, onRecord, onImport }: {
   recordings: Meta[];
   selected: string;
   onSelect(id: string): void;
@@ -39,8 +39,6 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
   level: number;
   onRecord(): void;
   onImport(): void;
-  onSearch(): void;
-  onSettings(): void;
 }) {
   const t = useMessages();
   const groups: { label: string; items: Meta[] }[] = [];
@@ -62,17 +60,9 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
             <div className="h-full bg-primary transition-[width] duration-150" style={{ width: `${Math.min(1, level * 2) * 100}%` }} />
           </div>
         )}
-        <div className="flex gap-2">
-          <Button className="flex-1" variant="outline" size="sm" onClick={onImport}>
-            <Upload /> {t.importButton()}
-          </Button>
-          <Button variant="outline" size="icon-sm" aria-label={t.searchTitle()} onClick={onSearch}>
-            <Search />
-          </Button>
-          <Button variant="outline" size="icon-sm" aria-label={t.settings()} onClick={onSettings}>
-            <Gear />
-          </Button>
-        </div>
+        <Button className="w-full" variant="outline" size="sm" onClick={onImport}>
+          <Upload /> {t.importButton()}
+        </Button>
       </div>
       <nav className="min-h-0 flex-1 overflow-auto px-2 pb-3">
         {recordings.length === 0 && <p className="p-3 text-xs text-muted-foreground">{t.listEmpty()}</p>}

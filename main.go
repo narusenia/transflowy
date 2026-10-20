@@ -105,11 +105,14 @@ func main() {
 			return
 		}
 		win = mygo.NewWindow(mygo.WindowOptions{
-			Title:           "transflowy",
-			Width:           1200,
-			Height:          760,
-			MinWidth:        720,
-			MinHeight:       480,
+			Title:     "transflowy",
+			Width:     1200,
+			Height:    760,
+			MinWidth:  720,
+			MinHeight: 480,
+			// The page draws its own title bar under the window controls (see titlebar.tsx).
+			TitleBarStyle:   mygo.TitleBarHiddenInset,
+			TitleBarHeight:  40,
 			BackgroundColor: "light-dark(#ffffff, #0a0a0a)", // shadcn neutral --background
 			// Opens where the user left it last time.
 			StateKey: "main",
