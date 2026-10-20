@@ -1681,3 +1681,23 @@ func Untitled() string { return In(i18n.Locale()).Untitled() }
 func (msgs Messages) Untitled() string {
 	return Catalog.Format(msgs.locale, "untitled", nil)
 }
+
+// Play says "再生"
+// in the language the app shows.
+func Play() string { return In(i18n.Locale()).Play() }
+
+// Play says "再生"
+// in the language of msgs.
+func (msgs Messages) Play() string {
+	return Catalog.Format(msgs.locale, "play", nil)
+}
+
+// Pause says "一時停止"
+// in the language the app shows.
+func Pause() string { return In(i18n.Locale()).Pause() }
+
+// Pause says "一時停止"
+// in the language of msgs.
+func (msgs Messages) Pause() string {
+	return Catalog.Format(msgs.locale, "pause", nil)
+}

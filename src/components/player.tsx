@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/icon-button";
 import { Pause, Play } from "lucide-react";
 import { clock, mediaUrl } from "@/lib/media";
 import { useMessages } from "@/i18n";
@@ -80,9 +80,9 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; o
 
     return (
       <div className="flex items-center gap-3 border-t px-4 py-2">
-        <Button size="icon" variant="ghost" onClick={() => ws.current?.playPause()}>
+        <IconButton size="icon" side="top" variant="ghost" label={playing ? t.pause() : t.play()} onClick={() => ws.current?.playPause()}>
           {playing ? <Pause /> : <Play />}
-        </Button>
+        </IconButton>
         <span className="w-24 shrink-0 text-xs tabular-nums text-muted-foreground">
           {clock(time)} / {clock(duration)}
         </span>

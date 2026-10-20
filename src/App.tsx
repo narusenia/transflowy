@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { Onboarding } from "@/components/onboarding";
 import { Detail, type Jump } from "@/components/detail";
 import { Search } from "@/components/search";
@@ -113,6 +114,7 @@ export function App() {
   if (first) return <><Toaster position="bottom-center" /><Onboarding settings={first} onDone={() => setFirst(null)} /></>;
 
   return (
+    <TooltipProvider delay={400}>
     <div className="flex h-screen flex-col text-sm">
       <Toaster position="bottom-center" />
       <TitleBar onToggleSidebar={() => setSidebar((s) => !s)} onSearch={() => setSearching(true)} onSettings={() => setSettingsOpen(true)} />
@@ -150,6 +152,7 @@ export function App() {
       <Search open={searching} onOpenChange={setSearching} onPick={pick} />
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} onChanged={() => Summarizer.templates().then(setTemplates).catch(() => {})} />
     </div>
+    </TooltipProvider>
   );
 }
 

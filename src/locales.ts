@@ -663,6 +663,14 @@ export interface Messages {
    * `無題の録音`
    */
   untitled(): string;
+  /**
+   * `再生`
+   */
+  play(): string;
+  /**
+   * `一時停止`
+   */
+  pause(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -837,6 +845,8 @@ const catalog = createCatalog<Messages>({
     "deleteConfirm": [],
     "cancel": [],
     "untitled": [],
+    "play": [],
+    "pause": [],
   },
   messages: {
     "ja": {
@@ -1005,6 +1015,8 @@ const catalog = createCatalog<Messages>({
       "deleteConfirm": "ゴミ箱に移動",
       "cancel": "キャンセル",
       "untitled": "無題の録音",
+      "play": "再生",
+      "pause": "一時停止",
     },
   },
 });

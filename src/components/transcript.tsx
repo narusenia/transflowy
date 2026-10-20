@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Pencil, Undo2 } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/icon-button";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import type { Transcript as T } from "@/mygo";
@@ -86,13 +87,13 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
                     </span>
                     <span className="flex shrink-0 gap-1 opacity-0 group-hover:opacity-100">
                       {s.text !== s.original && (
-                        <button title={t.segmentRevert()} aria-label={t.segmentRevert()} className="cursor-pointer text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); onRevert(row.index, s.start); }}>
-                          <Undo2 className="size-3.5" />
-                        </button>
+                        <IconButton size="icon-xs" variant="ghost" label={t.segmentRevert()} onClick={(e) => { e.stopPropagation(); onRevert(row.index, s.start); }}>
+                          <Undo2 />
+                        </IconButton>
                       )}
-                      <button title={t.segmentEdit()} aria-label={t.segmentEdit()} className="cursor-pointer text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); setEditing(row.index); }}>
-                        <Pencil className="size-3.5" />
-                      </button>
+                      <IconButton size="icon-xs" variant="ghost" label={t.segmentEdit()} onClick={(e) => { e.stopPropagation(); setEditing(row.index); }}>
+                        <Pencil />
+                      </IconButton>
                     </span>
                     {s.text !== s.original && <span className="sr-only">{t.segmentEdited()}</span>}
                   </>

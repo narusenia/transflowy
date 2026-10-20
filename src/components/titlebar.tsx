@@ -1,5 +1,5 @@
 import { PanelLeft, Search, Settings as Gear } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/icon-button";
 import { useMessages } from "@/i18n";
 
 /**
@@ -18,16 +18,16 @@ export function TitleBar({ onToggleSidebar, onSearch, onSettings }: { onToggleSi
         paddingRight: "calc(var(--mygo-titlebar-inset-right, 0px) + 0.5rem)",
       }}
     >
-      <Button variant="ghost" size="icon-sm" title={t.toggleSidebar()} aria-label={t.toggleSidebar()} onClick={onToggleSidebar}>
+      <IconButton variant="ghost" label={t.toggleSidebar()} onClick={onToggleSidebar}>
         <PanelLeft />
-      </Button>
+      </IconButton>
       <span className="flex-1" />
-      <Button variant="ghost" size="icon-sm" title={t.searchTitle()} aria-label={t.searchTitle()} onClick={onSearch}>
+      <IconButton variant="ghost" label={t.searchTitle()} onClick={onSearch}>
         <Search />
-      </Button>
-      <Button variant="ghost" size="icon-sm" title={t.settings()} aria-label={t.settings()} onClick={onSettings}>
+      </IconButton>
+      <IconButton variant="ghost" label={t.settings()} onClick={onSettings}>
         <Gear />
-      </Button>
+      </IconButton>
     </header>
   );
 }

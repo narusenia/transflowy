@@ -255,5 +255,7 @@
   "deleteDetail": "録音のフォルダ（音声・文字起こし・要約）をゴミ箱に移動します",
   "deleteConfirm": "ゴミ箱に移動",
   "cancel": "キャンセル",
-  "untitled": "無題の録音"
+  "untitled": "無題の録音",
+  "play": "再生",
+  "pause": "一時停止"
 }
