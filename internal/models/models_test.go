@@ -9,6 +9,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 )
@@ -52,3 +53,20 @@ func TestDownloadResumesAndVerifies(t *testing.T) {
 var timeZero = time.Time{}
 
 func bytesReader(b []byte) *bytes.Reader { return bytes.NewReader(b) }
+
+func TestDownloadUsesTheModelsOwnChecksum(t *testing.T) {
+	body := []byte("model bytes")
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.Write(body) })) // no checksum header, like GitHub releases
+	defer srv.Close()
+	h := sha256.Sum256(body)
+	dir := t.TempDir()
+
+	bad := Model{File: "bad.onnx", URL: srv.URL, SHA256: strings.Repeat("0", 64)}
+	if err := bad.Download(context.Background(), dir, nil); err == nil || bad.Present(dir) {
+		t.Fatalf("a wrong checksum must fail and leave no file: %v", err)
+	}
+	good := Model{File: "good.onnx", URL: srv.URL, SHA256: hex.EncodeToString(h[:])}
+	if err := good.Download(context.Background(), dir, nil); err != nil || !good.Present(dir) {
+		t.Fatalf("%v", err)
+	}
+}
