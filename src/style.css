@@ -127,4 +127,14 @@
   html {
     @apply font-sans;
     }
+  /* No elastic bounce (macOS): the title bar and the panes stay put at the end of a scroll. */
+  html,
+  body,
+  * {
+    overscroll-behavior: none;
+    }
+  html,
+  body {
+    overflow: hidden;
+    }
 }
