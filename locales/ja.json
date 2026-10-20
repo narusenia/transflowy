@@ -281,5 +281,17 @@
         "type": "int"
       }
     }
+  },
+  "speakerMe": "自分",
+  "speakerOthers": "相手",
+  "captureSystem": "システム音声も録音",
+  "captureSystemHint": "Zoom や Meet の相手の声など、Mac から出る音を別トラックで録音します",
+  "warnSystemAudio": "システム音声を録音できませんでした（マイクだけ録音します）: {detail}",
+  "@warnSystemAudio": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
   }
 }

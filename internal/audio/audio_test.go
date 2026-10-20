@@ -88,3 +88,24 @@ func TestPeaks(t *testing.T) {
 		t.Fatalf("%v %v", p, err)
 	}
 }
+
+func TestMixWAV(t *testing.T) {
+	dir := t.TempDir()
+	mk := func(name string, vals []int16) string {
+		p := filepath.Join(dir, name)
+		w, _ := CreateWAV(p, 16000)
+		w.Write(WAVBytes(vals, 16000)[44:])
+		w.Close()
+		return p
+	}
+	a := mk("a.wav", []int16{100, 30000, -30000})
+	b := mk("b.wav", []int16{1, 30000})
+	out := filepath.Join(dir, "m.wav")
+	if err := MixWAV(out, a, b); err != nil {
+		t.Fatal(err)
+	}
+	pcm, _ := ReadPCM(out, 0, 10)
+	if len(pcm) != 3 || pcm[0] != 101 || pcm[1] != 32767 || pcm[2] != -30000 {
+		t.Fatalf("%v", pcm)
+	}
+}

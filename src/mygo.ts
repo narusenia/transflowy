@@ -34,6 +34,7 @@ export interface Meta {
   detected?: string;
   engine?: string;
   processedUntil?: number;
+  systemProcessedUntil?: number;
   status: Status;
   error?: string;
 }
@@ -104,6 +105,11 @@ export interface Settings {
   template: string;
   /** LocalOnly forbids every request to a cloud provider. */
   localOnly: boolean;
+  /**
+   * CaptureSystem also records what the computer plays (macOS 14.2+): the
+   * other side of a call, as a second track.
+   */
+  captureSystem: boolean;
   /** InputDevice is the microphone's name; "" is the system default. */
   inputDevice: string;
   shortcut: string;

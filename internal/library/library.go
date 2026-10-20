@@ -30,6 +30,13 @@ const (
 // UnknownSpeaker marks a segment that has no speaker label.
 const UnknownSpeaker = -1
 
+// With a system audio track, the microphone is the user ("自分") and the
+// system track's lines without a diarized speaker are the others ("相手").
+const (
+	SpeakerMe     = 100
+	SpeakerOthers = 101
+)
+
 // Meta is a recording's meta.json.
 type Meta struct {
 	ID        string    `json:"id"`
@@ -44,8 +51,10 @@ type Meta struct {
 	// ProcessedUntil is how many seconds of audio have a transcript, so a
 	// restart continues where the pipeline stopped.
 	ProcessedUntil float64 `json:"processedUntil,omitempty"`
-	Status         Status  `json:"status"`
-	Error          string  `json:"error,omitempty"`
+	// SystemProcessedUntil is the same for the system audio track.
+	SystemProcessedUntil float64 `json:"systemProcessedUntil,omitempty"`
+	Status               Status  `json:"status"`
+	Error                string  `json:"error,omitempty"`
 }
 
 // Segment is one line of a transcript. Original keeps the engine's text so an

@@ -33,6 +33,9 @@ type Settings struct {
 	Template string `json:"template"`
 	// LocalOnly forbids every request to a cloud provider.
 	LocalOnly bool `json:"localOnly"`
+	// CaptureSystem also records what the computer plays (macOS 14.2+): the
+	// other side of a call, as a second track.
+	CaptureSystem bool `json:"captureSystem"`
 	// InputDevice is the microphone's name; "" is the system default.
 	InputDevice string `json:"inputDevice"`
 	Shortcut    string `json:"shortcut"`

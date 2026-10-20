@@ -83,3 +83,16 @@ func TestSetSpeakers(t *testing.T) {
 		t.Fatalf("%v", r.Transcript.Speakers)
 	}
 }
+
+func TestAppendSegmentsKeepsTimeOrder(t *testing.T) {
+	st, id := newRec(t) // lines at 1 and 5
+	st.AppendSegments(id, []Segment{{Start: 3, Text: "x"}, {Start: 0.5, Text: "y"}})
+	r, _ := st.Get(id)
+	var starts []float64
+	for _, s := range r.Transcript.Segments {
+		starts = append(starts, s.Start)
+	}
+	if len(starts) != 4 || starts[0] != 0.5 || starts[1] != 1 || starts[2] != 3 || starts[3] != 5 {
+		t.Fatalf("%v", starts)
+	}
+}

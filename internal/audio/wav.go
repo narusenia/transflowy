@@ -172,3 +172,48 @@ func Peaks(path string, n int) ([]float32, error) {
 	}
 	return out, nil
 }
+
+// MixWAV adds 16-bit mono WAVs of one sample rate into out (clipping at full
+// scale). The shorter inputs are padded with silence.
+func MixWAV(out string, ins ...string) error {
+	lens := make([]int, len(ins))
+	total := 0
+	for i, in := range ins {
+		n, err := PCMSamples(in)
+		if err != nil {
+			return err
+		}
+		lens[i], total = n, max(total, n)
+	}
+	w, err := CreateWAV(out, 16000)
+	if err != nil {
+		return err
+	}
+	const window = 60 * 16000
+	for from := 0; from < total; from += window {
+		sum := make([]int32, min(window, total-from))
+		for i, in := range ins {
+			if from >= lens[i] {
+				continue
+			}
+			pcm, err := ReadPCM(in, from, len(sum))
+			if err != nil {
+				w.Close()
+				return err
+			}
+			for j, v := range pcm {
+				sum[j] += int32(v)
+			}
+		}
+		b := make([]byte, len(sum)*2)
+		for j, v := range sum {
+			v = max(-32768, min(32767, v))
+			b[2*j], b[2*j+1] = byte(v), byte(uint16(int16(v))>>8)
+		}
+		if err := w.Write(b); err != nil {
+			w.Close()
+			return err
+		}
+	}
+	return w.Close()
+}

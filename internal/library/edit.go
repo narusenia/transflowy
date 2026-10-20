@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -106,4 +107,13 @@ func (s Store) AddToDictionary(word string) error {
 	}
 	_, err = f.WriteString(word + "\n")
 	return err
+}
+
+// AppendSegments adds lines to the transcript and keeps it in time order: two
+// tracks (microphone and system audio) are transcribed side by side.
+func (s Store) AppendSegments(id string, segs []Segment) error {
+	return s.UpdateTranscript(id, func(t *Transcript) {
+		t.Segments = append(t.Segments, segs...)
+		sort.SliceStable(t.Segments, func(i, j int) bool { return t.Segments[i].Start < t.Segments[j].Start })
+	})
 }

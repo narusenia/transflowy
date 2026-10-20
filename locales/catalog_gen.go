@@ -1801,3 +1801,53 @@ func SpeakerLines(count int) string { return In(i18n.Locale()).SpeakerLines(coun
 func (msgs Messages) SpeakerLines(count int) string {
 	return Catalog.Format(msgs.locale, "speakerLines", map[string]any{"count": count})
 }
+
+// SpeakerMe says "自分"
+// in the language the app shows.
+func SpeakerMe() string { return In(i18n.Locale()).SpeakerMe() }
+
+// SpeakerMe says "自分"
+// in the language of msgs.
+func (msgs Messages) SpeakerMe() string {
+	return Catalog.Format(msgs.locale, "speakerMe", nil)
+}
+
+// SpeakerOthers says "相手"
+// in the language the app shows.
+func SpeakerOthers() string { return In(i18n.Locale()).SpeakerOthers() }
+
+// SpeakerOthers says "相手"
+// in the language of msgs.
+func (msgs Messages) SpeakerOthers() string {
+	return Catalog.Format(msgs.locale, "speakerOthers", nil)
+}
+
+// CaptureSystem says "システム音声も録音"
+// in the language the app shows.
+func CaptureSystem() string { return In(i18n.Locale()).CaptureSystem() }
+
+// CaptureSystem says "システム音声も録音"
+// in the language of msgs.
+func (msgs Messages) CaptureSystem() string {
+	return Catalog.Format(msgs.locale, "captureSystem", nil)
+}
+
+// CaptureSystemHint says "Zoom や Meet の相手の声など、Mac から出る音を別トラックで録音します"
+// in the language the app shows.
+func CaptureSystemHint() string { return In(i18n.Locale()).CaptureSystemHint() }
+
+// CaptureSystemHint says "Zoom や Meet の相手の声など、Mac から出る音を別トラックで録音します"
+// in the language of msgs.
+func (msgs Messages) CaptureSystemHint() string {
+	return Catalog.Format(msgs.locale, "captureSystemHint", nil)
+}
+
+// WarnSystemAudio says "システム音声を録音できませんでした（マイクだけ録音します）: {detail}"
+// in the language the app shows.
+func WarnSystemAudio(detail string) string { return In(i18n.Locale()).WarnSystemAudio(detail) }
+
+// WarnSystemAudio says "システム音声を録音できませんでした（マイクだけ録音します）: {detail}"
+// in the language of msgs.
+func (msgs Messages) WarnSystemAudio(detail string) string {
+	return Catalog.Format(msgs.locale, "warnSystemAudio", map[string]any{"detail": detail})
+}

@@ -24,6 +24,12 @@ func speaker(t library.Transcript, n int) string {
 	if name := t.Speakers[strconv.Itoa(n)]; name != "" {
 		return name
 	}
+	switch n {
+	case library.SpeakerMe:
+		return locales.SpeakerMe()
+	case library.SpeakerOthers:
+		return locales.SpeakerOthers()
+	}
 	return locales.SpeakerLabel(n + 1) // speaker 0 is 話者1, as the page shows it
 }
 

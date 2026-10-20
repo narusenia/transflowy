@@ -711,6 +711,26 @@ export interface Messages {
    * `{count}行`
    */
   speakerLines(count: number): string;
+  /**
+   * `自分`
+   */
+  speakerMe(): string;
+  /**
+   * `相手`
+   */
+  speakerOthers(): string;
+  /**
+   * `システム音声も録音`
+   */
+  captureSystem(): string;
+  /**
+   * `Zoom や Meet の相手の声など、Mac から出る音を別トラックで録音します`
+   */
+  captureSystemHint(): string;
+  /**
+   * `システム音声を録音できませんでした（マイクだけ録音します）: {detail}`
+   */
+  warnSystemAudio(detail: string): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -897,6 +917,11 @@ const catalog = createCatalog<Messages>({
     "speakersHint": [],
     "speakersSave": [],
     "speakerLines": ["count"],
+    "speakerMe": [],
+    "speakerOthers": [],
+    "captureSystem": [],
+    "captureSystemHint": [],
+    "warnSystemAudio": ["detail"],
   },
   messages: {
     "ja": {
@@ -1077,6 +1102,11 @@ const catalog = createCatalog<Messages>({
       "speakersHint": "名前は文字起こし・要約・書き出しに使われます。空欄は「話者N」に戻ります",
       "speakersSave": "保存",
       "speakerLines": "{count}行",
+      "speakerMe": "自分",
+      "speakerOthers": "相手",
+      "captureSystem": "システム音声も録音",
+      "captureSystemHint": "Zoom や Meet の相手の声など、Mac から出る音を別トラックで録音します",
+      "warnSystemAudio": "システム音声を録音できませんでした（マイクだけ録音します）: {detail}",
     },
   },
 });
