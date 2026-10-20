@@ -75,6 +75,8 @@ export interface Settings {
   libraryDir: string;
   transcribe: Provider;
   summarize: Provider;
+  /** Template is the summary template an automatic summary uses. */
+  template: string;
   /** LocalOnly forbids every request to a cloud provider. */
   localOnly: boolean;
   shortcut: string;
@@ -82,6 +84,12 @@ export interface Settings {
 }
 
 export type Status = string;
+
+export interface Template {
+  name: string;
+  description: string;
+  builtin: boolean;
+}
 
 export interface Transcript {
   segments: Segment[];
@@ -126,6 +134,10 @@ export const Library = {
   /** List returns every recording's meta, newest first. */
   list(): Promise<Meta[]> {
     return call("Library.List");
+  },
+  /** Summary returns the Markdown of a recording's summary made with a template. */
+  summary(id: string, template: string): Promise<string> {
+    return call("Library.Summary", id, template);
   },
 } as const;
 
@@ -182,6 +194,29 @@ export const Transcriber = {
    */
   setLanguage(id: string, lang: string): Promise<void> {
     return call("Transcriber.SetLanguage", id, lang);
+  },
+} as const;
+
+/** Summarizer is callable from the page. */
+export const Summarizer = {
+  /**
+   * DetectOllama lists the models of a local Ollama; empty when it is not running.
+   * Use baseUrl "http://localhost:11434/v1" with the openai-compat summarize provider.
+   */
+  detectOllama(): Promise<string[]> {
+    return call("Summarizer.DetectOllama");
+  },
+  /**
+   * Summarize writes a summary of a finished transcript with a template, keeping
+   * the summaries made with other templates. A summary of the same template is
+   * replaced. It is also the retry after a failed summary.
+   */
+  summarize(id: string, template: string): Promise<void> {
+    return call("Summarizer.Summarize", id, template);
+  },
+  /** Templates lists the built-in and the user's summary templates. */
+  templates(): Promise<Template[]> {
+    return call("Summarizer.Templates");
   },
 } as const;
 

@@ -12,6 +12,7 @@ import (
 	"transflowy/internal/models"
 	"transflowy/internal/pipeline"
 	"transflowy/internal/settings"
+	"transflowy/internal/summarize"
 	"transflowy/internal/transcribe"
 )
 
@@ -33,18 +34,29 @@ func main() {
 	modelDir := filepath.Join(cfgDir, "transflowy", "models")
 	server := &transcribe.Server{Model: models.Whisper.Path(modelDir)}
 	engines := &Engines{cfg: cfg, server: server, modelDir: modelDir}
+	store := func() (library.Store, error) { s, err := cfg.Get(); return library.Store{Root: s.LibraryDir}, err }
+	changed := func(id string) { _ = LibraryChanged.Broadcast(id) }
+	sumQueue := summarize.New(summarize.Config{
+		Store:     store,
+		Templates: func() []summarize.Template { s, _ := cfg.Get(); return summarize.Templates(s.LibraryDir) },
+		Default:   func() string { s, _ := cfg.Get(); return s.Template },
+		Chat:      engines.Chat,
+		Changed:   changed,
+	})
 	queue := pipeline.New(pipeline.Config{
-		Store:   func() (library.Store, error) { s, err := cfg.Get(); return library.Store{Root: s.LibraryDir}, err },
-		Engine:  engines.Build,
-		Phrases: phrases(cfg),
-		Changed: func(id string) { _ = LibraryChanged.Broadcast(id) },
+		Store:       store,
+		Engine:      engines.Build,
+		Phrases:     phrases(cfg),
+		Changed:     changed,
+		Transcribed: func(id string) { sumQueue.Enqueue(id, "") },
 	})
 	ctx, stopQueue := context.WithCancel(context.Background())
 	go queue.Run(ctx)
+	go sumQueue.Run(ctx)
 	// Settings and keys decide which engine is ready: recordings that waited are tried again.
 	var refreshTray func()
 	cfg.OnChange = func() {
-		resumeAll(cfg, queue)
+		resumeAll(cfg, queue, sumQueue)
 		if refreshTray != nil {
 			refreshTray()
 		}
@@ -57,7 +69,8 @@ func main() {
 	mygo.BindAs("Recorder", rec)
 	mygo.BindAs("Importer", imp)
 	mygo.BindAs("Transcriber", &Transcriber{cfg: cfg, queue: queue})
-	mygo.BindAs("Models", &Models{dir: modelDir, onReady: func() { resumeAll(cfg, queue) }})
+	mygo.BindAs("Summarizer", &Summarizer{cfg: cfg, engines: engines, queue: sumQueue})
+	mygo.BindAs("Models", &Models{dir: modelDir, onReady: func() { resumeAll(cfg, queue, sumQueue) }})
 
 	var win *mygo.Window
 	openWindow := func() {
@@ -102,7 +115,7 @@ func main() {
 			log.Println("settings:", err)
 		}
 		recoverRecordings(library.Store{Root: s.LibraryDir})
-		resumeAll(cfg, queue)
+		resumeAll(cfg, queue, sumQueue)
 
 		locked := func() bool { s, _ := cfg.Get(); return s.LocalOnly }
 		update, err := newTray(s.Shortcut, locked, rec.toggle, openWindow)

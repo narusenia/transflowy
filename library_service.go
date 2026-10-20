@@ -31,3 +31,12 @@ func (l *Library) Get(id string) (library.Recording, error) {
 	}
 	return st.Get(id)
 }
+
+// Summary returns the Markdown of a recording's summary made with a template.
+func (l *Library) Summary(id, template string) (string, error) {
+	st, err := l.store()
+	if err != nil {
+		return "", err
+	}
+	return st.Summary(id, template)
+}

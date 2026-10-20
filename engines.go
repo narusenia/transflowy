@@ -13,6 +13,7 @@ import (
 	"transflowy/internal/netguard"
 	"transflowy/internal/pipeline"
 	"transflowy/internal/settings"
+	"transflowy/internal/summarize"
 	"transflowy/internal/transcribe"
 	"transflowy/locales"
 )
@@ -95,6 +96,43 @@ func (e *Engines) Build(kind string) (pipeline.Job, error) {
 	return pipeline.Job{}, os.ErrInvalid
 }
 
+// Chat is the summary queue's model factory: the summarize provider of the
+// settings, through the same local-only client.
+func (e *Engines) Chat() (summarize.Chat, error) {
+	s, err := e.cfg.Get()
+	if err != nil {
+		return summarize.Chat{}, err
+	}
+	p := s.Summarize
+	notReady := func(msg string) (summarize.Chat, error) {
+		return summarize.Chat{}, pipeline.NotReadyError{Msg: msg}
+	}
+	if p.Model == "" {
+		return notReady(locales.ErrNoSummaryModel())
+	}
+	switch p.Kind {
+	case settings.KindOpenRouter:
+		if s.LocalOnly {
+			return notReady(locales.ErrLocalOnly())
+		}
+		key := e.key(p.Kind)
+		if k, _ := key(); k == "" {
+			return notReady(locales.ErrNoKey())
+		}
+		return summarize.Chat{Client: e.client(), BaseURL: "https://openrouter.ai/api/v1", Key: key, Model: p.Model}, nil
+	case settings.KindOpenAICompat: // Ollama, LM Studio, ...; a key is optional
+		u, err := url.Parse(strings.TrimRight(p.BaseURL, "/"))
+		if err != nil || u.Host == "" {
+			return notReady(locales.ErrNoBaseURL())
+		}
+		if !netguard.Allowed(s.LocalOnly, u.Hostname()) {
+			return notReady(locales.ErrLocalOnly())
+		}
+		return summarize.Chat{Client: e.client(), BaseURL: u.String(), Key: e.key(p.Kind), Model: p.Model}, nil
+	}
+	return summarize.Chat{}, os.ErrInvalid
+}
+
 // phrases reads dictionary.txt in the library: one name or term per line.
 func phrases(cfg *settings.Service) func() []string {
 	return func() []string {
@@ -120,7 +158,7 @@ func phrases(cfg *settings.Service) func() []string {
 
 // resumeAll queues every recording that is waiting for processing: after a
 // start, a finished model download or a settings change.
-func resumeAll(cfg *settings.Service, q *pipeline.Queue) {
+func resumeAll(cfg *settings.Service, q *pipeline.Queue, sum *summarize.Queue) {
 	s, err := cfg.Get()
 	if err != nil {
 		return
@@ -129,6 +167,9 @@ func resumeAll(cfg *settings.Service, q *pipeline.Queue) {
 	for _, m := range metas {
 		if m.Status == library.StatusQueued || m.Status == library.StatusProcessing {
 			q.Enqueue(m.ID, "", false)
+		}
+		if m.Status == library.StatusSummarizing {
+			sum.Enqueue(m.ID, "")
 		}
 	}
 }

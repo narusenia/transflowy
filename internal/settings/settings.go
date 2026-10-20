@@ -29,6 +29,8 @@ type Settings struct {
 	LibraryDir string   `json:"libraryDir"`
 	Transcribe Provider `json:"transcribe"`
 	Summarize  Provider `json:"summarize"`
+	// Template is the summary template an automatic summary uses.
+	Template string `json:"template"`
 	// LocalOnly forbids every request to a cloud provider.
 	LocalOnly bool   `json:"localOnly"`
 	Shortcut  string `json:"shortcut"`
@@ -40,7 +42,8 @@ func Defaults(home string) Settings {
 	return Settings{
 		LibraryDir: filepath.Join(home, "Documents", "Transflowy"),
 		Transcribe: Provider{Kind: KindLocal},
-		Summarize:  Provider{Kind: KindOpenRouter},
+		Summarize:  Provider{Kind: KindOpenRouter}, // Model stays empty: the user must pick one
+		Template:   "汎用メモ",
 		Shortcut:   "Alt+Cmd+R",
 	}
 }
