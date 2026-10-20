@@ -1,0 +1,322 @@
+// Package pipeline turns recordings into transcripts, one chunk at a time. It
+// works on a recording that is still being captured as well as on a finished
+// one, saves after every chunk so a restart continues, and waits out a lost
+// connection.
+package pipeline
+
+import (
+	"context"
+	"errors"
+	"log"
+	"os"
+	"path/filepath"
+	"sync"
+	"time"
+
+	"transflowy/internal/audio"
+	"transflowy/internal/library"
+	"transflowy/internal/netguard"
+	"transflowy/internal/transcribe"
+	"transflowy/locales"
+)
+
+const (
+	wavName = "recording.wav"
+	m4aName = "audio.m4a"
+	// Samples read per pass: a long recording is planned in windows, not held whole.
+	readLimit = 20 * 60 * transcribe.SampleRate
+	livePoll  = time.Second
+	maxTries  = 5
+)
+
+// Job is what the engine factory returns for one recording.
+type Job struct {
+	Engine  transcribe.Engine
+	Params  transcribe.Params
+	Diarize bool
+}
+
+// Config connects the queue to the app. Sleep is for tests.
+type Config struct {
+	Store   func() (library.Store, error)
+	Engine  func(kind string) (Job, error) // kind "" means the setting
+	Phrases func() []string
+	Changed func(id string)
+	Sleep   func(ctx context.Context, d time.Duration) bool
+}
+
+type request struct {
+	id      string
+	kind    string
+	restart bool // throw away the transcript and start over
+}
+
+// Queue runs one recording at a time.
+type Queue struct {
+	cfg     Config
+	mu      sync.Mutex
+	pending []request
+	cancel  map[string]context.CancelFunc // the running job's
+	running string
+	wake    chan struct{}
+}
+
+func New(cfg Config) *Queue {
+	if cfg.Sleep == nil {
+		cfg.Sleep = func(ctx context.Context, d time.Duration) bool {
+			t := time.NewTimer(d)
+			defer t.Stop()
+			select {
+			case <-t.C:
+				return true
+			case <-ctx.Done():
+				return false
+			}
+		}
+	}
+	return &Queue{cfg: cfg, cancel: map[string]context.CancelFunc{}, wake: make(chan struct{}, 1)}
+}
+
+// Enqueue adds a recording. One already waiting is replaced; one already
+// running is stopped and queued again, which is how "reprocess with another
+// engine" takes over. restart discards what was transcribed so far.
+func (q *Queue) Enqueue(id, kind string, restart bool) {
+	q.mu.Lock()
+	for i, r := range q.pending {
+		if r.id == id {
+			q.pending = append(q.pending[:i], q.pending[i+1:]...)
+			break
+		}
+	}
+	q.pending = append(q.pending, request{id, kind, restart})
+	if c := q.cancel[id]; c != nil {
+		c()
+	}
+	q.mu.Unlock()
+	select {
+	case q.wake <- struct{}{}:
+	default:
+	}
+}
+
+// Run processes the queue until ctx ends.
+func (q *Queue) Run(ctx context.Context) {
+	for {
+		q.mu.Lock()
+		var req request
+		have := len(q.pending) > 0
+		if have {
+			req = q.pending[0]
+			q.pending = q.pending[1:]
+		}
+		q.mu.Unlock()
+		if !have {
+			select {
+			case <-q.wake:
+				continue
+			case <-ctx.Done():
+				return
+			}
+		}
+		jctx, cancel := context.WithCancel(ctx)
+		q.mu.Lock()
+		q.cancel[req.id] = cancel
+		q.mu.Unlock()
+		q.process(jctx, req)
+		cancel()
+		q.mu.Lock()
+		delete(q.cancel, req.id)
+		q.mu.Unlock()
+		if ctx.Err() != nil {
+			return
+		}
+	}
+}
+
+func (q *Queue) changed(id string) {
+	if q.cfg.Changed != nil {
+		q.cfg.Changed(id)
+	}
+}
+
+func (q *Queue) process(ctx context.Context, req request) {
+	st, err := q.cfg.Store()
+	if err != nil {
+		log.Println("pipeline:", err)
+		return
+	}
+	id := req.id
+	dir, err := st.Path(id)
+	if err != nil {
+		return
+	}
+	if req.restart {
+		_ = st.UpdateTranscript(id, func(t *library.Transcript) { t.Segments = []library.Segment{} })
+		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil, m.Detected, m.Error = 0, "", "" })
+	}
+	rec, err := st.Get(id)
+	if err != nil {
+		return
+	}
+	job, err := q.cfg.Engine(req.kind)
+	if err != nil {
+		q.fail(st, id, rec.Meta.Status == library.StatusRecording, err)
+		return
+	}
+
+	wav := filepath.Join(dir, wavName)
+	if _, err := os.Stat(wav); err != nil { // processed before: rebuild it from the m4a
+		if rec.Meta.Status == library.StatusRecording {
+			return
+		}
+		if err := audio.ToWAV16k(filepath.Join(dir, m4aName), wav); err != nil {
+			q.fail(st, id, false, err)
+			return
+		}
+	}
+
+	done := int(rec.Meta.ProcessedUntil * transcribe.SampleRate)
+	for ctx.Err() == nil {
+		// Read the status before the audio: a recording that is no longer
+		// "recording" has all its audio on disk.
+		cur, err := st.Get(id)
+		if err != nil {
+			return
+		}
+		live := cur.Meta.Status == library.StatusRecording
+		if !live && cur.Meta.Status != library.StatusProcessing {
+			_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status = library.StatusProcessing })
+			q.changed(id)
+		}
+		region, err := audio.ReadPCM(wav, done, readLimit)
+		if err != nil {
+			q.fail(st, id, live, err)
+			return
+		}
+		final := !live && len(region) < readLimit
+		spans, _ := transcribe.Plan(region, 0, final, job.Params)
+		for _, sp := range spans {
+			if ctx.Err() != nil {
+				return
+			}
+			if sp.Speech {
+				if err := q.transcribeSpan(ctx, st, id, job, cur.Meta.Language, region[sp.Start:sp.End], done+sp.Start); err != nil {
+					if ctx.Err() == nil {
+						q.fail(st, id, live, err)
+					}
+					return
+				}
+			}
+			end := float64(done+sp.End) / transcribe.SampleRate
+			_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil = end })
+			q.changed(id)
+		}
+		if n := len(spans); n > 0 {
+			done += spans[n-1].End
+		}
+		switch {
+		case live:
+			if !q.cfg.Sleep(ctx, livePoll) {
+				return
+			}
+		case len(spans) == 0 && final:
+			q.finish(st, id, dir)
+			return
+		}
+	}
+}
+
+// transcribeSpan sends one chunk and appends its lines to the transcript.
+func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string, job Job, lang string, pcm []int16, startSample int) error {
+	req := transcribe.Request{WAV: audio.WAVBytes(pcm, transcribe.SampleRate), Language: lang, Phrases: q.cfg.Phrases(), Diarize: job.Diarize}
+	res, err := q.send(ctx, st, id, job.Engine, req)
+	if err != nil {
+		return err
+	}
+	offset := float64(startSample) / transcribe.SampleRate
+	for i := range res.Segments {
+		res.Segments[i].Start += offset
+		res.Segments[i].End += offset
+	}
+	if err := st.UpdateTranscript(id, func(t *library.Transcript) { t.Segments = append(t.Segments, res.Segments...) }); err != nil {
+		return err
+	}
+	_, err = st.UpdateMeta(id, func(m *library.Meta) {
+		m.Engine, m.Error = job.Engine.Name(), ""
+		if res.Language != "" {
+			m.Detected = res.Language
+		}
+	})
+	return err
+}
+
+// send retries a chunk. A lost connection is waited out for as long as it
+// lasts; other temporary failures get a few tries; a bad key or a refused
+// file fails at once.
+func (q *Queue) send(ctx context.Context, st library.Store, id string, e transcribe.Engine, req transcribe.Request) (transcribe.Result, error) {
+	backoff, tries := 2*time.Second, 0
+	note := func(text string) {
+		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Error = text })
+		q.changed(id)
+	}
+	for {
+		res, err := e.Transcribe(ctx, req)
+		if err == nil {
+			return res, nil
+		}
+		if ctx.Err() != nil || !transcribe.Retryable(err) {
+			return transcribe.Result{}, err
+		}
+		if transcribe.Offline(err) {
+			note(locales.StatusOffline())
+		} else if tries++; tries >= maxTries {
+			return transcribe.Result{}, err
+		} else {
+			note(locales.StatusRetrying())
+		}
+		if !q.cfg.Sleep(ctx, backoff) {
+			return transcribe.Result{}, ctx.Err()
+		}
+		backoff = min(backoff*2, 30*time.Second)
+	}
+}
+
+// fail records why a recording could not be processed. For a recording that
+// is still being captured it only gives up on live processing: the recorder
+// queues it again when it stops, and then a failure is shown.
+func (q *Queue) fail(st library.Store, id string, live bool, err error) {
+	log.Println("pipeline:", id, err)
+	if live {
+		return
+	}
+	_, _ = st.UpdateMeta(id, func(m *library.Meta) {
+		m.Status, m.Error = library.StatusFailed, describe(err)
+	})
+	q.changed(id)
+}
+
+func describe(err error) string {
+	var he *transcribe.HTTPError
+	switch {
+	case errors.Is(err, netguard.ErrLocalOnly):
+		return err.Error()
+	case errors.As(err, &he) && (he.Status == 401 || he.Status == 403):
+		return locales.ErrBadKey()
+	}
+	return locales.ErrProcessing(err.Error())
+}
+
+func (q *Queue) finish(st library.Store, id, dir string) {
+	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusDone, "" })
+	CleanupWAV(dir)
+	q.changed(id)
+}
+
+// CleanupWAV removes recording.wav once the m4a exists and the transcript is
+// done: the m4a is what is kept (the wav is rebuilt from it to reprocess).
+func CleanupWAV(dir string) {
+	if _, err := os.Stat(filepath.Join(dir, m4aName)); err != nil {
+		return
+	}
+	_ = os.Remove(filepath.Join(dir, wavName))
+}

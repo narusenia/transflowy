@@ -3,6 +3,8 @@ package audio
 
 import (
 	"encoding/binary"
+	"errors"
+	"io"
 	"os"
 )
 
@@ -56,3 +58,45 @@ func (w *WAV) Write(pcm []byte) error {
 
 // Close closes the file.
 func (w *WAV) Close() error { return w.f.Close() }
+
+// WAVBytes returns a complete 16-bit mono WAV file for pcm.
+func WAVBytes(pcm []int16, sampleRate int) []byte {
+	n := len(pcm) * 2
+	b := make([]byte, 44+n)
+	copy(b[0:], "RIFF")
+	binary.LittleEndian.PutUint32(b[4:], uint32(36+n))
+	copy(b[8:], "WAVEfmt ")
+	binary.LittleEndian.PutUint32(b[16:], 16)
+	binary.LittleEndian.PutUint16(b[20:], 1)
+	binary.LittleEndian.PutUint16(b[22:], 1)
+	binary.LittleEndian.PutUint32(b[24:], uint32(sampleRate))
+	binary.LittleEndian.PutUint32(b[28:], uint32(sampleRate)*2)
+	binary.LittleEndian.PutUint16(b[32:], 2)
+	binary.LittleEndian.PutUint16(b[34:], 16)
+	copy(b[36:], "data")
+	binary.LittleEndian.PutUint32(b[40:], uint32(n))
+	for i, v := range pcm {
+		binary.LittleEndian.PutUint16(b[44+i*2:], uint16(v))
+	}
+	return b
+}
+
+// ReadPCM reads up to limit samples of a 16-bit mono WAV, starting at sample
+// from. It returns fewer than limit samples at the end of the file.
+func ReadPCM(path string, from, limit int) ([]int16, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	buf := make([]byte, limit*2)
+	n, err := f.ReadAt(buf, 44+int64(from)*2)
+	if err != nil && !errors.Is(err, io.EOF) {
+		return nil, err
+	}
+	out := make([]int16, n/2)
+	for i := range out {
+		out[i] = int16(binary.LittleEndian.Uint16(buf[i*2:]))
+	}
+	return out, nil
+}
