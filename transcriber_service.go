@@ -53,8 +53,12 @@ func (t *Transcriber) SetLanguage(id, lang string) error {
 }
 
 // Diarize tells the voices apart again in a transcribed recording with the
-// local models; the text stays as it is.
-func (t *Transcriber) Diarize(id string) error {
+// local models; the text stays as it is. speakers is how many people talk, or
+// 0 to find out (a wrong count is worse than none: use it when it is known).
+func (t *Transcriber) Diarize(id string, speakers int) error {
+	if speakers < 0 || speakers > 20 {
+		return errors.New("speakers must be between 0 and 20")
+	}
 	s, err := t.cfg.Get()
 	if err != nil {
 		return err
@@ -66,6 +70,6 @@ func (t *Transcriber) Diarize(id string) error {
 	if rec.Meta.Status != library.StatusDone {
 		return errors.New("the transcript is not finished")
 	}
-	t.queue.Diarize(id)
+	t.queue.Diarize(id, speakers)
 	return nil
 }

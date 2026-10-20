@@ -21,17 +21,19 @@ var Whisper = Model{
 
 // The local speaker diarization models (sherpa-onnx): pyannote segmentation 3.0
 // finds who speaks when, and a speaker embedding model tells the voices apart.
-// Together they are about 45 MB.
+// Together they are about 33 MB.
 var (
 	SpeakerSegmentation = Model{
 		File: "pyannote-segmentation-3-0.onnx",
 		URL:  "https://huggingface.co/csukuangfj/sherpa-onnx-pyannote-segmentation-3-0/resolve/main/model.onnx",
 	}
+	// WeSpeaker ResNet34 (VoxCeleb, large-margin). 3D-Speaker's ERes2Net, tried
+	// first, split a 17 minute Japanese recording into 200 speakers.
 	SpeakerEmbedding = Model{
-		File: "3dspeaker_eres2net_base_sv_zh-cn_16k.onnx",
-		URL:  "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
+		File: "wespeaker_en_voxceleb_resnet34_LM.onnx",
+		URL:  "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/wespeaker_en_voxceleb_resnet34_LM.onnx",
 		// GitHub releases do not send a checksum header.
-		SHA256: "1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b",
+		SHA256: "e9848563da86f263117134dfd7ad63c92355b37de492b55e325400c9d9c39012",
 	}
 )
 

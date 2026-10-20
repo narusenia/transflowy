@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { useMessages } from "@/i18n";
 import { defaultSpeaker } from "@/lib/speaker";
-import { Exporter, Library, type Transcript } from "@/mygo";
+import { Exporter, Library, Transcriber, type Transcript } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
 const select = "h-8 rounded-md border bg-transparent px-2 text-sm";
@@ -153,6 +153,30 @@ export function SpeakersDialog({ id, transcript, open, onOpenChange, onChanged }
           ))}
         </div>
         <Button onClick={save}>{t.speakersSave()}</Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Tell the voices apart again, optionally with the number of speakers. */
+export function DiarizeDialog({ id, open, onOpenChange, onChanged }: { id: string; open: boolean; onOpenChange(o: boolean): void; onChanged(): void }) {
+  const t = useMessages();
+  const [count, setCount] = useState(0);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{t.diarizeTitle()}</DialogTitle>
+        </DialogHeader>
+        <p className="text-xs text-muted-foreground">{t.diarizeHint()}</p>
+        <label className="flex items-center justify-between gap-3 text-sm">
+          {t.diarizeCount()}
+          <select className={select} value={count} onChange={(e) => setCount(Number(e.target.value))}>
+            <option value={0}>{t.diarizeAuto()}</option>
+            {[2, 3, 4, 5, 6, 7, 8].map((n) => <option key={n} value={n}>{t.diarizeCountN(n)}</option>)}
+          </select>
+        </label>
+        <Button onClick={() => Transcriber.diarize(id, count).then(() => { onOpenChange(false); onChanged(); }).catch(fail)}>{t.diarizeRun()}</Button>
       </DialogContent>
     </Dialog>
   );

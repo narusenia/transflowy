@@ -1912,11 +1912,11 @@ func (msgs Messages) LocalDiarizationHint() string {
 	return Catalog.Format(msgs.locale, "localDiarizationHint", nil)
 }
 
-// SpeakerModelDownload says "モデルをダウンロード（約 45MB）"
+// SpeakerModelDownload says "モデルをダウンロード（約 33MB）"
 // in the language the app shows.
 func SpeakerModelDownload() string { return In(i18n.Locale()).SpeakerModelDownload() }
 
-// SpeakerModelDownload says "モデルをダウンロード（約 45MB）"
+// SpeakerModelDownload says "モデルをダウンロード（約 33MB）"
 // in the language of msgs.
 func (msgs Messages) SpeakerModelDownload() string {
 	return Catalog.Format(msgs.locale, "speakerModelDownload", nil)
@@ -2050,4 +2050,64 @@ func LiveCloudHint() string { return In(i18n.Locale()).LiveCloudHint() }
 // in the language of msgs.
 func (msgs Messages) LiveCloudHint() string {
 	return Catalog.Format(msgs.locale, "liveCloudHint", nil)
+}
+
+// DiarizeTitle says "話者分離をやり直す"
+// in the language the app shows.
+func DiarizeTitle() string { return In(i18n.Locale()).DiarizeTitle() }
+
+// DiarizeTitle says "話者分離をやり直す"
+// in the language of msgs.
+func (msgs Messages) DiarizeTitle() string {
+	return Catalog.Format(msgs.locale, "diarizeTitle", nil)
+}
+
+// DiarizeHint says "…"
+// in the language the app shows.
+func DiarizeHint() string { return In(i18n.Locale()).DiarizeHint() }
+
+// DiarizeHint says "…"
+// in the language of msgs.
+func (msgs Messages) DiarizeHint() string {
+	return Catalog.Format(msgs.locale, "diarizeHint", nil)
+}
+
+// DiarizeCount says "話者の数"
+// in the language the app shows.
+func DiarizeCount() string { return In(i18n.Locale()).DiarizeCount() }
+
+// DiarizeCount says "話者の数"
+// in the language of msgs.
+func (msgs Messages) DiarizeCount() string {
+	return Catalog.Format(msgs.locale, "diarizeCount", nil)
+}
+
+// DiarizeAuto says "自動"
+// in the language the app shows.
+func DiarizeAuto() string { return In(i18n.Locale()).DiarizeAuto() }
+
+// DiarizeAuto says "自動"
+// in the language of msgs.
+func (msgs Messages) DiarizeAuto() string {
+	return Catalog.Format(msgs.locale, "diarizeAuto", nil)
+}
+
+// DiarizeCountN says "{n}人"
+// in the language the app shows.
+func DiarizeCountN(n int) string { return In(i18n.Locale()).DiarizeCountN(n) }
+
+// DiarizeCountN says "{n}人"
+// in the language of msgs.
+func (msgs Messages) DiarizeCountN(n int) string {
+	return Catalog.Format(msgs.locale, "diarizeCountN", map[string]any{"n": n})
+}
+
+// DiarizeRun says "実行"
+// in the language the app shows.
+func DiarizeRun() string { return In(i18n.Locale()).DiarizeRun() }
+
+// DiarizeRun says "実行"
+// in the language of msgs.
+func (msgs Messages) DiarizeRun() string {
+	return Catalog.Format(msgs.locale, "diarizeRun", nil)
 }

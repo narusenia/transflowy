@@ -15,7 +15,7 @@ type Config struct {
 }
 
 // DefaultThreshold is sherpa-onnx's suggestion for these models.
-const DefaultThreshold = 0.5
+const DefaultThreshold = 0.7
 
 // Run is not available on this OS yet.
 func Run(Config, []int16) ([]Turn, error) {

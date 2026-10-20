@@ -137,7 +137,7 @@ func (e *Engines) Chat() (summarize.Chat, error) {
 // Diarizer is the pipeline's factory for local speaker diarization. auto is
 // the run after a transcription: the setting decides, and a missing model
 // just skips it (the pipeline does not ask when the engine diarized itself). A run the user asked for explains what is missing.
-func (e *Engines) Diarizer(auto bool) (func([]int16) ([]diarize.Turn, error), error) {
+func (e *Engines) Diarizer(auto bool) (func([]int16, int) ([]diarize.Turn, error), error) {
 	s, err := e.cfg.Get()
 	if err != nil {
 		return nil, err
@@ -152,7 +152,11 @@ func (e *Engines) Diarizer(auto bool) (func([]int16) ([]diarize.Turn, error), er
 		return nil, pipeline.NotReadyError{Msg: locales.ErrNoSpeakerModel()}
 	}
 	cfg := diarize.Config{Segmentation: models.SpeakerSegmentation.Path(e.modelDir), Embedding: models.SpeakerEmbedding.Path(e.modelDir)}
-	return func(pcm []int16) ([]diarize.Turn, error) { return diarize.Run(cfg, pcm) }, nil
+	return func(pcm []int16, speakers int) ([]diarize.Turn, error) {
+		c := cfg
+		c.NumSpeakers = speakers
+		return diarize.Run(c, pcm)
+	}, nil
 }
 
 // phrases reads dictionary.txt in the library: one name or term per line.

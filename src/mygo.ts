@@ -286,10 +286,11 @@ export const Importer = {
 export const Transcriber = {
   /**
    * Diarize tells the voices apart again in a transcribed recording with the
-   * local models; the text stays as it is.
+   * local models; the text stays as it is. speakers is how many people talk, or
+   * 0 to find out (a wrong count is worse than none: use it when it is known).
    */
-  diarize(id: string): Promise<void> {
-    return call("Transcriber.Diarize", id);
+  diarize(id: string, speakers: number): Promise<void> {
+    return call("Transcriber.Diarize", id, speakers);
   },
   /**
    * Reprocess transcribes a recording again from the start. kind names the

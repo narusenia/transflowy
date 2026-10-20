@@ -254,8 +254,8 @@ func TestTwoTracksAreMergedInTimeOrder(t *testing.T) {
 
 func TestLocalDiarizationLabelsTheLines(t *testing.T) {
 	e := setup(t, library.StatusQueued, 5)
-	e.q.cfg.Diarizer = func(auto bool) (func([]int16) ([]diarize.Turn, error), error) {
-		return func(pcm []int16) ([]diarize.Turn, error) {
+	e.q.cfg.Diarizer = func(auto bool) (func([]int16, int) ([]diarize.Turn, error), error) {
+		return func(pcm []int16, _ int) ([]diarize.Turn, error) {
 			return []diarize.Turn{{Start: 0, End: 100, Speaker: 1}}, nil
 		}, nil
 	}
@@ -273,7 +273,7 @@ func TestLocalDiarizationLabelsTheLines(t *testing.T) {
 func TestManualDiarizationExplainsWhyItCannotRun(t *testing.T) {
 	e := setup(t, library.StatusQueued, 5)
 	r := e.run(t) // transcribed, no diarization
-	e.q.cfg.Diarizer = func(auto bool) (func([]int16) ([]diarize.Turn, error), error) {
+	e.q.cfg.Diarizer = func(auto bool) (func([]int16, int) ([]diarize.Turn, error), error) {
 		if auto {
 			t.Error("a manual request must not be auto")
 		}
@@ -282,7 +282,7 @@ func TestManualDiarizationExplainsWhyItCannotRun(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go e.q.Run(ctx)
-	e.q.Diarize(e.id)
+	e.q.Diarize(e.id, 0)
 	for i := 0; i < 200; i++ {
 		if got, _ := e.st.Get(e.id); got.Meta.Error == "no models" {
 			if got.Meta.Status != library.StatusDone || len(got.Transcript.Segments) != len(r.Transcript.Segments) {

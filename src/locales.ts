@@ -756,7 +756,7 @@ export interface Messages {
    */
   localDiarizationHint(): string;
   /**
-   * `モデルをダウンロード（約 45MB）`
+   * `モデルをダウンロード（約 33MB）`
    */
   speakerModelDownload(): string;
   /**
@@ -811,6 +811,30 @@ export interface Messages {
    * `クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください`
    */
   liveCloudHint(): string;
+  /**
+   * `話者分離をやり直す`
+   */
+  diarizeTitle(): string;
+  /**
+   * `録音の音声から、声の違いで話者を分け直します。これまでの話者名は消えます。人数が分かっているときは指定すると正確になります`
+   */
+  diarizeHint(): string;
+  /**
+   * `話者の数`
+   */
+  diarizeCount(): string;
+  /**
+   * `自動`
+   */
+  diarizeAuto(): string;
+  /**
+   * `{n}人`
+   */
+  diarizeCountN(n: number): string;
+  /**
+   * `実行`
+   */
+  diarizeRun(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -1022,6 +1046,12 @@ const catalog = createCatalog<Messages>({
     "liveWaiting": [],
     "liveRecognizing": [],
     "liveCloudHint": [],
+    "diarizeTitle": [],
+    "diarizeHint": [],
+    "diarizeCount": [],
+    "diarizeAuto": [],
+    "diarizeCountN": ["n"],
+    "diarizeRun": [],
   },
   messages: {
     "ja": {
@@ -1213,7 +1243,7 @@ const catalog = createCatalog<Messages>({
       "settingsDiarization": "話者分離",
       "localDiarization": "ローカルで話者分離",
       "localDiarizationHint": "ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 分かかります。クラウドの文字起こしは、自分で話者を分けます",
-      "speakerModelDownload": "モデルをダウンロード（約 45MB）",
+      "speakerModelDownload": "モデルをダウンロード（約 33MB）",
       "speakerModelReady": "モデルは準備できています",
       "speakerModelProgress": "ダウンロード中 {pct}%",
       "diarizeAgain": "話者分離をやり直す",
@@ -1227,6 +1257,12 @@ const catalog = createCatalog<Messages>({
       "liveWaiting": "話すと、ここに字幕が出ます",
       "liveRecognizing": "認識中…",
       "liveCloudHint": "クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください",
+      "diarizeTitle": "話者分離をやり直す",
+      "diarizeHint": "録音の音声から、声の違いで話者を分け直します。これまでの話者名は消えます。人数が分かっているときは指定すると正確になります",
+      "diarizeCount": "話者の数",
+      "diarizeAuto": "自動",
+      "diarizeCountN": "{n}人",
+      "diarizeRun": "実行",
     },
   },
 });

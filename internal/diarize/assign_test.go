@@ -19,3 +19,24 @@ func TestAssign(t *testing.T) {
 		t.Fatalf("n=%d %+v", n, segs)
 	}
 }
+
+func TestTidyMergesFragmentsAndRanksBySpeech(t *testing.T) {
+	turns := []Turn{
+		{0, 100, 7},   // speaks most
+		{100, 160, 3}, // second
+		{160, 163, 9}, // fragment next to speaker 3
+		{163, 170, 4}, // fragment next to speaker 3
+		{170, 230, 7},
+	}
+	got := Tidy(turns)
+	want := []int{0, 1, 1, 0, 0}
+	for i, g := range got {
+		if g.Speaker != want[i] {
+			t.Fatalf("turn %d: speaker %d, want %d (%+v)", i, g.Speaker, want[i], got)
+		}
+	}
+	short := []Turn{{0, 5, 3}, {5, 9, 8}}
+	if got := Tidy(short); got[0].Speaker != 3 || got[1].Speaker != 8 {
+		t.Fatalf("a short recording is left alone: %+v", got)
+	}
+}

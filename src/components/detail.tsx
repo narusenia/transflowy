@@ -8,7 +8,7 @@ import { Player, type PlayerHandle } from "@/components/player";
 import { Transcript } from "@/components/transcript";
 import { LiveCaptions } from "@/components/live-captions";
 import { Markdown } from "@/components/summary";
-import { ExportDialog, ReplaceDialog, SpeakersDialog, speakersOf } from "@/components/tools";
+import { DiarizeDialog, ExportDialog, ReplaceDialog, SpeakersDialog, speakersOf } from "@/components/tools";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { clock } from "@/lib/media";
@@ -64,6 +64,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
   const [text, setText] = useState("");
   const [replacing, setReplacing] = useState(false);
   const [naming, setNaming] = useState(false);
+  const [diarizing, setDiarizing] = useState(false);
   const [draft, setDraft] = useState<{ name: string; text: string } | null>(null); // a summary being written by hand
   const [exporting, setExporting] = useState(false);
 
@@ -216,7 +217,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
                   <Users />
                 </IconButton>
               )}
-              <IconButton variant="outline" label={t.diarizeAgain()} disabled={meta.status !== "done"} onClick={() => Transcriber.diarize(meta.id).then(onChanged).catch(fail)}>
+              <IconButton variant="outline" label={t.diarizeAgain()} disabled={meta.status !== "done"} onClick={() => setDiarizing(true)}>
                 <AudioLines />
               </IconButton>
               <IconButton variant="outline" label={t.replaceButton()} onClick={() => setReplacing(true)}>
@@ -264,6 +265,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
           </Tabs>
         )}
       </div>
+      <DiarizeDialog key={meta.id} id={meta.id} open={diarizing} onOpenChange={setDiarizing} onChanged={onChanged} />
       <SpeakersDialog id={meta.id} transcript={rec.transcript} open={naming} onOpenChange={setNaming} onChanged={onChanged} />
       <ReplaceDialog id={meta.id} open={replacing} onOpenChange={setReplacing} onChanged={onChanged} />
       <ExportDialog key={meta.id} id={meta.id} summaries={rec.summaries} template={name} open={exporting} onOpenChange={setExporting} />

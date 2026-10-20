@@ -20,8 +20,9 @@ type Config struct {
 	Threshold float32
 }
 
-// DefaultThreshold is sherpa-onnx's suggestion for these models.
-const DefaultThreshold = 0.5
+// DefaultThreshold: measured on a 17 minute Japanese recording with the
+// WeSpeaker model, 0.5 gave 13 speakers, 0.7 gave 5 (3 real) and 0.9 gave 2.
+const DefaultThreshold = 0.7
 
 // Run diarizes 16 kHz mono samples. It takes about a tenth of the audio's
 // length on an Apple silicon Mac, and holds the whole recording in memory.
@@ -56,5 +57,5 @@ func Run(cfg Config, pcm []int16) ([]Turn, error) {
 	for i, s := range segs {
 		turns[i] = Turn{Start: float64(s.Start), End: float64(s.End), Speaker: s.Speaker}
 	}
-	return turns, nil
+	return Tidy(turns), nil
 }

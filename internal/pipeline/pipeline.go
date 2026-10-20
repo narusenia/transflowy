@@ -12,6 +12,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"time"
 
@@ -64,7 +65,7 @@ type Config struct {
 	// or its models are missing. auto is true after a transcription (the
 	// setting decides) and false when the user asked for it. A NotReadyError
 	// says why it cannot run now.
-	Diarizer func(auto bool) (func([]int16) ([]diarize.Turn, error), error)
+	Diarizer func(auto bool) (func(pcm []int16, speakers int) ([]diarize.Turn, error), error)
 	Changed  func(id string)
 	// Transcribed is called once a recording's transcript is complete.
 	Transcribed func(id string)
@@ -72,10 +73,11 @@ type Config struct {
 }
 
 type request struct {
-	id      string
-	kind    string
-	restart bool // throw away the transcript and start over
-	diarize bool // only tell the voices apart again, in the transcript that is there
+	id       string
+	kind     string
+	restart  bool // throw away the transcript and start over
+	diarize  bool // only tell the voices apart again, in the transcript that is there
+	speakers int  // with diarize: how many speakers there are; 0 finds out
 }
 
 // Queue runs one recording at a time.
@@ -131,9 +133,9 @@ func (q *Queue) Enqueue(id, kind string, restart bool) {
 
 // Diarize tells the voices apart again in a transcribed recording, with the
 // local models, and leaves the text as it is.
-func (q *Queue) Diarize(id string) {
+func (q *Queue) Diarize(id string, speakers int) {
 	q.mu.Lock()
-	q.pending = append(q.pending, request{id: id, diarize: true})
+	q.pending = append(q.pending, request{id: id, diarize: true, speakers: speakers})
 	q.mu.Unlock()
 	select {
 	case q.wake <- struct{}{}:
@@ -216,7 +218,7 @@ func (q *Queue) process(ctx context.Context, req request) {
 
 	tracks := tracksOf(dir, job)
 	if req.diarize {
-		q.diarizeLocal(ctx, st, id, tracks, false)
+		q.diarizeLocal(ctx, st, id, tracks, false, req.speakers)
 		q.setDone(st, id, dir)
 		return
 	}
@@ -236,7 +238,7 @@ func (q *Queue) process(ctx context.Context, req request) {
 		}
 	}
 	if !job.Diarize { // an engine that told the voices apart itself is not asked again
-		q.diarizeLocal(ctx, st, id, tracks, true)
+		q.diarizeLocal(ctx, st, id, tracks, true, 0)
 	}
 	q.finish(st, id, dir)
 }
@@ -245,7 +247,7 @@ func (q *Queue) process(ctx context.Context, req request) {
 // (the cloud one does). It reads the system track when there are two: the
 // microphone is the user. Lines of other voices get the speaker numbers.
 // A failure leaves the transcript as it is.
-func (q *Queue) diarizeLocal(ctx context.Context, st library.Store, id string, tracks []track, auto bool) {
+func (q *Queue) diarizeLocal(ctx context.Context, st library.Store, id string, tracks []track, auto bool, speakers int) {
 	if q.cfg.Diarizer == nil || ctx.Err() != nil {
 		return
 	}
@@ -271,13 +273,28 @@ func (q *Queue) diarizeLocal(ctx context.Context, st library.Store, id string, t
 	}
 	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusDiarizing, "" })
 	q.changed(id)
-	turns, err := run(pcm)
+	turns, err := run(pcm, speakers)
 	if err != nil {
 		log.Println("pipeline:", id, err)
 		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Error = describe(err) })
 		return
 	}
+	// A run starts from nothing: numbers and names from an earlier one mean other voices now.
+	fallback := library.UnknownSpeaker
+	if len(tracks) > 1 {
+		fallback = library.SpeakerOthers
+	}
 	_ = st.UpdateTranscript(id, func(t *library.Transcript) {
+		for i := range t.Segments {
+			if t.Segments[i].Speaker != library.SpeakerMe {
+				t.Segments[i].Speaker = fallback
+			}
+		}
+		for k := range t.Speakers {
+			if n, err := strconv.Atoi(k); err == nil && n < library.SpeakerMe {
+				delete(t.Speakers, k)
+			}
+		}
 		diarize.Assign(t.Segments, turns, func(s int) bool { return s != library.SpeakerMe })
 	})
 }

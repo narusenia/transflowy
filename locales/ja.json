@@ -300,7 +300,7 @@
   "settingsDiarization": "話者分離",
   "localDiarization": "ローカルで話者分離",
   "localDiarizationHint": "ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 分かかります。クラウドの文字起こしは、自分で話者を分けます",
-  "speakerModelDownload": "モデルをダウンロード（約 45MB）",
+  "speakerModelDownload": "モデルをダウンロード（約 33MB）",
   "speakerModelReady": "モデルは準備できています",
   "speakerModelProgress": "ダウンロード中 {pct}%",
   "@speakerModelProgress": {
@@ -320,5 +320,18 @@
   "tabLive": "ライブ字幕",
   "liveWaiting": "話すと、ここに字幕が出ます",
   "liveRecognizing": "認識中…",
-  "liveCloudHint": "クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください"
+  "liveCloudHint": "クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください",
+  "diarizeTitle": "話者分離をやり直す",
+  "diarizeHint": "録音の音声から、声の違いで話者を分け直します。これまでの話者名は消えます。人数が分かっているときは指定すると正確になります",
+  "diarizeCount": "話者の数",
+  "diarizeAuto": "自動",
+  "diarizeCountN": "{n}人",
+  "diarizeRun": "実行",
+  "@diarizeCountN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }
