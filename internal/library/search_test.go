@@ -27,3 +27,17 @@ func TestSearch(t *testing.T) {
 		t.Fatalf("blank query: %+v", hits)
 	}
 }
+
+func TestSearchSeesEdits(t *testing.T) {
+	st := Store{Root: t.TempDir()}
+	a, _ := st.Create("x", time.Now())
+	st.SaveTranscript(a.ID, Transcript{Segments: []Segment{{Text: "旧い"}}})
+	if hits, _ := st.Search("新しい", 10); len(hits) != 0 {
+		t.Fatalf("before: %+v", hits)
+	}
+	time.Sleep(10 * time.Millisecond) // a later modification time
+	st.SaveTranscript(a.ID, Transcript{Segments: []Segment{{Text: "新しい"}}})
+	if hits, _ := st.Search("新しい", 10); len(hits) != 1 {
+		t.Fatalf("after edit: %+v", hits)
+	}
+}
