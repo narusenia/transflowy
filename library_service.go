@@ -60,3 +60,50 @@ func (l *Library) ChooseFolder() (string, error) {
 	}
 	return paths[0], nil
 }
+
+// SetTitle renames a recording.
+func (l *Library) SetTitle(id, title string) error {
+	st, err := l.store()
+	if err != nil {
+		return err
+	}
+	return st.SetTitle(id, title)
+}
+
+// EditSegment changes the text of one transcript line. start is the line's
+// start time as the page has it; the original engine text is kept.
+func (l *Library) EditSegment(id string, index int, start float64, text string) error {
+	st, err := l.store()
+	if err != nil {
+		return err
+	}
+	return st.EditSegment(id, index, start, text)
+}
+
+// ResetSegment puts the engine's original text back into one line.
+func (l *Library) ResetSegment(id string, index int, start float64) error {
+	st, err := l.store()
+	if err != nil {
+		return err
+	}
+	return st.ResetSegment(id, index, start)
+}
+
+// Replace changes every occurrence of find in a recording's transcript and
+// returns how many lines changed.
+func (l *Library) Replace(id, find, with string) (int, error) {
+	st, err := l.store()
+	if err != nil {
+		return 0, err
+	}
+	return st.Replace(id, find, with)
+}
+
+// AddToDictionary adds a word to dictionary.txt, which the engines get.
+func (l *Library) AddToDictionary(word string) error {
+	st, err := l.store()
+	if err != nil {
+		return err
+	}
+	return st.AddToDictionary(word)
+}

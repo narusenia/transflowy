@@ -1,0 +1,72 @@
+package library
+
+import (
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+)
+
+func newRec(t *testing.T) (Store, string) {
+	st := Store{Root: t.TempDir()}
+	m, _ := st.Create("x", time.Now())
+	st.SaveTranscript(m.ID, Transcript{Segments: []Segment{
+		{Start: 1, Text: "テスト環境", Original: "テスト環境"},
+		{Start: 5, Text: "テスト", Original: "テスト"},
+	}})
+	return st, m.ID
+}
+
+func TestEditAndReset(t *testing.T) {
+	st, id := newRec(t)
+	if err := st.EditSegment(id, 1, 5, " 本番 "); err != nil {
+		t.Fatal(err)
+	}
+	r, _ := st.Get(id)
+	if s := r.Transcript.Segments[1]; s.Text != "本番" || s.Original != "テスト" {
+		t.Fatalf("%+v", s)
+	}
+	if err := st.EditSegment(id, 1, 99, "x"); err != ErrStaleSegment {
+		t.Fatalf("wrong start: %v", err)
+	}
+	if err := st.EditSegment(id, 7, 5, "x"); err != ErrStaleSegment {
+		t.Fatalf("bad index: %v", err)
+	}
+	st.ResetSegment(id, 1, 5)
+	if r, _ = st.Get(id); r.Transcript.Segments[1].Text != "テスト" {
+		t.Fatalf("reset: %+v", r.Transcript.Segments[1])
+	}
+}
+
+func TestReplaceAndDictionary(t *testing.T) {
+	st, id := newRec(t)
+	if n, err := st.Replace(id, "テスト", "検証"); n != 2 || err != nil {
+		t.Fatalf("%d %v", n, err)
+	}
+	if n, _ := st.Replace(id, "", "x"); n != 0 {
+		t.Fatal("empty find replaced")
+	}
+	st.AddToDictionary("検証")
+	st.AddToDictionary("検証")
+	st.AddToDictionary("Kubernetes")
+	b, _ := os.ReadFile(filepath.Join(st.Root, "dictionary.txt"))
+	if string(b) != "検証\nKubernetes\n" {
+		t.Fatalf("%q", b)
+	}
+}
+
+func TestStaleSummary(t *testing.T) {
+	st, id := newRec(t)
+	st.SaveSummary(id, "議事録", "古い")
+	d, _ := st.Path(id)
+	old := time.Now().Add(-time.Hour)
+	os.Chtimes(filepath.Join(d, "summary-議事録.md"), old, old)
+	r, _ := st.Get(id)
+	if len(r.Stale) != 1 || r.Stale[0] != "議事録" {
+		t.Fatalf("stale: %v", r.Stale)
+	}
+	st.SaveSummary(id, "議事録", "新しい")
+	if r, _ = st.Get(id); len(r.Stale) != 0 {
+		t.Fatalf("fresh summary is stale: %v", r.Stale)
+	}
+}

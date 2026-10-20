@@ -70,6 +70,9 @@ type Recording struct {
 	Meta       Meta       `json:"meta"`
 	Transcript Transcript `json:"transcript"`
 	Summaries  []string   `json:"summaries"` // template names, from summary-<name>.md
+	// Stale lists the summaries older than the transcript (it was edited or
+	// transcribed again): the page offers to make them again.
+	Stale []string `json:"stale"`
 }
 
 // Store reads and writes recordings under Root.
@@ -213,12 +216,20 @@ func (s Store) Get(id string) (Recording, error) {
 		r.Transcript.Segments = []Segment{}
 	}
 	files, _ := filepath.Glob(filepath.Join(d, "summary-*.md"))
-	r.Summaries = []string{}
+	r.Summaries, r.Stale = []string{}, []string{}
+	var transcriptAt time.Time
+	if fi, err := os.Stat(filepath.Join(d, "transcript.json")); err == nil {
+		transcriptAt = fi.ModTime()
+	}
 	for _, f := range files {
 		name := strings.TrimSuffix(strings.TrimPrefix(filepath.Base(f), "summary-"), ".md")
 		r.Summaries = append(r.Summaries, name)
+		if fi, err := os.Stat(f); err == nil && fi.ModTime().Before(transcriptAt) {
+			r.Stale = append(r.Stale, name)
+		}
 	}
 	sort.Strings(r.Summaries)
+	sort.Strings(r.Stale)
 	return r, nil
 }
 
