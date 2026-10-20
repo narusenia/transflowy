@@ -1,4 +1,6 @@
-# transflowy
+<p align="center"><img src="resources/icon.png" alt="transflowy" width="128"></p>
+
+<h1 align="center">transflowy</h1>
 
 [English](README.md)
 
