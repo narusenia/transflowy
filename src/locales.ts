@@ -515,6 +515,122 @@ export interface Messages {
    * `{path} に保存しました`
    */
   exportSaved(path: string): string;
+  /**
+   * `transflowy へようこそ`
+   */
+  obWelcome(): string;
+  /**
+   * `あとで設定する`
+   */
+  obSkip(): string;
+  /**
+   * `次へ`
+   */
+  obNext(): string;
+  /**
+   * `戻る`
+   */
+  obBack(): string;
+  /**
+   * `はじめる`
+   */
+  obStart(): string;
+  /**
+   * `マイクを許可`
+   */
+  obStep1Title(): string;
+  /**
+   * `会議や自分の声を録音するために、マイクを使います。下のボタンを押すと、macOS が許可を求めます。`
+   */
+  obStep1Body(): string;
+  /**
+   * `マイクを許可する`
+   */
+  obMicButton(): string;
+  /**
+   * `マイクを確認しました`
+   */
+  obMicOk(): string;
+  /**
+   * `音が検出できませんでした。静かな場所なら問題ありません。許可していない場合は、システム設定 › プライバシーとセキュリティ › マイク で transflowy をオンにしてください`
+   */
+  obMicSilent(): string;
+  /**
+   * `文字起こしの方法`
+   */
+  obStep2Title(): string;
+  /**
+   * `あとから設定画面で変えられます。録音は、準備ができていなくてもいつでも始められます。準備が整うと自動で処理します。`
+   */
+  obStep2Body(): string;
+  /**
+   * `クラウド（OpenRouter）`
+   */
+  obCloud(): string;
+  /**
+   * `高精度で、話者分離と日英混在に強い。録音を OpenRouter へ送ります。目安は 1 時間あたり約 $0.10`
+   */
+  obCloudBody(): string;
+  /**
+   * `ローカル（Whisper）`
+   */
+  obLocal(): string;
+  /**
+   * `録音を端末の外へ送りません。初回に約 0.6GB のモデルをダウンロードします`
+   */
+  obLocalBody(): string;
+  /**
+   * `OpenRouter の API キー`
+   */
+  obKeyLabel(): string;
+  /**
+   * `要約に使うモデル`
+   */
+  obSummaryModel(): string;
+  /**
+   * `OpenRouter のモデル名（例: anthropic/claude-haiku-4.5）。空のあいだ、要約は待機します`
+   */
+  obSummaryModelHint(): string;
+  /**
+   * `10 秒の試し録音`
+   */
+  obTrial(): string;
+  /**
+   * `押してから 10 秒間、何か話してください。結果をすぐに表示します`
+   */
+  obTrialHint(): string;
+  /**
+   * `録音中… 話してください`
+   */
+  obTrialRecording(): string;
+  /**
+   * `文字起こし中…`
+   */
+  obTrialWorking(): string;
+  /**
+   * `文字が得られませんでした`
+   */
+  obTrialEmpty(): string;
+  /**
+   * `ダウンロードを始める`
+   */
+  obModelStart(): string;
+  /**
+   * `裏でダウンロードします。このまま次へ進めます`
+   */
+  obModelBackground(): string;
+  /**
+   * `ショートカット`
+   */
+  obStep3Title(): string;
+  /**
+   * `どのアプリを使っていても、このキーで録音を開始・停止できます。メニューバーのアイコンからも操作できます。`
+   */
+  obStep3Body(): string;
+  /**
+   * `ダウンロード中 {pct}%`
+   */
+  obModelProgress(pct: number): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -652,6 +768,35 @@ const catalog = createCatalog<Messages>({
     "exportNote": [],
     "replaceDone": ["count"],
     "exportSaved": ["path"],
+    "obWelcome": [],
+    "obSkip": [],
+    "obNext": [],
+    "obBack": [],
+    "obStart": [],
+    "obStep1Title": [],
+    "obStep1Body": [],
+    "obMicButton": [],
+    "obMicOk": [],
+    "obMicSilent": [],
+    "obStep2Title": [],
+    "obStep2Body": [],
+    "obCloud": [],
+    "obCloudBody": [],
+    "obLocal": [],
+    "obLocalBody": [],
+    "obKeyLabel": [],
+    "obSummaryModel": [],
+    "obSummaryModelHint": [],
+    "obTrial": [],
+    "obTrialHint": [],
+    "obTrialRecording": [],
+    "obTrialWorking": [],
+    "obTrialEmpty": [],
+    "obModelStart": [],
+    "obModelBackground": [],
+    "obStep3Title": [],
+    "obStep3Body": [],
+    "obModelProgress": ["pct"],
   },
   messages: {
     "ja": {
@@ -783,6 +928,35 @@ const catalog = createCatalog<Messages>({
       "exportNote": ".txt と .srt は文字起こしだけを書き出します",
       "replaceDone": "{count}件を置換しました",
       "exportSaved": "{path} に保存しました",
+      "obWelcome": "transflowy へようこそ",
+      "obSkip": "あとで設定する",
+      "obNext": "次へ",
+      "obBack": "戻る",
+      "obStart": "はじめる",
+      "obStep1Title": "マイクを許可",
+      "obStep1Body": "会議や自分の声を録音するために、マイクを使います。下のボタンを押すと、macOS が許可を求めます。",
+      "obMicButton": "マイクを許可する",
+      "obMicOk": "マイクを確認しました",
+      "obMicSilent": "音が検出できませんでした。静かな場所なら問題ありません。許可していない場合は、システム設定 › プライバシーとセキュリティ › マイク で transflowy をオンにしてください",
+      "obStep2Title": "文字起こしの方法",
+      "obStep2Body": "あとから設定画面で変えられます。録音は、準備ができていなくてもいつでも始められます。準備が整うと自動で処理します。",
+      "obCloud": "クラウド（OpenRouter）",
+      "obCloudBody": "高精度で、話者分離と日英混在に強い。録音を OpenRouter へ送ります。目安は 1 時間あたり約 $0.10",
+      "obLocal": "ローカル（Whisper）",
+      "obLocalBody": "録音を端末の外へ送りません。初回に約 0.6GB のモデルをダウンロードします",
+      "obKeyLabel": "OpenRouter の API キー",
+      "obSummaryModel": "要約に使うモデル",
+      "obSummaryModelHint": "OpenRouter のモデル名（例: anthropic/claude-haiku-4.5）。空のあいだ、要約は待機します",
+      "obTrial": "10 秒の試し録音",
+      "obTrialHint": "押してから 10 秒間、何か話してください。結果をすぐに表示します",
+      "obTrialRecording": "録音中… 話してください",
+      "obTrialWorking": "文字起こし中…",
+      "obTrialEmpty": "文字が得られませんでした",
+      "obModelStart": "ダウンロードを始める",
+      "obModelBackground": "裏でダウンロードします。このまま次へ進めます",
+      "obStep3Title": "ショートカット",
+      "obStep3Body": "どのアプリを使っていても、このキーで録音を開始・停止できます。メニューバーのアイコンからも操作できます。",
+      "obModelProgress": "ダウンロード中 {pct}%",
     },
   },
 });

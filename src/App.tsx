@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Onboarding } from "@/components/onboarding";
 import { Detail, type Jump } from "@/components/detail";
 import { Search } from "@/components/search";
 import { SettingsDialog } from "@/components/settings";
 import { Sidebar } from "@/components/sidebar";
 import { useMessages } from "@/i18n";
 import type { Messages } from "@/locales";
-import { events, Importer, Library, Models, Recorder, Summarizer, type Hit, type Meta, type ModelStatus, type Recording, type RecordingState, type Template } from "@/mygo";
+import { events, Importer, Library, Models, Recorder, Settings, Summarizer, type Hit, type Meta, type ModelStatus, type Recording, type RecordingState, type Settings as S, type Template } from "@/mygo";
 
 const idle: RecordingState = { recording: false, id: "", elapsed: 0, level: 0 };
 const LEVELS = 150; // bars of the live waveform
@@ -31,6 +32,7 @@ export function App() {
   const [searching, setSearching] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [jump, setJump] = useState<Jump | null>(null);
+  const [first, setFirst] = useState<S | null>(null); // settings, while the first-run screen is up
   const selectedRef = useRef("");
   selectedRef.current = selected;
 
@@ -48,6 +50,7 @@ export function App() {
   };
 
   useEffect(() => {
+    Settings.get().then((c) => !c.onboarded && setFirst(c)).catch(() => {});
     Models.status().then(setModel);
     Summarizer.templates().then(setTemplates).catch(() => {});
     Recorder.state().then((s) => {
@@ -98,6 +101,8 @@ export function App() {
     select(h.id);
     setJump((j) => ({ n: (j?.n ?? 0) + 1, time: h.kind === "transcript" ? h.time : undefined, template: h.template }));
   };
+
+  if (first) return <><Toaster position="bottom-center" /><Onboarding settings={first} onDone={() => setFirst(null)} /></>;
 
   return (
     <div className="flex h-screen text-sm">

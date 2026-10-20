@@ -32,6 +32,15 @@ export interface Meta {
   error?: string;
 }
 
+/** MicResult says what the permission check heard. */
+export interface MicResult {
+  /**
+   * Heard is false when the input was completely silent. That can be a quiet
+   * room, but it is also what macOS delivers while permission is denied.
+   */
+  heard: boolean;
+}
+
 /** ModelProgress is sent while the local model downloads. */
 export interface ModelProgress {
   /** downloading, done, failed */
@@ -244,6 +253,21 @@ export const Transcriber = {
    */
   setLanguage(id: string, lang: string): Promise<void> {
     return call("Transcriber.SetLanguage", id, lang);
+  },
+} as const;
+
+/** Onboarding is callable from the first-run screen. */
+export const Onboarding = {
+  /** CheckMic opens the microphone for a moment, which makes macOS ask for permission. */
+  checkMic(): Promise<MicResult> {
+    return call("Onboarding.CheckMic");
+  },
+  /**
+   * Trial records ten seconds and transcribes them with the engine in the
+   * settings, to show the result at once. The audio is not kept.
+   */
+  trial(): Promise<string> {
+    return call("Onboarding.Trial");
   },
 } as const;
 

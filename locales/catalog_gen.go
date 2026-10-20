@@ -1311,3 +1311,293 @@ func ExportSaved(path string) string { return In(i18n.Locale()).ExportSaved(path
 func (msgs Messages) ExportSaved(path string) string {
 	return Catalog.Format(msgs.locale, "exportSaved", map[string]any{"path": path})
 }
+
+// ObWelcome says "transflowy へようこそ"
+// in the language the app shows.
+func ObWelcome() string { return In(i18n.Locale()).ObWelcome() }
+
+// ObWelcome says "transflowy へようこそ"
+// in the language of msgs.
+func (msgs Messages) ObWelcome() string {
+	return Catalog.Format(msgs.locale, "obWelcome", nil)
+}
+
+// ObSkip says "あとで設定する"
+// in the language the app shows.
+func ObSkip() string { return In(i18n.Locale()).ObSkip() }
+
+// ObSkip says "あとで設定する"
+// in the language of msgs.
+func (msgs Messages) ObSkip() string {
+	return Catalog.Format(msgs.locale, "obSkip", nil)
+}
+
+// ObNext says "次へ"
+// in the language the app shows.
+func ObNext() string { return In(i18n.Locale()).ObNext() }
+
+// ObNext says "次へ"
+// in the language of msgs.
+func (msgs Messages) ObNext() string {
+	return Catalog.Format(msgs.locale, "obNext", nil)
+}
+
+// ObBack says "戻る"
+// in the language the app shows.
+func ObBack() string { return In(i18n.Locale()).ObBack() }
+
+// ObBack says "戻る"
+// in the language of msgs.
+func (msgs Messages) ObBack() string {
+	return Catalog.Format(msgs.locale, "obBack", nil)
+}
+
+// ObStart says "はじめる"
+// in the language the app shows.
+func ObStart() string { return In(i18n.Locale()).ObStart() }
+
+// ObStart says "はじめる"
+// in the language of msgs.
+func (msgs Messages) ObStart() string {
+	return Catalog.Format(msgs.locale, "obStart", nil)
+}
+
+// ObStep1Title says "マイクを許可"
+// in the language the app shows.
+func ObStep1Title() string { return In(i18n.Locale()).ObStep1Title() }
+
+// ObStep1Title says "マイクを許可"
+// in the language of msgs.
+func (msgs Messages) ObStep1Title() string {
+	return Catalog.Format(msgs.locale, "obStep1Title", nil)
+}
+
+// ObStep1Body says "会議や自分の声を録音するために、マイクを使います。下のボタンを押すと、macOS …"
+// in the language the app shows.
+func ObStep1Body() string { return In(i18n.Locale()).ObStep1Body() }
+
+// ObStep1Body says "会議や自分の声を録音するために、マイクを使います。下のボタンを押すと、macOS …"
+// in the language of msgs.
+func (msgs Messages) ObStep1Body() string {
+	return Catalog.Format(msgs.locale, "obStep1Body", nil)
+}
+
+// ObMicButton says "マイクを許可する"
+// in the language the app shows.
+func ObMicButton() string { return In(i18n.Locale()).ObMicButton() }
+
+// ObMicButton says "マイクを許可する"
+// in the language of msgs.
+func (msgs Messages) ObMicButton() string {
+	return Catalog.Format(msgs.locale, "obMicButton", nil)
+}
+
+// ObMicOk says "マイクを確認しました"
+// in the language the app shows.
+func ObMicOk() string { return In(i18n.Locale()).ObMicOk() }
+
+// ObMicOk says "マイクを確認しました"
+// in the language of msgs.
+func (msgs Messages) ObMicOk() string {
+	return Catalog.Format(msgs.locale, "obMicOk", nil)
+}
+
+// ObMicSilent says "…"
+// in the language the app shows.
+func ObMicSilent() string { return In(i18n.Locale()).ObMicSilent() }
+
+// ObMicSilent says "…"
+// in the language of msgs.
+func (msgs Messages) ObMicSilent() string {
+	return Catalog.Format(msgs.locale, "obMicSilent", nil)
+}
+
+// ObStep2Title says "文字起こしの方法"
+// in the language the app shows.
+func ObStep2Title() string { return In(i18n.Locale()).ObStep2Title() }
+
+// ObStep2Title says "文字起こしの方法"
+// in the language of msgs.
+func (msgs Messages) ObStep2Title() string {
+	return Catalog.Format(msgs.locale, "obStep2Title", nil)
+}
+
+// ObStep2Body says "…"
+// in the language the app shows.
+func ObStep2Body() string { return In(i18n.Locale()).ObStep2Body() }
+
+// ObStep2Body says "…"
+// in the language of msgs.
+func (msgs Messages) ObStep2Body() string {
+	return Catalog.Format(msgs.locale, "obStep2Body", nil)
+}
+
+// ObCloud says "クラウド（OpenRouter）"
+// in the language the app shows.
+func ObCloud() string { return In(i18n.Locale()).ObCloud() }
+
+// ObCloud says "クラウド（OpenRouter）"
+// in the language of msgs.
+func (msgs Messages) ObCloud() string {
+	return Catalog.Format(msgs.locale, "obCloud", nil)
+}
+
+// ObCloudBody says "高精度で、話者分離と日英混在に強い。録音を OpenRouter へ送ります。目安は 1 …"
+// in the language the app shows.
+func ObCloudBody() string { return In(i18n.Locale()).ObCloudBody() }
+
+// ObCloudBody says "高精度で、話者分離と日英混在に強い。録音を OpenRouter へ送ります。目安は 1 …"
+// in the language of msgs.
+func (msgs Messages) ObCloudBody() string {
+	return Catalog.Format(msgs.locale, "obCloudBody", nil)
+}
+
+// ObLocal says "ローカル（Whisper）"
+// in the language the app shows.
+func ObLocal() string { return In(i18n.Locale()).ObLocal() }
+
+// ObLocal says "ローカル（Whisper）"
+// in the language of msgs.
+func (msgs Messages) ObLocal() string {
+	return Catalog.Format(msgs.locale, "obLocal", nil)
+}
+
+// ObLocalBody says "録音を端末の外へ送りません。初回に約 0.6GB のモデルをダウンロードします"
+// in the language the app shows.
+func ObLocalBody() string { return In(i18n.Locale()).ObLocalBody() }
+
+// ObLocalBody says "録音を端末の外へ送りません。初回に約 0.6GB のモデルをダウンロードします"
+// in the language of msgs.
+func (msgs Messages) ObLocalBody() string {
+	return Catalog.Format(msgs.locale, "obLocalBody", nil)
+}
+
+// ObKeyLabel says "OpenRouter の API キー"
+// in the language the app shows.
+func ObKeyLabel() string { return In(i18n.Locale()).ObKeyLabel() }
+
+// ObKeyLabel says "OpenRouter の API キー"
+// in the language of msgs.
+func (msgs Messages) ObKeyLabel() string {
+	return Catalog.Format(msgs.locale, "obKeyLabel", nil)
+}
+
+// ObSummaryModel says "要約に使うモデル"
+// in the language the app shows.
+func ObSummaryModel() string { return In(i18n.Locale()).ObSummaryModel() }
+
+// ObSummaryModel says "要約に使うモデル"
+// in the language of msgs.
+func (msgs Messages) ObSummaryModel() string {
+	return Catalog.Format(msgs.locale, "obSummaryModel", nil)
+}
+
+// ObSummaryModelHint says "OpenRouter のモデル名（例: anthropic/claude-haiku-4.5）。空のあいだ、要約は待機します"
+// in the language the app shows.
+func ObSummaryModelHint() string { return In(i18n.Locale()).ObSummaryModelHint() }
+
+// ObSummaryModelHint says "OpenRouter のモデル名（例: anthropic/claude-haiku-4.5）。空のあいだ、要約は待機します"
+// in the language of msgs.
+func (msgs Messages) ObSummaryModelHint() string {
+	return Catalog.Format(msgs.locale, "obSummaryModelHint", nil)
+}
+
+// ObTrial says "10 秒の試し録音"
+// in the language the app shows.
+func ObTrial() string { return In(i18n.Locale()).ObTrial() }
+
+// ObTrial says "10 秒の試し録音"
+// in the language of msgs.
+func (msgs Messages) ObTrial() string {
+	return Catalog.Format(msgs.locale, "obTrial", nil)
+}
+
+// ObTrialHint says "押してから 10 秒間、何か話してください。結果をすぐに表示します"
+// in the language the app shows.
+func ObTrialHint() string { return In(i18n.Locale()).ObTrialHint() }
+
+// ObTrialHint says "押してから 10 秒間、何か話してください。結果をすぐに表示します"
+// in the language of msgs.
+func (msgs Messages) ObTrialHint() string {
+	return Catalog.Format(msgs.locale, "obTrialHint", nil)
+}
+
+// ObTrialRecording says "録音中… 話してください"
+// in the language the app shows.
+func ObTrialRecording() string { return In(i18n.Locale()).ObTrialRecording() }
+
+// ObTrialRecording says "録音中… 話してください"
+// in the language of msgs.
+func (msgs Messages) ObTrialRecording() string {
+	return Catalog.Format(msgs.locale, "obTrialRecording", nil)
+}
+
+// ObTrialWorking says "文字起こし中…"
+// in the language the app shows.
+func ObTrialWorking() string { return In(i18n.Locale()).ObTrialWorking() }
+
+// ObTrialWorking says "文字起こし中…"
+// in the language of msgs.
+func (msgs Messages) ObTrialWorking() string {
+	return Catalog.Format(msgs.locale, "obTrialWorking", nil)
+}
+
+// ObTrialEmpty says "文字が得られませんでした"
+// in the language the app shows.
+func ObTrialEmpty() string { return In(i18n.Locale()).ObTrialEmpty() }
+
+// ObTrialEmpty says "文字が得られませんでした"
+// in the language of msgs.
+func (msgs Messages) ObTrialEmpty() string {
+	return Catalog.Format(msgs.locale, "obTrialEmpty", nil)
+}
+
+// ObModelStart says "ダウンロードを始める"
+// in the language the app shows.
+func ObModelStart() string { return In(i18n.Locale()).ObModelStart() }
+
+// ObModelStart says "ダウンロードを始める"
+// in the language of msgs.
+func (msgs Messages) ObModelStart() string {
+	return Catalog.Format(msgs.locale, "obModelStart", nil)
+}
+
+// ObModelBackground says "裏でダウンロードします。このまま次へ進めます"
+// in the language the app shows.
+func ObModelBackground() string { return In(i18n.Locale()).ObModelBackground() }
+
+// ObModelBackground says "裏でダウンロードします。このまま次へ進めます"
+// in the language of msgs.
+func (msgs Messages) ObModelBackground() string {
+	return Catalog.Format(msgs.locale, "obModelBackground", nil)
+}
+
+// ObStep3Title says "ショートカット"
+// in the language the app shows.
+func ObStep3Title() string { return In(i18n.Locale()).ObStep3Title() }
+
+// ObStep3Title says "ショートカット"
+// in the language of msgs.
+func (msgs Messages) ObStep3Title() string {
+	return Catalog.Format(msgs.locale, "obStep3Title", nil)
+}
+
+// ObStep3Body says "…"
+// in the language the app shows.
+func ObStep3Body() string { return In(i18n.Locale()).ObStep3Body() }
+
+// ObStep3Body says "…"
+// in the language of msgs.
+func (msgs Messages) ObStep3Body() string {
+	return Catalog.Format(msgs.locale, "obStep3Body", nil)
+}
+
+// ObModelProgress says "ダウンロード中 {pct}%"
+// in the language the app shows.
+func ObModelProgress(pct int) string { return In(i18n.Locale()).ObModelProgress(pct) }
+
+// ObModelProgress says "ダウンロード中 {pct}%"
+// in the language of msgs.
+func (msgs Messages) ObModelProgress(pct int) string {
+	return Catalog.Format(msgs.locale, "obModelProgress", map[string]any{"pct": pct})
+}
