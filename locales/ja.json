@@ -164,5 +164,6 @@
     }
   },
   "inputDevice": "入力デバイス",
-  "inputDeviceDefault": "システムの既定"
+  "inputDeviceDefault": "システムの既定",
+  "exportTranscript": "文字起こし"
 }

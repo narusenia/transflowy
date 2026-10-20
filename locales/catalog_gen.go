@@ -1051,3 +1051,13 @@ func InputDeviceDefault() string { return In(i18n.Locale()).InputDeviceDefault()
 func (msgs Messages) InputDeviceDefault() string {
 	return Catalog.Format(msgs.locale, "inputDeviceDefault", nil)
 }
+
+// ExportTranscript says "文字起こし"
+// in the language the app shows.
+func ExportTranscript() string { return In(i18n.Locale()).ExportTranscript() }
+
+// ExportTranscript says "文字起こし"
+// in the language of msgs.
+func (msgs Messages) ExportTranscript() string {
+	return Catalog.Format(msgs.locale, "exportTranscript", nil)
+}

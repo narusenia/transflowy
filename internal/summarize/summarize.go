@@ -3,13 +3,12 @@ package summarize
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"transflowy/internal/export"
 	"transflowy/internal/library"
 	"transflowy/internal/netguard"
 	"transflowy/internal/pipeline"
@@ -32,25 +31,8 @@ const preamble = `あなたは文字起こしを要約するアシスタント�
 
 `
 
-// Format renders a transcript as "[12:34] 話者1: text" lines. Minutes are not
-// wrapped at 60, so an hour and a quarter reads [75:00].
-func Format(t library.Transcript) string {
-	var b strings.Builder
-	for _, s := range t.Segments {
-		sec := int(s.Start)
-		fmt.Fprintf(&b, "[%02d:%02d] ", sec/60, sec%60)
-		if s.Speaker != library.UnknownSpeaker {
-			n := strconv.Itoa(s.Speaker)
-			name := t.Speakers[n]
-			if name == "" {
-				name = "話者" + n
-			}
-			b.WriteString(name + ": ")
-		}
-		b.WriteString(s.Text + "\n")
-	}
-	return b.String()
-}
+// Format is the transcript as the model reads it: "[12:34] 話者1: text".
+func Format(t library.Transcript) string { return export.Lines(t, true) }
 
 // SplitTitle separates the title line from the summary body. An answer
 // without one is all body.

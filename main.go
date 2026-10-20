@@ -83,6 +83,7 @@ func main() {
 	mygo.BindAs("Recorder", rec)
 	mygo.BindAs("Importer", imp)
 	mygo.BindAs("Transcriber", &Transcriber{cfg: cfg, queue: queue})
+	mygo.BindAs("Exporter", &Exporter{cfg: cfg})
 	mygo.BindAs("Summarizer", &Summarizer{cfg: cfg, engines: engines, queue: sumQueue})
 	mygo.BindAs("Models", &Models{dir: modelDir, onReady: func() { resumeAll(cfg, queue, sumQueue) }})
 
