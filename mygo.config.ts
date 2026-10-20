@@ -12,4 +12,10 @@ export default defineConfig({
   frontendDist: "dist",
   bindings: "src/mygo.ts",
   out: "build",
+  macos: {
+    // Core Audio Tap (system audio, a later stage) needs 14.2.
+    minimumSystemVersion: "14.2",
+    // Without this key macOS refuses microphone access without asking.
+    infoPlist: { NSMicrophoneUsageDescription: "会議やメモを録音して文字起こしするために、マイクを使います。" },
+  },
 });
