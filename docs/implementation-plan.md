@@ -6,7 +6,14 @@
 
 結果は各項目の下に 1〜2 行で追記する。決定が変わる場合は requirements.md も直す。
 
-- [ ] P1 OpenRouter 文字起こし: 1 分 / 5 分 / 30 分の音声で制約確認、MAI-Transcribe-2 の diarization・phraseList の渡し方確認
+- [x] P1 OpenRouter 文字起こし: 1 分 / 5 分 / 30 分の音声で制約確認、MAI-Transcribe-2 の diarization・phraseList の渡し方確認
+  - `POST /api/v1/audio/transcriptions`（JSON、`input_audio.data` は base64、`provider.options.azure.diarization.enabled` / `phraseList.phrases`）が動作。料金は約 $0.10/時（297 秒で $0.00825）
+  - **処理速度**: 5 分（297 秒）の音声が 8.7〜9.3 秒、約 34 倍速。60 秒タイムアウトに当たるのは約 30 分超の見込み。**クラウドは長めのチャンク（最大 10 分）で送れる**（P2 のローカルは 15 秒）
+  - **日英混在**: 日本語 + 英語の 1 チャンクでも英語が落ちず、1.1 秒で完了（Whisper と違う）
+  - **話者分離**: `say` の 2 声（Kyoko / Reed）を 4 ターンとも正しく speaker 0 / 1 に分けた（sherpa-onnx では不可だった）。長いチャンクで送れば話者 ID がチャンク内で一貫する
+  - **受け付ける形式は wav / mp3 / flac**。m4a / aac / webm は 400。→ クラウドへは WAV で送る（16kHz モノラルで 10 分 ≈ 19MB、上限 25MB 内）。保存形式（m4a）はそのまま送れない
+  - 話者分離なしだと segment が非常に長い（最大 177 秒）。表示用の行は VAD 区間か句読点で自前分割する。単語タイムスタンプは日本語だと 1 文字単位
+  - 未確認: 実際の会議音声での精度、`prompt` 相当（phraseList）の効果、`mai-transcribe-2` の同時リクエスト上限
 - [x] P2 whisper-server: large-v3-turbo の日本語 + 英語混在精度と処理速度（実時間比）
   - `ggml-large-v3-turbo-q5_0.bin`（574MB）+ `whisper-server`（Homebrew 導入済み）。起動 9 秒、22.8 秒の音声を約 1.7 秒で処理（約 13 倍速、M 系 Metal）
   - 日本語は正確。文中の英単語（API、スプリント）も問題なし。`prompt` に辞書語を渡す方式も動いた（読点の入り方が変わる程度）
