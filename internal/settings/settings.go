@@ -43,6 +43,8 @@ type Settings struct {
 	InputDevice string `json:"inputDevice"`
 	Shortcut    string `json:"shortcut"`
 	Onboarded   bool   `json:"onboarded"`
+	// Language is the language of the app's texts; empty follows the system.
+	Language string `json:"language"`
 }
 
 // Defaults returns the settings a fresh install starts with.

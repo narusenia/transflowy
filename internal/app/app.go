@@ -95,6 +95,7 @@ func Run() {
 	mygo.BindAs("Exporter", &Exporter{cfg: cfg})
 	mygo.BindAs("Summarizer", &Summarizer{cfg: cfg, engines: engines, queue: sumQueue})
 	mygo.BindAs("About", &About{})
+	mygo.BindAs("Language", &Language{cfg: cfg})
 	mygo.BindAs("Models", &Models{dir: modelDir, onReady: func() { resumeAll(cfg, queue, sumQueue) }})
 
 	// The page plays audio and reads peaks.json from the library through media://localhost/<id>/<file>.
@@ -153,6 +154,7 @@ func Run() {
 		if err != nil {
 			log.Println("settings:", err)
 		}
+		mygo.App.SetLocale(s.Language) // our settings own the choice: "" follows the system
 		recoverRecordings(library.Store{Root: s.LibraryDir})
 		resumeAll(cfg, queue, sumQueue)
 

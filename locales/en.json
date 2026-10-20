@@ -217,5 +217,7 @@
   "diarizeCountN": "{n, plural, one {# speaker} other {# speakers}}",
   "diarizeRun": "Run",
   "captionsToggle": "Show captions",
-  "defaultTemplateName": "Memo"
+  "defaultTemplateName": "Memo",
+  "appLanguage": "Language of the app",
+  "languageSystem": "Match the system"
 }

@@ -2210,3 +2210,23 @@ func DefaultTemplateName() string { return In(i18n.Locale()).DefaultTemplateName
 func (msgs Messages) DefaultTemplateName() string {
 	return Catalog.Format(msgs.locale, "defaultTemplateName", nil)
 }
+
+// AppLanguage says "表示言語"
+// in the language the app shows.
+func AppLanguage() string { return In(i18n.Locale()).AppLanguage() }
+
+// AppLanguage says "表示言語"
+// in the language of msgs.
+func (msgs Messages) AppLanguage() string {
+	return Catalog.Format(msgs.locale, "appLanguage", nil)
+}
+
+// LanguageSystem says "システムに合わせる"
+// in the language the app shows.
+func LanguageSystem() string { return In(i18n.Locale()).LanguageSystem() }
+
+// LanguageSystem says "システムに合わせる"
+// in the language of msgs.
+func (msgs Messages) LanguageSystem() string {
+	return Catalog.Format(msgs.locale, "languageSystem", nil)
+}

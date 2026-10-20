@@ -350,5 +350,7 @@
     }
   },
   "captionsToggle": "字幕の表示",
-  "defaultTemplateName": "汎用メモ"
+  "defaultTemplateName": "汎用メモ",
+  "appLanguage": "表示言語",
+  "languageSystem": "システムに合わせる"
 }

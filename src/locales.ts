@@ -875,6 +875,14 @@ export interface Messages {
    * `汎用メモ`
    */
   defaultTemplateName(): string;
+  /**
+   * `表示言語`
+   */
+  appLanguage(): string;
+  /**
+   * `システムに合わせる`
+   */
+  languageSystem(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -1103,6 +1111,8 @@ const catalog = createCatalog<Messages>({
     "diarizeRun": [],
     "captionsToggle": [],
     "defaultTemplateName": [],
+    "appLanguage": [],
+    "languageSystem": [],
   },
   messages: {
     "ja": {
@@ -1324,6 +1334,8 @@ const catalog = createCatalog<Messages>({
       "diarizeRun": "実行",
       "captionsToggle": "字幕の表示",
       "defaultTemplateName": "汎用メモ",
+      "appLanguage": "表示言語",
+      "languageSystem": "システムに合わせる",
     },
     "en": {
       "trayRecordStart": "Start recording",
@@ -1544,6 +1556,8 @@ const catalog = createCatalog<Messages>({
       "diarizeRun": "Run",
       "captionsToggle": "Show captions",
       "defaultTemplateName": "Memo",
+      "appLanguage": "Language of the app",
+      "languageSystem": "Match the system",
     },
   },
 });

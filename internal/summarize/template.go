@@ -18,7 +18,7 @@ type Template struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Builtin     bool   `json:"builtin"`
-	Key         string `json:"-"` // a built-in's file name, the same in every language
+	Key         string `json:"key"` // a built-in's file name, the same in every language
 	Prompt      string `json:"-"`
 }
 

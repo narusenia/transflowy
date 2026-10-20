@@ -19,6 +19,12 @@ export interface ImportProblem {
   message: string;
 }
 
+/** LanguageOption is a language the app is written in, named in itself. */
+export interface LanguageOption {
+  tag: string;
+  name: string;
+}
+
 /** MenuAction names the recording and the item chosen. */
 export interface MenuAction {
   id: string;
@@ -125,6 +131,8 @@ export interface Settings {
   inputDevice: string;
   shortcut: string;
   onboarded: boolean;
+  /** Language is the language of the app's texts; empty follows the system. */
+  language: string;
 }
 
 export type Status = string;
@@ -133,6 +141,7 @@ export interface Template {
   name: string;
   description: string;
   builtin: boolean;
+  key: string;
 }
 
 export interface Transcript {
@@ -376,6 +385,21 @@ export const About = {
   /** Version is the version of the packaged app; empty when it runs in development. */
   version(): Promise<string> {
     return call("About.Version");
+  },
+} as const;
+
+/** Language is callable from the settings: the language the app shows. */
+export const Language = {
+  /** Options lists the languages the app is written in. */
+  options(): Promise<LanguageOption[]> {
+    return call("Language.Options");
+  },
+  /**
+   * Set shows another language at once and keeps the choice; "" follows the
+   * system's languages.
+   */
+  set(tag: string): Promise<void> {
+    return call("Language.Set", tag);
   },
 } as const;
 
