@@ -32,9 +32,11 @@ type Settings struct {
 	// Template is the summary template an automatic summary uses.
 	Template string `json:"template"`
 	// LocalOnly forbids every request to a cloud provider.
-	LocalOnly bool   `json:"localOnly"`
-	Shortcut  string `json:"shortcut"`
-	Onboarded bool   `json:"onboarded"`
+	LocalOnly bool `json:"localOnly"`
+	// InputDevice is the microphone's name; "" is the system default.
+	InputDevice string `json:"inputDevice"`
+	Shortcut    string `json:"shortcut"`
+	Onboarded   bool   `json:"onboarded"`
 }
 
 // Defaults returns the settings a fresh install starts with.

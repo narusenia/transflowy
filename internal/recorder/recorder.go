@@ -35,9 +35,26 @@ type Recorder struct {
 // ErrBusy is returned by Start while a recording is running.
 var ErrBusy = errors.New("already recording")
 
-// Start opens the default microphone and records into the WAV file at path.
-// macOS asks for microphone permission the first time.
-func (r *Recorder) Start(path string) error {
+// Devices lists the names of the input devices.
+func Devices() ([]string, error) {
+	ctx, err := malgo.InitContext(nil, malgo.ContextConfig{}, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = ctx.Uninit(); ctx.Free() }()
+	infos, err := ctx.Devices(malgo.Capture)
+	names := make([]string, len(infos))
+	for i := range infos {
+		names[i] = infos[i].Name()
+	}
+	return names, err
+}
+
+// Start opens the input device called device and records into the WAV file at
+// path. An empty or unknown name (an unplugged headset) uses the default
+// device, so a recording is always possible. macOS asks for microphone
+// permission the first time.
+func (r *Recorder) Start(path, device string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.dev != nil {
@@ -57,6 +74,17 @@ func (r *Recorder) Start(path string) error {
 	cfg.Capture.Format = malgo.FormatS16
 	cfg.Capture.Channels = 1
 	cfg.SampleRate = sampleRate
+	if device != "" {
+		if infos, err := ctx.Devices(malgo.Capture); err == nil {
+			for i := range infos {
+				if infos[i].Name() == device {
+					// ponytail: Pointer copies the id into C memory malgo gives no way to free; 64 bytes per recording.
+					cfg.Capture.DeviceID = infos[i].ID.Pointer()
+					break
+				}
+			}
+		}
+	}
 	r.buf, r.writeEr = nil, nil
 	r.samples.Store(0)
 	r.level.Store(0)

@@ -55,7 +55,10 @@ func (r *Recorder) store() (library.Store, error) {
 	return library.Store{Root: s.LibraryDir}, err
 }
 
-// Start begins a recording from the default microphone.
+// Devices lists the input devices for the settings screen.
+func (r *Recorder) Devices() ([]string, error) { return recorder.Devices() }
+
+// Start begins a recording from the input device in the settings (the default one when none).
 func (r *Recorder) Start() (library.Meta, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -68,7 +71,8 @@ func (r *Recorder) Start() (library.Meta, error) {
 		return library.Meta{}, err
 	}
 	dir, _ := st.Path(m.ID)
-	if err := r.rec.Start(filepath.Join(dir, wavName)); err != nil {
+	cur, _ := r.cfg.Get()
+	if err := r.rec.Start(filepath.Join(dir, wavName), cur.InputDevice); err != nil {
 		_ = os.RemoveAll(dir) // nothing was recorded: leave no empty folder
 		return library.Meta{}, err
 	}
