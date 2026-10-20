@@ -6,6 +6,7 @@ import { IconButton } from "@/components/icon-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Player, type PlayerHandle } from "@/components/player";
 import { Transcript } from "@/components/transcript";
+import { LiveCaptions } from "@/components/live-captions";
 import { Markdown } from "@/components/summary";
 import { ExportDialog, ReplaceDialog, SpeakersDialog, speakersOf } from "@/components/tools";
 import { Badge } from "@/components/ui/badge";
@@ -185,6 +186,8 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       )}
     </div>
   );
+  // While recording, the summary's place shows the live captions.
+  const leftPane = recording ? <LiveCaptions rec={rec} elapsed={live?.elapsed ?? 0} /> : summaryPane;
   const transcriptPane = <Transcript
       transcript={rec.transcript}
       time={time}
@@ -194,6 +197,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       onEdit={(i, start, text) => Library.editSegment(meta.id, i, start, text).then(onChanged).catch(fail)}
       onRevert={(i, start) => Library.resetSegment(meta.id, i, start).then(onChanged).catch(fail)}
       onSpeakers={() => setNaming(true)}
+      live={recording}
     />;
 
   return (
@@ -246,16 +250,16 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       <div className="min-h-0 flex-1">
         {wide ? (
           <div className="grid h-full grid-cols-2 divide-x">
-            <div className="min-h-0">{summaryPane}</div>
+            <div className="min-h-0">{leftPane}</div>
             <div className="min-h-0">{transcriptPane}</div>
           </div>
         ) : (
           <Tabs value={tab} onValueChange={(v) => setTab(String(v))} className="h-full gap-0">
             <TabsList className="m-2 self-start">
-              <TabsTrigger value="summary">{t.tabSummary()}</TabsTrigger>
+              <TabsTrigger value="summary">{recording ? t.tabLive() : t.tabSummary()}</TabsTrigger>
               <TabsTrigger value="transcript">{t.tabTranscript()}</TabsTrigger>
             </TabsList>
-            <TabsContent value="summary" className="min-h-0">{summaryPane}</TabsContent>
+            <TabsContent value="summary" className="min-h-0">{leftPane}</TabsContent>
             <TabsContent value="transcript" className="min-h-0">{transcriptPane}</TabsContent>
           </Tabs>
         )}

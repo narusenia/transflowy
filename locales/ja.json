@@ -316,5 +316,9 @@
   "summarySave": "保存",
   "summaryEditHint": "⌘Enter で保存、Esc で取り消し。空にして保存すると、この要約を削除します",
   "manualSummaryName": "メモ",
-  "summaryRegenerateKeepsEdits": "手で直した内容は、再生成で置き換わります"
+  "summaryRegenerateKeepsEdits": "手で直した内容は、再生成で置き換わります",
+  "tabLive": "ライブ字幕",
+  "liveWaiting": "話すと、ここに字幕が出ます",
+  "liveRecognizing": "認識中…",
+  "liveCloudHint": "クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください"
 }

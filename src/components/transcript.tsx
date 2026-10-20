@@ -20,7 +20,7 @@ function activeIndex(segments: T["segments"], t: number) {
 }
 
 /** The lines of a transcript. Only the visible ones are drawn (TanStack Virtual). */
-export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert, onSpeakers }: {
+export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert, onSpeakers, live }: {
   transcript: T;
   time: number;
   onSeek(seconds: number): void;
@@ -29,11 +29,12 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   onEdit(index: number, start: number, text: string): void;
   onRevert(index: number, start: number): void;
   onSpeakers(): void; // the speaker label was clicked: name the speakers
+  live: boolean; // a recording is running: follow the newest line, not the playhead
 }) {
   const t = useMessages();
   const scroller = useRef<HTMLDivElement>(null);
   const segs = transcript.segments;
-  const active = useMemo(() => activeIndex(segs, time), [segs, time]);
+  const active = useMemo(() => (live ? segs.length - 1 : activeIndex(segs, time)), [segs, time, live]);
   const v = useVirtualizer({ count: segs.length, getScrollElement: () => scroller.current, estimateSize: () => 52, overscan: 8 });
   const [editing, setEditing] = useState(-1);
   const programmatic = useRef(false); // our own scroll must not turn follow off
@@ -41,10 +42,10 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   useEffect(() => {
     if (follow && active >= 0) {
       programmatic.current = true;
-      v.scrollToIndex(active, { align: "center" });
+      v.scrollToIndex(active, { align: live ? "end" : "center" });
       setTimeout(() => (programmatic.current = false), 100);
     }
-  }, [active, follow]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active, follow, live]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [shown, setShown] = useState(false); // the button, once the user scrolled away
   useEffect(() => setShown(!follow), [follow]);
@@ -69,7 +70,7 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
                 ref={v.measureElement}
                 onClick={() => editing < 0 && onSeek(s.start)}
                 onDoubleClick={() => setEditing(row.index)}
-                className={`group absolute left-0 top-0 flex w-full cursor-pointer gap-3 px-4 py-2 text-left text-sm hover:bg-muted/60 ${row.index === active ? "bg-muted" : ""}`}
+                className={`group absolute left-0 top-0 flex w-full cursor-pointer gap-3 px-4 py-2 text-left text-sm hover:bg-muted/60 ${row.index === active && !live ? "bg-muted" : ""}`}
                 style={{ transform: `translateY(${row.start}px)` }}
               >
                 <span className="w-12 shrink-0 pt-0.5 text-xs tabular-nums text-muted-foreground">{clock(s.start)}</span>

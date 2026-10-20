@@ -2011,3 +2011,43 @@ func SummaryRegenerateKeepsEdits() string { return In(i18n.Locale()).SummaryRege
 func (msgs Messages) SummaryRegenerateKeepsEdits() string {
 	return Catalog.Format(msgs.locale, "summaryRegenerateKeepsEdits", nil)
 }
+
+// TabLive says "ライブ字幕"
+// in the language the app shows.
+func TabLive() string { return In(i18n.Locale()).TabLive() }
+
+// TabLive says "ライブ字幕"
+// in the language of msgs.
+func (msgs Messages) TabLive() string {
+	return Catalog.Format(msgs.locale, "tabLive", nil)
+}
+
+// LiveWaiting says "話すと、ここに字幕が出ます"
+// in the language the app shows.
+func LiveWaiting() string { return In(i18n.Locale()).LiveWaiting() }
+
+// LiveWaiting says "話すと、ここに字幕が出ます"
+// in the language of msgs.
+func (msgs Messages) LiveWaiting() string {
+	return Catalog.Format(msgs.locale, "liveWaiting", nil)
+}
+
+// LiveRecognizing says "認識中…"
+// in the language the app shows.
+func LiveRecognizing() string { return In(i18n.Locale()).LiveRecognizing() }
+
+// LiveRecognizing says "認識中…"
+// in the language of msgs.
+func (msgs Messages) LiveRecognizing() string {
+	return Catalog.Format(msgs.locale, "liveRecognizing", nil)
+}
+
+// LiveCloudHint says "…"
+// in the language the app shows.
+func LiveCloudHint() string { return In(i18n.Locale()).LiveCloudHint() }
+
+// LiveCloudHint says "…"
+// in the language of msgs.
+func (msgs Messages) LiveCloudHint() string {
+	return Catalog.Format(msgs.locale, "liveCloudHint", nil)
+}

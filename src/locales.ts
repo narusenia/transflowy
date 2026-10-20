@@ -795,6 +795,22 @@ export interface Messages {
    * `手で直した内容は、再生成で置き換わります`
    */
   summaryRegenerateKeepsEdits(): string;
+  /**
+   * `ライブ字幕`
+   */
+  tabLive(): string;
+  /**
+   * `話すと、ここに字幕が出ます`
+   */
+  liveWaiting(): string;
+  /**
+   * `認識中…`
+   */
+  liveRecognizing(): string;
+  /**
+   * `クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください`
+   */
+  liveCloudHint(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -1002,6 +1018,10 @@ const catalog = createCatalog<Messages>({
     "summaryEditHint": [],
     "manualSummaryName": [],
     "summaryRegenerateKeepsEdits": [],
+    "tabLive": [],
+    "liveWaiting": [],
+    "liveRecognizing": [],
+    "liveCloudHint": [],
   },
   messages: {
     "ja": {
@@ -1203,6 +1223,10 @@ const catalog = createCatalog<Messages>({
       "summaryEditHint": "⌘Enter で保存、Esc で取り消し。空にして保存すると、この要約を削除します",
       "manualSummaryName": "メモ",
       "summaryRegenerateKeepsEdits": "手で直した内容は、再生成で置き換わります",
+      "tabLive": "ライブ字幕",
+      "liveWaiting": "話すと、ここに字幕が出ます",
+      "liveRecognizing": "認識中…",
+      "liveCloudHint": "クラウドの文字起こしは、数分ごとにまとめて表示します。すぐ見たいときは、設定でローカルを選んでください",
     },
   },
 });
