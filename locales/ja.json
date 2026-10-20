@@ -333,5 +333,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "captionsToggle": "字幕の表示"
 }

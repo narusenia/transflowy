@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Player, type PlayerHandle } from "@/components/player";
 import { Transcript } from "@/components/transcript";
 import { LiveCaptions } from "@/components/live-captions";
+import { PlaybackCaption } from "@/components/playback-caption";
 import { Markdown } from "@/components/summary";
 import { DiarizeDialog, ExportDialog, ReplaceDialog, SpeakersDialog, speakersOf } from "@/components/tools";
 import { Badge } from "@/components/ui/badge";
@@ -272,7 +273,10 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       {recording ? (
         <LiveWave live={live} />
       ) : meta.duration > 0 ? (
+        <>
+        <PlaybackCaption transcript={rec.transcript} time={time} />
         <Player ref={player} id={meta.id} duration={meta.duration} onTime={setTime} />
+        </>
       ) : null}
     </div>
   );

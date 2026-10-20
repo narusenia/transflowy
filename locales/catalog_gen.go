@@ -2111,3 +2111,13 @@ func DiarizeRun() string { return In(i18n.Locale()).DiarizeRun() }
 func (msgs Messages) DiarizeRun() string {
 	return Catalog.Format(msgs.locale, "diarizeRun", nil)
 }
+
+// CaptionsToggle says "字幕の表示"
+// in the language the app shows.
+func CaptionsToggle() string { return In(i18n.Locale()).CaptionsToggle() }
+
+// CaptionsToggle says "字幕の表示"
+// in the language of msgs.
+func (msgs Messages) CaptionsToggle() string {
+	return Catalog.Format(msgs.locale, "captionsToggle", nil)
+}

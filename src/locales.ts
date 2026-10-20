@@ -835,6 +835,10 @@ export interface Messages {
    * `実行`
    */
   diarizeRun(): string;
+  /**
+   * `字幕の表示`
+   */
+  captionsToggle(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -1052,6 +1056,7 @@ const catalog = createCatalog<Messages>({
     "diarizeAuto": [],
     "diarizeCountN": ["n"],
     "diarizeRun": [],
+    "captionsToggle": [],
   },
   messages: {
     "ja": {
@@ -1263,6 +1268,7 @@ const catalog = createCatalog<Messages>({
       "diarizeAuto": "自動",
       "diarizeCountN": "{n}人",
       "diarizeRun": "実行",
+      "captionsToggle": "字幕の表示",
     },
   },
 });

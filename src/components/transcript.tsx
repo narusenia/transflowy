@@ -9,7 +9,7 @@ import { speakerName } from "@/lib/speaker";
 import type { Transcript as T } from "@/mygo";
 
 /** Index of the line playing at time t: the last one that started, -1 before the first. */
-function activeIndex(segments: T["segments"], t: number) {
+export function activeIndex(segments: T["segments"], t: number) {
   let lo = 0, hi = segments.length;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
