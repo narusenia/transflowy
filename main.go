@@ -111,9 +111,11 @@ func main() {
 			MinWidth:  720,
 			MinHeight: 480,
 			// The page draws its own title bar under the window controls (see titlebar.tsx).
-			TitleBarStyle:   mygo.TitleBarHiddenInset,
-			TitleBarHeight:  40,
-			BackgroundColor: "light-dark(#ffffff, #0a0a0a)", // shadcn neutral --background
+			TitleBarStyle:  mygo.TitleBarHiddenInset,
+			TitleBarHeight: 40,
+			// Centers the traffic lights in the 40 px bar the page draws.
+			TrafficLightPosition: &mygo.Point{X: 16, Y: 14},
+			BackgroundColor:      "light-dark(#ffffff, #0a0a0a)", // shadcn neutral --background
 			// Opens where the user left it last time.
 			StateKey: "main",
 			// The frontend: devUrl during `mygo dev`, frontendDist
