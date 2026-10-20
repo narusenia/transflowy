@@ -74,7 +74,7 @@ func setup(t *testing.T, status library.Status, parts ...float64) *env {
 	e := &env{st: st, id: m.ID, eng: &fake{}}
 	e.q = New(Config{
 		Store:   func() (library.Store, error) { return st, nil },
-		Engine:  func(string) (Job, error) { return Job{Engine: e.eng, Params: transcribe.LocalParams}, nil },
+		Engine:  func(string) (Job, error) { return Job{Engine: e.eng, Params: transcribe.Params{Target: 8, Max: 15, MinSilence: 0.3}}, nil },
 		Phrases: func() []string { return nil },
 		Sleep:   func(ctx context.Context, _ time.Duration) bool { return ctx.Err() == nil },
 	})
@@ -99,7 +99,7 @@ func (e *env) run(t *testing.T) library.Recording {
 }
 
 func TestProcessesWholeRecording(t *testing.T) {
-	// 5 s tone, 1 s pause, 6 s tone, 0.6 s pause, 20 s tone: three local chunks.
+	// 5 s tone, 1 s pause, 6 s tone, 0.6 s pause, 20 s tone: three chunks at Max 15.
 	e := setup(t, library.StatusQueued, 5, 1, 6, 0.6, 20)
 	r := e.run(t)
 	if r.Meta.Status != library.StatusDone || len(r.Transcript.Segments) != 3 || r.Meta.Detected != "ja" || r.Meta.Engine != "fake" {

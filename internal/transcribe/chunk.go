@@ -18,12 +18,13 @@ type Params struct {
 	MinSilence float64 // a pause this long is a place to cut
 }
 
-// Whisper decides one language per ~30 s window, so local chunks stay short
-// and each one is detected on its own. The cloud engine keeps one speaker
+// Whisper decides one language per ~30 s window, so local chunks stay under
+// it and each one is detected on its own. Max is generous: a pause is a better
+// place to cut than a deadline, and a language change usually follows a pause. The cloud engine keeps one speaker
 // numbering per request, so its chunks are long (the request limit is about
 // 25 MB of WAV, 13 minutes).
 var (
-	LocalParams = Params{Target: 8, Max: 15, MinSilence: 0.3}
+	LocalParams = Params{Target: 8, Max: 25, MinSilence: 0.3}
 	CloudParams = Params{Target: 300, Max: 600, MinSilence: 0.5}
 )
 
@@ -96,7 +97,7 @@ func Plan(pcm []int16, from int, final bool, p Params) (spans []Span, next int) 
 		case cut >= 0:
 			emit(cut)
 		case n-start >= maxF:
-			emit(start + maxF)
+			emit(quietest(rms, start+maxF-min(250, maxF/2), start+maxF)) // no pause: cut where it is quietest
 		case final:
 			emit(n)
 		default:
@@ -104,4 +105,19 @@ func Plan(pcm []int16, from int, final bool, p Params) (spans []Span, next int) 
 		}
 	}
 	return spans, from + start*frameLen
+}
+
+// quietest returns the frame in [from, to) with the least energy around it.
+func quietest(rms []float64, from, to int) int {
+	best, bestSum := to, math.Inf(1)
+	for i := from; i < to-5; i++ {
+		var sum float64
+		for _, r := range rms[i : i+5] { // 100 ms: a dip, not a single quiet frame
+			sum += r
+		}
+		if sum < bestSum {
+			best, bestSum = i+2, sum
+		}
+	}
+	return best
 }
