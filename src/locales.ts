@@ -411,6 +411,110 @@ export interface Messages {
    * `システムの既定`
    */
   inputDeviceDefault(): string;
+  /**
+   * `文字起こし`
+   */
+  exportTranscript(): string;
+  /**
+   * `タイトルを入力`
+   */
+  titlePlaceholder(): string;
+  /**
+   * `編集`
+   */
+  segmentEdit(): string;
+  /**
+   * `元に戻す`
+   */
+  segmentRevert(): string;
+  /**
+   * `編集済み`
+   */
+  segmentEdited(): string;
+  /**
+   * `置換`
+   */
+  replaceButton(): string;
+  /**
+   * `文字起こしを置換`
+   */
+  replaceTitle(): string;
+  /**
+   * `置換前`
+   */
+  replaceFind(): string;
+  /**
+   * `置換後`
+   */
+  replaceWith(): string;
+  /**
+   * `置換する`
+   */
+  replaceRun(): string;
+  /**
+   * `辞書に追加`
+   */
+  addDictionary(): string;
+  /**
+   * `辞書に追加しました`
+   */
+  dictionaryAdded(): string;
+  /**
+   * `再生成`
+   */
+  staleSummary(): string;
+  /**
+   * `文字起こしが要約より新しくなっています。クリックで要約を作り直します`
+   */
+  staleHint(): string;
+  /**
+   * `コピー・書き出し`
+   */
+  exportButton(): string;
+  /**
+   * `内容`
+   */
+  exportInclude(): string;
+  /**
+   * `要約のみ`
+   */
+  includeSummary(): string;
+  /**
+   * `要約 + 文字起こし`
+   */
+  includeBoth(): string;
+  /**
+   * `文字起こしのみ`
+   */
+  includeTranscript(): string;
+  /**
+   * `タイムスタンプを付ける`
+   */
+  exportStamps(): string;
+  /**
+   * `クリップボードにコピー`
+   */
+  exportCopy(): string;
+  /**
+   * `コピーしました`
+   */
+  exportCopied(): string;
+  /**
+   * `ファイルに書き出し`
+   */
+  exportSaveAs(): string;
+  /**
+   * `.txt と .srt は文字起こしだけを書き出します`
+   */
+  exportNote(): string;
+  /**
+   * `{count}件を置換しました`
+   */
+  replaceDone(count: number): string;
+  /**
+   * `{path} に保存しました`
+   */
+  exportSaved(path: string): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -522,6 +626,32 @@ const catalog = createCatalog<Messages>({
     "statusProcessingPercent": ["pct"],
     "inputDevice": [],
     "inputDeviceDefault": [],
+    "exportTranscript": [],
+    "titlePlaceholder": [],
+    "segmentEdit": [],
+    "segmentRevert": [],
+    "segmentEdited": [],
+    "replaceButton": [],
+    "replaceTitle": [],
+    "replaceFind": [],
+    "replaceWith": [],
+    "replaceRun": [],
+    "addDictionary": [],
+    "dictionaryAdded": [],
+    "staleSummary": [],
+    "staleHint": [],
+    "exportButton": [],
+    "exportInclude": [],
+    "includeSummary": [],
+    "includeBoth": [],
+    "includeTranscript": [],
+    "exportStamps": [],
+    "exportCopy": [],
+    "exportCopied": [],
+    "exportSaveAs": [],
+    "exportNote": [],
+    "replaceDone": ["count"],
+    "exportSaved": ["path"],
   },
   messages: {
     "ja": {
@@ -627,6 +757,32 @@ const catalog = createCatalog<Messages>({
       "statusProcessingPercent": "処理中 {pct}%",
       "inputDevice": "入力デバイス",
       "inputDeviceDefault": "システムの既定",
+      "exportTranscript": "文字起こし",
+      "titlePlaceholder": "タイトルを入力",
+      "segmentEdit": "編集",
+      "segmentRevert": "元に戻す",
+      "segmentEdited": "編集済み",
+      "replaceButton": "置換",
+      "replaceTitle": "文字起こしを置換",
+      "replaceFind": "置換前",
+      "replaceWith": "置換後",
+      "replaceRun": "置換する",
+      "addDictionary": "辞書に追加",
+      "dictionaryAdded": "辞書に追加しました",
+      "staleSummary": "再生成",
+      "staleHint": "文字起こしが要約より新しくなっています。クリックで要約を作り直します",
+      "exportButton": "コピー・書き出し",
+      "exportInclude": "内容",
+      "includeSummary": "要約のみ",
+      "includeBoth": "要約 + 文字起こし",
+      "includeTranscript": "文字起こしのみ",
+      "exportStamps": "タイムスタンプを付ける",
+      "exportCopy": "クリップボードにコピー",
+      "exportCopied": "コピーしました",
+      "exportSaveAs": "ファイルに書き出し",
+      "exportNote": ".txt と .srt は文字起こしだけを書き出します",
+      "replaceDone": "{count}件を置換しました",
+      "exportSaved": "{path} に保存しました",
     },
   },
 });

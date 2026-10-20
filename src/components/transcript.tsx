@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Pencil, Undo2 } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
 import { clock } from "@/lib/media";
@@ -17,18 +18,21 @@ function activeIndex(segments: T["segments"], t: number) {
 }
 
 /** The lines of a transcript. Only the visible ones are drawn (TanStack Virtual). */
-export function Transcript({ transcript, time, onSeek, follow, setFollow }: {
+export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert }: {
   transcript: T;
   time: number;
   onSeek(seconds: number): void;
   follow: boolean;
   setFollow(on: boolean): void;
+  onEdit(index: number, start: number, text: string): void;
+  onRevert(index: number, start: number): void;
 }) {
   const t = useMessages();
   const scroller = useRef<HTMLDivElement>(null);
   const segs = transcript.segments;
   const active = useMemo(() => activeIndex(segs, time), [segs, time]);
   const v = useVirtualizer({ count: segs.length, getScrollElement: () => scroller.current, estimateSize: () => 52, overscan: 8 });
+  const [editing, setEditing] = useState(-1);
   const programmatic = useRef(false); // our own scroll must not turn follow off
 
   useEffect(() => {
@@ -56,20 +60,44 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow }: {
           {v.getVirtualItems().map((row) => {
             const s = segs[row.index]!;
             return (
-              <button
+              <div
                 key={row.key}
                 data-index={row.index}
                 ref={v.measureElement}
-                onClick={() => onSeek(s.start)}
-                className={`absolute left-0 top-0 flex w-full cursor-pointer gap-3 px-4 py-2 text-left text-sm hover:bg-muted/60 ${row.index === active ? "bg-muted" : ""}`}
+                onClick={() => editing < 0 && onSeek(s.start)}
+                onDoubleClick={() => setEditing(row.index)}
+                className={`group absolute left-0 top-0 flex w-full cursor-pointer gap-3 px-4 py-2 text-left text-sm hover:bg-muted/60 ${row.index === active ? "bg-muted" : ""}`}
                 style={{ transform: `translateY(${row.start}px)` }}
               >
                 <span className="w-12 shrink-0 pt-0.5 text-xs tabular-nums text-muted-foreground">{clock(s.start)}</span>
-                <span className="min-w-0">
-                  {speaker(s.speaker) && <span className="mr-2 font-medium">{speaker(s.speaker)}</span>}
-                  {s.text}
-                </span>
-              </button>
+                {editing === row.index ? (
+                  <Editor
+                    text={s.text}
+                    onDone={(text) => {
+                      setEditing(-1);
+                      if (text !== null && text !== s.text) onEdit(row.index, s.start, text);
+                    }}
+                  />
+                ) : (
+                  <>
+                    <span className="min-w-0 flex-1">
+                      {speaker(s.speaker) && <span className="mr-2 font-medium">{speaker(s.speaker)}</span>}
+                      {s.text}
+                    </span>
+                    <span className="flex shrink-0 gap-1 opacity-0 group-hover:opacity-100">
+                      {s.text !== s.original && (
+                        <button title={t.segmentRevert()} aria-label={t.segmentRevert()} className="cursor-pointer text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); onRevert(row.index, s.start); }}>
+                          <Undo2 className="size-3.5" />
+                        </button>
+                      )}
+                      <button title={t.segmentEdit()} aria-label={t.segmentEdit()} className="cursor-pointer text-muted-foreground hover:text-foreground" onClick={(e) => { e.stopPropagation(); setEditing(row.index); }}>
+                        <Pencil className="size-3.5" />
+                      </button>
+                    </span>
+                    {s.text !== s.original && <span className="sr-only">{t.segmentEdited()}</span>}
+                  </>
+                )}
+              </div>
             );
           })}
         </div>
@@ -80,5 +108,31 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow }: {
         </Button>
       )}
     </div>
+  );
+}
+
+/** One line being edited. Saves on blur or ⌘Enter, Esc drops the change. Enter alone is the IME's. */
+function Editor({ text, onDone }: { text: string; onDone(text: string | null): void }) {
+  const [v, setV] = useState(text);
+  const done = useRef(false);
+  const finish = (value: string | null) => {
+    if (done.current) return;
+    done.current = true;
+    onDone(value);
+  };
+  return (
+    <textarea
+      autoFocus
+      rows={Math.max(1, Math.ceil(text.length / 40))}
+      className="min-w-0 flex-1 resize-none rounded border bg-background px-2 py-1"
+      value={v}
+      onClick={(e) => e.stopPropagation()}
+      onChange={(e) => setV(e.target.value)}
+      onBlur={() => finish(v)}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") finish(null);
+        else if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.nativeEvent.isComposing) finish(v);
+      }}
+    />
   );
 }

@@ -59,6 +59,7 @@ export interface Recording {
   meta: Meta;
   transcript: Transcript;
   summaries: string[];
+  stale: string[];
 }
 
 /** RecordingState is sent to the page while a recording runs and when it ends. */
@@ -138,9 +139,20 @@ export const Settings = {
  * settings name. Creating and changing recordings is done on the Go side.
  */
 export const Library = {
+  /** AddToDictionary adds a word to dictionary.txt, which the engines get. */
+  addToDictionary(word: string): Promise<void> {
+    return call("Library.AddToDictionary", word);
+  },
   /** ChooseFolder asks for a folder and returns it; "" when canceled. */
   chooseFolder(): Promise<string> {
     return call("Library.ChooseFolder");
+  },
+  /**
+   * EditSegment changes the text of one transcript line. start is the line's
+   * start time as the page has it; the original engine text is kept.
+   */
+  editSegment(id: string, index: number, start: number, text: string): Promise<void> {
+    return call("Library.EditSegment", id, index, start, text);
   },
   /** Get returns one recording with its transcript. */
   get(id: string): Promise<Recording> {
@@ -150,9 +162,24 @@ export const Library = {
   list(): Promise<Meta[]> {
     return call("Library.List");
   },
+  /**
+   * Replace changes every occurrence of find in a recording's transcript and
+   * returns how many lines changed.
+   */
+  replace(id: string, find: string, with_: string): Promise<number> {
+    return call("Library.Replace", id, find, with_);
+  },
+  /** ResetSegment puts the engine's original text back into one line. */
+  resetSegment(id: string, index: number, start: number): Promise<void> {
+    return call("Library.ResetSegment", id, index, start);
+  },
   /** Search finds recordings by title, transcript and summary text. */
   search(query: string): Promise<Hit[]> {
     return call("Library.Search", query);
+  },
+  /** SetTitle renames a recording. */
+  setTitle(id: string, title: string): Promise<void> {
+    return call("Library.SetTitle", id, title);
   },
   /** Summary returns the Markdown of a recording's summary made with a template. */
   summary(id: string, template: string): Promise<string> {
@@ -217,6 +244,22 @@ export const Transcriber = {
    */
   setLanguage(id: string, lang: string): Promise<void> {
     return call("Transcriber.SetLanguage", id, lang);
+  },
+} as const;
+
+/** Exporter is callable from the page. */
+export const Exporter = {
+  /**
+   * Save asks where to put a .md, .txt or .srt file and writes it. It returns
+   * the path, or "" when the dialog was canceled. A .txt and a .srt hold the
+   * transcript; a .md holds what include names.
+   */
+  save(id: string, template: string, format: string, include: string, stamps: boolean): Promise<string> {
+    return call("Exporter.Save", id, template, format, include, stamps);
+  },
+  /** Text returns the text for the clipboard. */
+  text(id: string, template: string, include: string, stamps: boolean): Promise<string> {
+    return call("Exporter.Text", id, template, include, stamps);
   },
 } as const;
 

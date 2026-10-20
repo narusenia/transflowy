@@ -5,6 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Player, type PlayerHandle } from "@/components/player";
 import { Transcript } from "@/components/transcript";
 import { Markdown } from "@/components/summary";
+import { ExportDialog, ReplaceDialog } from "@/components/tools";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import { Library, Summarizer, Transcriber, type Recording, type Template } from "@/mygo";
@@ -54,6 +57,8 @@ export function Detail({ rec, templates, jump, live, onChanged }: {
   const [name, setName] = useState(""); // the summary shown
   const [tpl, setTpl] = useState(""); // the template the button uses
   const [text, setText] = useState("");
+  const [replacing, setReplacing] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     setTime(0);
@@ -103,6 +108,11 @@ export function Detail({ rec, templates, jump, live, onChanged }: {
               {s}
             </Button>
           ))}
+        {rec.stale.includes(name) && (
+          <button title={t.staleHint()} className="cursor-pointer" onClick={() => Summarizer.summarize(meta.id, name).then(onChanged).catch(fail)}>
+            <Badge variant="destructive">{t.staleSummary()}</Badge>
+          </button>
+        )}
         <span className="flex-1" />
         <select aria-label={t.summaryTemplate()} className={select} value={tpl} onChange={(e) => setTpl(e.target.value)}>
           {templates.map((x) => (
@@ -126,17 +136,31 @@ export function Detail({ rec, templates, jump, live, onChanged }: {
       </div>
     </div>
   );
-  const transcriptPane = <Transcript transcript={rec.transcript} time={time} onSeek={seek} follow={follow} setFollow={setFollow} />;
+  const transcriptPane = <Transcript
+      transcript={rec.transcript}
+      time={time}
+      onSeek={seek}
+      follow={follow}
+      setFollow={setFollow}
+      onEdit={(i, start, text) => Library.editSegment(meta.id, i, start, text).then(onChanged).catch(fail)}
+      onRevert={(i, start) => Library.resetSegment(meta.id, i, start).then(onChanged).catch(fail)}
+    />;
 
   return (
     <div className="flex h-full flex-col">
       <header className="space-y-2 border-b px-4 py-3">
-        <h1 className="truncate text-lg font-semibold">{meta.title || new Date(meta.createdAt).toLocaleString()}</h1>
+        <Title key={meta.id} id={meta.id} title={meta.title} fallback={new Date(meta.createdAt).toLocaleString()} onChanged={onChanged} />
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span>{new Date(meta.createdAt).toLocaleString()}</span>
           {meta.duration > 0 && <span>· {clock(meta.duration)}</span>}
           {meta.engine && <span>· {meta.engine}</span>}
           <span className="flex-1" />
+          {!recording && rec.transcript.segments.length > 0 && (
+            <>
+              <Button size="sm" variant="outline" onClick={() => setReplacing(true)}>{t.replaceButton()}</Button>
+              <Button size="sm" variant="outline" onClick={() => setExporting(true)}>{t.exportButton()}</Button>
+            </>
+          )}
           {!recording && meta.status !== "importing" && <Reprocess id={meta.id} language={meta.language ?? ""} detected={meta.detected} onChanged={onChanged} />}
         </div>
         {(meta.status === "failed" || (meta.status === "done" && meta.error)) && (
@@ -168,6 +192,8 @@ export function Detail({ rec, templates, jump, live, onChanged }: {
           </Tabs>
         )}
       </div>
+      <ReplaceDialog id={meta.id} open={replacing} onOpenChange={setReplacing} onChanged={onChanged} />
+      <ExportDialog key={meta.id} id={meta.id} summaries={rec.summaries} template={name} open={exporting} onOpenChange={setExporting} />
       {recording ? (
         <LiveWave live={live} />
       ) : meta.duration > 0 ? (
@@ -224,5 +250,36 @@ function LiveWave({ live }: { live: Live | null }) {
       </div>
       <span className="text-xs text-muted-foreground">{t.liveRecording()}</span>
     </div>
+  );
+}
+
+/** The title: click to rename; an empty title goes back to the date. */
+function Title({ id, title, fallback, onChanged }: { id: string; title: string; fallback: string; onChanged(): void }) {
+  const t = useMessages();
+  const [editing, setEditing] = useState(false);
+  const [v, setV] = useState(title);
+  const save = () => {
+    setEditing(false);
+    if (v.trim() !== title) Library.setTitle(id, v).then(onChanged).catch(fail);
+  };
+  if (!editing)
+    return (
+      <h1 className="cursor-text truncate text-lg font-semibold" title={t.segmentEdit()} onClick={() => { setV(title); setEditing(true); }}>
+        {title || fallback}
+      </h1>
+    );
+  return (
+    <Input
+      autoFocus
+      className="h-8 text-lg font-semibold"
+      value={v}
+      placeholder={t.titlePlaceholder()}
+      onChange={(e) => setV(e.target.value)}
+      onBlur={save}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") setEditing(false);
+        else if (e.key === "Enter" && !e.nativeEvent.isComposing) save();
+      }}
+    />
   );
 }
