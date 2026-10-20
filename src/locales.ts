@@ -280,6 +280,10 @@ export interface Messages {
    */
   playbackSpeed(): string;
   /**
+   * `無音をスキップ`
+   */
+  skipSilence(): string;
+  /**
    * `音声がまだありません`
    */
   noAudio(): string;
@@ -917,6 +921,7 @@ const catalog = createCatalog<Messages>({
     "languageJa": [],
     "languageEn": [],
     "playbackSpeed": [],
+    "skipSilence": [],
     "noAudio": [],
     "settings": [],
     "settingsTranscribe": [],
@@ -1129,6 +1134,7 @@ const catalog = createCatalog<Messages>({
       "languageJa": "日本語",
       "languageEn": "英語",
       "playbackSpeed": "再生速度",
+      "skipSilence": "無音をスキップ",
       "noAudio": "音声がまだありません",
       "settings": "設定",
       "settingsTranscribe": "文字起こし",

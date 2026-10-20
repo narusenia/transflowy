@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 import { IconButton } from "@/components/icon-button";
-import { Pause, Play } from "lucide-react";
+import { FastForward, Pause, Play } from "lucide-react";
 import { clock, mediaUrl } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import { useDark } from "@/lib/theme";
@@ -15,6 +15,25 @@ const speeds = [0.75, 1, 1.25, 1.5, 2];
 // Shown while a recording has no peaks.json (made before peaks existed).
 const flat = Array.from({ length: 300 }, () => 0.25);
 
+const SILENT = 0.02; // a peak below this is silence
+const MIN_SILENCE = 1.5; // seconds: shorter pauses are left alone
+
+/** [start, end] seconds of the runs of quiet bars. Resolution is one bar: a bar is long in a long recording. */
+function silences(peaks: number[], duration: number): [number, number][] {
+  const bar = duration / peaks.length;
+  const out: [number, number][] = [];
+  let from = -1;
+  for (let i = 0; i <= peaks.length; i++) {
+    const quiet = i < peaks.length && (peaks[i] ?? 1) < SILENT;
+    if (quiet && from < 0) from = i;
+    if (!quiet && from >= 0) {
+      if ((i - from) * bar >= MIN_SILENCE) out.push([from * bar, i * bar]);
+      from = -1;
+    }
+  }
+  return out;
+}
+
 /** The bottom player: wavesurfer.js draws the saved peaks and never decodes the audio. */
 export const Player = forwardRef<PlayerHandle, { id: string; duration: number; done: boolean; onTime(seconds: number): void }>(
   function Player({ id, duration, done, onTime }, ref) {
@@ -27,6 +46,10 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; d
     const [playing, setPlaying] = useState(false);
     const [time, setTime] = useState(0);
     const [speed, setSpeed] = useState(1);
+    const [skip, setSkip] = useState(false);
+    const skipRef = useRef(false);
+    skipRef.current = skip;
+    const quiet = useRef<[number, number][]>([]);
 
     useImperativeHandle(ref, () => ({
       seek(seconds, play) {
@@ -65,7 +88,10 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; d
             cursorWidth: 2,
             cursorColor: style.getPropertyValue("--destructive") || "#e11d48",
           });
+          quiet.current = silences(peaks, duration);
           w.on("timeupdate", (s) => {
+            const gap = skipRef.current && quiet.current.find(([a, b]) => s >= a && s < b);
+            if (gap) w.setTime(gap[1]); // jump over the silence
             setTime(s);
             onTimeRef.current(s);
           });
@@ -104,6 +130,9 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; d
           {clock(time)} / {clock(duration)}
         </span>
         <div ref={box} className="min-w-0 flex-1" />
+        <IconButton size="icon" side="top" variant={skip ? "secondary" : "ghost"} label={t.skipSilence()} onClick={() => setSkip(!skip)}>
+          <FastForward />
+        </IconButton>
         <select
           aria-label={t.playbackSpeed()}
           className="h-7 rounded-md border bg-transparent px-1 text-xs"
