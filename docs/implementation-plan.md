@@ -82,11 +82,18 @@
 
 ## Phase 4: 要約
 
-- [ ] プロバイダ: OpenRouter / OpenAI 互換 URL、Ollama 自動検出
-- [ ] 組み込みテンプレート 6 種とユーザーテンプレート読み込み
-- [ ] 要約の自動実行、別テンプレートでの再生成、複数要約の保持
-- [ ] タイトル自動生成
-- [ ] 要約中のタイムスタンプ `[mm:ss]` の出力
+- [x] プロバイダ: OpenRouter / OpenAI 互換 URL、Ollama 自動検出（`summarize.Chat` が `/chat/completions` を呼ぶ。送信は `netguard` のクライアント経由。Ollama は `Summarizer.DetectOllama` がモデル一覧を返し、画面が openai-compat の `http://localhost:11434/v1` として設定する。モデルの既定は空で、未選択は待機）
+  - 実 API（OpenRouter、`anthropic/claude-haiku-4.5`）で、合成の文字起こしからタイトル行・`[mm:ss]`・節構成が出ることを確認。Ollama と OpenAI 互換の実サーバは未確認
+- [x] 組み込みテンプレート 6 種とユーザーテンプレート読み込み（`internal/summarize/templates/*.md` を埋め込み。ユーザー分は `<保存先>/templates/*.md`、同名は置き換え。frontmatter は `name` / `description`）
+- [x] 要約の自動実行、別テンプレートでの再生成、複数要約の保持（文字起こし完了で `Settings.Template`（既定「汎用メモ」）を自動実行。`Summarizer.Summarize(id, template)` で再生成。状態 `summarizing` = 要約待ち。失敗は文字起こしを `done` のまま `meta.error` に出す）
+- [x] タイトル自動生成（要約と同時。`meta.title` が空のときだけ設定し、取り込みやユーザーが付けた題は上書きしない）
+- [x] 要約中のタイムスタンプ `[mm:ss]` の出力（文字起こしを `[mm:ss] 話者N: 本文` で渡し、根拠の時刻を行末に付けさせる。1 時間超は `[75:00]`）
+
+**Phase 4 の制約・追加タスク**
+
+- 長い文字起こしは分割せず 1 回で送る。モデルの文脈長を超える長時間録音は失敗する（分割要約は必要になったら足す）
+- 文字起こしの再処理で要約も既定テンプレートで作り直される（他テンプレートの要約は古いまま残る → Phase 6 の「再生成」バッジ）
+- テンプレート選択・要約表示の画面は Phase 5。設定画面（要約モデル・テンプレート）も Phase 5
 
 ## Phase 5: 画面
 
