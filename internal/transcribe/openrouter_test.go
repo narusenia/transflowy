@@ -62,3 +62,41 @@ func TestErrorKinds(t *testing.T) {
 		t.Error("retryable statuses")
 	}
 }
+
+func TestWhisperRequest(t *testing.T) {
+	var form map[string]string
+	var auth string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.ParseMultipartForm(1 << 20)
+		auth = r.Header.Get("Authorization")
+		form = map[string]string{}
+		for k, v := range r.MultipartForm.Value {
+			form[k] = v[0]
+		}
+		if _, _, err := r.FormFile("file"); err != nil {
+			t.Error("no file field")
+		}
+		w.Write([]byte(`{"language":"japanese","segments":[{"start":0,"end":1.5,"text":" 田中さん\n"},{"start":1.5,"end":2,"text":" "}]}`))
+	}))
+	defer srv.Close()
+
+	local := Whisper{Client: srv.Client(), URL: srv.URL, Local: true}
+	res, err := local.Transcribe(context.Background(), Request{WAV: []byte("RIFF"), Phrases: []string{"田中", "API"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if form["language"] != "auto" || form["prompt"] != "田中, API" || form["model"] != "" || auth != "" {
+		t.Errorf("local form: %v auth=%q", form, auth)
+	}
+	if len(res.Segments) != 1 || res.Segments[0].Text != "田中さん" || res.Segments[0].Speaker != -1 { // empty segment dropped
+		t.Errorf("result: %+v", res)
+	}
+
+	compat := Whisper{Client: srv.Client(), URL: srv.URL, Model: "whisper-1", Key: func() (string, error) { return "k", nil }}
+	if _, err := compat.Transcribe(context.Background(), Request{WAV: []byte("RIFF")}); err != nil {
+		t.Fatal(err)
+	}
+	if _, has := form["language"]; has || form["model"] != "whisper-1" || auth != "Bearer k" {
+		t.Errorf("compat form: %v auth=%q", form, auth)
+	}
+}
