@@ -82,4 +82,4 @@ go test ./...
 
 ## ライセンス
 
-[MIT](LICENSE)
+[MIT](LICENSE)。含まれるソフトウェアと、ダウンロードするモデルのライセンスは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)（アプリ内でも、情報ボタンの「オープンソースライセンス」で見られる）。依存を変えたら `bun run notices` を実行する。

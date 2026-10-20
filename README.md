@@ -82,4 +82,4 @@ Details: [docs/requirements.md](docs/requirements.md), [docs/implementation-plan
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE). Licenses of the software it includes and the models it downloads: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) (also in the app: the info button, then the open source licenses). After the dependencies change, run `bun run notices`.
