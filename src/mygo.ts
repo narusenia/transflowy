@@ -367,6 +367,18 @@ export const Summarizer = {
   },
 } as const;
 
+/** About is callable from the About dialog. */
+export const About = {
+  /** OpenRepository opens the project page in the browser. */
+  openRepository(): Promise<void> {
+    return call("About.OpenRepository");
+  },
+  /** Version is the version of the packaged app; empty when it runs in development. */
+  version(): Promise<string> {
+    return call("About.Version");
+  },
+} as const;
+
 /** Models is callable from the page. */
 export const Models = {
   /**

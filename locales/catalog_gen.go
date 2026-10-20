@@ -752,6 +752,76 @@ func (msgs Messages) Settings() string {
 	return Catalog.Format(msgs.locale, "settings", nil)
 }
 
+// About says "transflowy について"
+// in the language the app shows.
+func About() string { return In(i18n.Locale()).About() }
+
+// About says "transflowy について"
+// in the language of msgs.
+func (msgs Messages) About() string {
+	return Catalog.Format(msgs.locale, "about", nil)
+}
+
+// AboutVersion says "バージョン {version}"
+// in the language the app shows.
+func AboutVersion(version string) string { return In(i18n.Locale()).AboutVersion(version) }
+
+// AboutVersion says "バージョン {version}"
+// in the language of msgs.
+func (msgs Messages) AboutVersion(version string) string {
+	return Catalog.Format(msgs.locale, "aboutVersion", map[string]any{"version": version})
+}
+
+// AboutDevBuild says "開発ビルド"
+// in the language the app shows.
+func AboutDevBuild() string { return In(i18n.Locale()).AboutDevBuild() }
+
+// AboutDevBuild says "開発ビルド"
+// in the language of msgs.
+func (msgs Messages) AboutDevBuild() string {
+	return Catalog.Format(msgs.locale, "aboutDevBuild", nil)
+}
+
+// AboutLicense says "MIT ライセンス · © 2026 Naruse Nia"
+// in the language the app shows.
+func AboutLicense() string { return In(i18n.Locale()).AboutLicense() }
+
+// AboutLicense says "MIT ライセンス · © 2026 Naruse Nia"
+// in the language of msgs.
+func (msgs Messages) AboutLicense() string {
+	return Catalog.Format(msgs.locale, "aboutLicense", nil)
+}
+
+// AboutRepository says "GitHub で開く"
+// in the language the app shows.
+func AboutRepository() string { return In(i18n.Locale()).AboutRepository() }
+
+// AboutRepository says "GitHub で開く"
+// in the language of msgs.
+func (msgs Messages) AboutRepository() string {
+	return Catalog.Format(msgs.locale, "aboutRepository", nil)
+}
+
+// AboutNotices says "オープンソースライセンス"
+// in the language the app shows.
+func AboutNotices() string { return In(i18n.Locale()).AboutNotices() }
+
+// AboutNotices says "オープンソースライセンス"
+// in the language of msgs.
+func (msgs Messages) AboutNotices() string {
+	return Catalog.Format(msgs.locale, "aboutNotices", nil)
+}
+
+// AboutNoticesHide says "ライセンスを閉じる"
+// in the language the app shows.
+func AboutNoticesHide() string { return In(i18n.Locale()).AboutNoticesHide() }
+
+// AboutNoticesHide says "ライセンスを閉じる"
+// in the language of msgs.
+func (msgs Messages) AboutNoticesHide() string {
+	return Catalog.Format(msgs.locale, "aboutNoticesHide", nil)
+}
+
 // SettingsTranscribe says "文字起こし"
 // in the language the app shows.
 func SettingsTranscribe() string { return In(i18n.Locale()).SettingsTranscribe() }

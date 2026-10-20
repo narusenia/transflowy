@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Onboarding } from "@/components/onboarding";
 import { Detail, type Jump } from "@/components/detail";
 import { Search } from "@/components/search";
+import { AboutDialog } from "@/components/about";
 import { SettingsDialog } from "@/components/settings";
 import { Sidebar } from "@/components/sidebar";
 import { TitleBar } from "@/components/titlebar";
@@ -35,6 +36,7 @@ export function App() {
   const [sidebar, setSidebar] = useState(true);
   const [searching, setSearching] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [canCapture, setCanCapture] = useState(false);
   const [capture, setCapture] = useState(false);
   const [renameId, setRenameId] = useState("");
@@ -127,7 +129,7 @@ export function App() {
     <TooltipProvider delay={400}>
     <div className="flex h-screen flex-col text-sm">
       <Toaster position="bottom-center" theme={dark ? "dark" : "light"} />
-      <TitleBar onToggleSidebar={() => setSidebar((s) => !s)} onSearch={() => setSearching(true)} onSettings={() => setSettingsOpen(true)} />
+      <TitleBar onToggleSidebar={() => setSidebar((s) => !s)} onSearch={() => setSearching(true)} onSettings={() => setSettingsOpen(true)} onAbout={() => setAboutOpen(true)} />
       <div className="flex min-h-0 flex-1">
       {sidebar && (
         <Sidebar
@@ -166,6 +168,7 @@ export function App() {
       </main>
       </div>
       <Search open={searching} onOpenChange={setSearching} onPick={pick} />
+      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} onChanged={() => Summarizer.templates().then(setTemplates).catch(() => {})} />
     </div>
     </TooltipProvider>

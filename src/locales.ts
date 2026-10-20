@@ -292,6 +292,34 @@ export interface Messages {
    */
   settings(): string;
   /**
+   * `transflowy について`
+   */
+  about(): string;
+  /**
+   * `バージョン {version}`
+   */
+  aboutVersion(version: string): string;
+  /**
+   * `開発ビルド`
+   */
+  aboutDevBuild(): string;
+  /**
+   * `MIT ライセンス · © 2026 Naruse Nia`
+   */
+  aboutLicense(): string;
+  /**
+   * `GitHub で開く`
+   */
+  aboutRepository(): string;
+  /**
+   * `オープンソースライセンス`
+   */
+  aboutNotices(): string;
+  /**
+   * `ライセンスを閉じる`
+   */
+  aboutNoticesHide(): string;
+  /**
    * `文字起こし`
    */
   settingsTranscribe(): string;
@@ -924,6 +952,13 @@ const catalog = createCatalog<Messages>({
     "skipSilence": [],
     "noAudio": [],
     "settings": [],
+    "about": [],
+    "aboutVersion": ["version"],
+    "aboutDevBuild": [],
+    "aboutLicense": [],
+    "aboutRepository": [],
+    "aboutNotices": [],
+    "aboutNoticesHide": [],
     "settingsTranscribe": [],
     "settingsSummarize": [],
     "settingsKeys": [],
@@ -1137,6 +1172,13 @@ const catalog = createCatalog<Messages>({
       "skipSilence": "無音をスキップ",
       "noAudio": "音声がまだありません",
       "settings": "設定",
+      "about": "transflowy について",
+      "aboutVersion": "バージョン {version}",
+      "aboutDevBuild": "開発ビルド",
+      "aboutLicense": "MIT ライセンス · © 2026 Naruse Nia",
+      "aboutRepository": "GitHub で開く",
+      "aboutNotices": "オープンソースライセンス",
+      "aboutNoticesHide": "ライセンスを閉じる",
       "settingsTranscribe": "文字起こし",
       "settingsSummarize": "要約",
       "settingsKeys": "API キー",

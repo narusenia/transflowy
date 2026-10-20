@@ -1,4 +1,4 @@
-import { PanelLeft, Search, Settings as Gear } from "lucide-react";
+import { Info, PanelLeft, Search, Settings as Gear } from "lucide-react";
 import { IconButton } from "@/components/icon-button";
 import { useMessages } from "@/i18n";
 
@@ -7,7 +7,7 @@ import { useMessages } from "@/i18n";
  * lights); mygo tells the page how much room they take in CSS variables, and
  * `--app-region: drag` makes the bar move the window. Buttons inside stay clickable.
  */
-export function TitleBar({ onToggleSidebar, onSearch, onSettings }: { onToggleSidebar(): void; onSearch(): void; onSettings(): void }) {
+export function TitleBar({ onToggleSidebar, onSearch, onSettings, onAbout }: { onToggleSidebar(): void; onSearch(): void; onSettings(): void; onAbout(): void }) {
   const t = useMessages();
   return (
     <header
@@ -27,6 +27,9 @@ export function TitleBar({ onToggleSidebar, onSearch, onSettings }: { onToggleSi
       </IconButton>
       <IconButton variant="ghost" label={t.settings()} onClick={onSettings}>
         <Gear />
+      </IconButton>
+      <IconButton variant="ghost" label={t.about()} onClick={onAbout}>
+        <Info />
       </IconButton>
     </header>
   );

@@ -128,6 +128,20 @@
   "skipSilence": "無音をスキップ",
   "noAudio": "音声がまだありません",
   "settings": "設定",
+  "about": "transflowy について",
+  "aboutVersion": "バージョン {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDevBuild": "開発ビルド",
+  "aboutLicense": "MIT ライセンス · © 2026 Naruse Nia",
+  "aboutRepository": "GitHub で開く",
+  "aboutNotices": "オープンソースライセンス",
+  "aboutNoticesHide": "ライセンスを閉じる",
   "settingsTranscribe": "文字起こし",
   "settingsSummarize": "要約",
   "settingsKeys": "API キー",
