@@ -95,6 +95,9 @@ func (s Store) dir(id string) (string, error) {
 	return filepath.Join(s.Root, id), nil
 }
 
+// Path returns a recording's folder.
+func (s Store) Path(id string) (string, error) { return s.dir(id) }
+
 // SaveMeta writes meta.json.
 func (s Store) SaveMeta(m Meta) error { return s.write(m.ID, "meta.json", m) }
 
@@ -195,7 +198,7 @@ func sanitize(title string) string {
 	r := strings.NewReplacer("/", "-", "\\", "-", ":", "-", "\x00", "")
 	t := strings.TrimSpace(strings.TrimLeft(r.Replace(title), "."))
 	if t == "" {
-		return "recording"
+		return "録音"
 	}
 	if rs := []rune(t); len(rs) > 40 {
 		t = string(rs[:40])
