@@ -19,6 +19,7 @@ A desktop app for macOS that records, transcribes and summarizes meetings and no
 - **Play** with speed control, a caption of the playing line, the playhead following the transcript, and an option to skip silence.
 - **Search** titles, transcripts and summaries with `⌘K`.
 - **Export** to the clipboard, `.md`, `.txt` or `.srt`.
+- **Japanese and English** UI. It follows the system language; choose one in the settings. The built-in summary templates come in both.
 - **Local only** switch: while it is on, nothing is sent to the cloud. One guard (`internal/netguard`) covers every request.
 
 ## Data
