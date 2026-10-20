@@ -138,3 +138,22 @@
     overflow: hidden;
     }
 }
+/* Shimmer (components/ui/shimmer.tsx): a highlight sweeps over muted text. */
+@keyframes shimmer {
+  from { background-position: 100% center; }
+  to { background-position: 0% center; }
+}
+.shimmer {
+  background-image:
+    linear-gradient(90deg, #0000 calc(50% - var(--spread)), var(--color-background), #0000 calc(50% + var(--spread))),
+    linear-gradient(var(--color-muted-foreground), var(--color-muted-foreground));
+  background-size: 250% 100%, auto;
+  background-repeat: no-repeat, padding-box;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; background-image: none; color: var(--color-muted-foreground); }
+}
