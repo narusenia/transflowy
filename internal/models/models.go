@@ -19,8 +19,25 @@ var Whisper = Model{
 	URL:  "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin",
 }
 
-// Model is a file to fetch into the models directory.
-type Model struct{ File, URL string }
+// The local speaker diarization models (sherpa-onnx): pyannote segmentation 3.0
+// finds who speaks when, and a speaker embedding model tells the voices apart.
+// Together they are about 45 MB.
+var (
+	SpeakerSegmentation = Model{
+		File: "pyannote-segmentation-3-0.onnx",
+		URL:  "https://huggingface.co/csukuangfj/sherpa-onnx-pyannote-segmentation-3-0/resolve/main/model.onnx",
+	}
+	SpeakerEmbedding = Model{
+		File: "3dspeaker_eres2net_base_sv_zh-cn_16k.onnx",
+		URL:  "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2net_base_sv_zh-cn_3dspeaker_16k.onnx",
+		// GitHub releases do not send a checksum header.
+		SHA256: "1a331345f04805badbb495c775a6ddffcdd1a732567d5ec8b3d5749e3c7a5e4b",
+	}
+)
+
+// Model is a file to fetch into the models directory. SHA256 is checked when
+// the server names none of its own.
+type Model struct{ File, URL, SHA256 string }
 
 // Path returns where the model lives under dir.
 func (m Model) Path(dir string) string { return filepath.Join(dir, m.File) }
@@ -97,7 +114,11 @@ func (m Model) Download(ctx context.Context, dir string, progress func(done, tot
 	if err := f.Close(); err != nil {
 		return err
 	}
-	if want := strings.Trim(resp.Header.Get("X-Linked-Etag"), `"`); len(want) == 64 {
+	want := strings.Trim(resp.Header.Get("X-Linked-Etag"), `"`)
+	if len(want) != 64 {
+		want = m.SHA256
+	}
+	if len(want) == 64 {
 		if got, err := sum(part); err != nil || got != want {
 			_ = os.Remove(part) // a corrupt file is not resumed
 			return fmt.Errorf("download: checksum mismatch")
