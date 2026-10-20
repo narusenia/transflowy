@@ -30,13 +30,14 @@ export function Onboarding({ settings, onDone }: { settings: S; onDone(): void }
   const [hasKey, setHasKey] = useState(false);
   const [trial, setTrial] = useState<"" | "recording" | "working">("");
   const [heard, setHeard] = useState<string | null>(null);
-  const [model, setModel] = useState<ModelStatus>({ present: false, downloading: false });
+  const [model, setModel] = useState<ModelStatus>({ present: false, downloading: false, speakerPresent: false, speakerDownloading: false });
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
     Models.status().then(setModel);
     Settings.hasKey("openrouter").then(setHasKey).catch(() => {});
     return events.modelChanged.on((p) => {
+      if (p.kind !== "whisper") return;
       if (p.state === "downloading") setPct(p.total ? Math.floor((p.done / p.total) * 100) : 0);
       Models.status().then(setModel);
     });

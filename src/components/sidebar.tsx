@@ -10,7 +10,7 @@ import { Mic, Square, Upload } from "lucide-react";
 function statusBadge(t: Messages, m: Meta) {
   const label: Record<string, string> = {
     recording: t.statusRecording(), importing: t.statusImporting(), queued: t.statusQueued(),
-    summarizing: t.statusSummarizing(), failed: t.statusFailed(),
+    summarizing: t.statusSummarizing(), diarizing: t.statusDiarizing(), failed: t.statusFailed(),
   };
   if (m.status === "processing") {
     const pct = m.duration > 0 ? Math.min(99, Math.floor(((m.processedUntil ?? 0) / m.duration) * 100)) : 0;

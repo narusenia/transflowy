@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useMessages } from "@/i18n";
 import { getMode, setMode, type Mode } from "@/lib/theme";
-import { Library, Recorder, Settings, Summarizer, type Provider, type Settings as S, type Template } from "@/mygo";
+import { events, Library, Models, Recorder, Settings, Summarizer, type ModelStatus, type Provider, type Settings as S, type Template } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
 const select = "h-8 rounded-md border bg-transparent px-2 text-sm";
@@ -79,6 +79,8 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
   const [templates, setTemplates] = useState<Template[]>([]);
   const [ollama, setOllama] = useState<string[] | null>(null);
   const [devices, setDevices] = useState<string[]>([]);
+  const [models, setModels] = useState<ModelStatus | null>(null);
+  const [speakerPct, setSpeakerPct] = useState(0);
   const [mode, setModeState] = useState<Mode>(getMode);
 
   useEffect(() => {
@@ -86,7 +88,15 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
     Settings.get().then(setS).catch(fail);
     Summarizer.templates().then(setTemplates).catch(() => setTemplates([]));
     Recorder.devices().then(setDevices).catch(() => setDevices([]));
+    Models.status().then(setModels).catch(() => {});
+    const off = events.modelChanged.on((p) => {
+      if (p.kind !== "speaker") return;
+      if (p.state === "downloading") setSpeakerPct(p.total ? Math.floor((p.done / p.total) * 100) : 0);
+      if (p.state === "failed") toast.error(p.error ?? "");
+      Models.status().then(setModels).catch(() => {});
+    });
     setOllama(null);
+    return off;
   }, [open]);
 
   const save = (next: S) => {
@@ -136,6 +146,27 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
             <section className="py-2">
               <h3 className="pt-2 text-sm font-semibold">{t.settingsTranscribe()}</h3>
               <ProviderFields p={s.transcribe} kinds={["local", "openrouter", "openai-compat"]} modelHint={t.modelDefault()} onChange={(p) => save({ ...s, transcribe: p })} />
+            </section>
+            <section className="py-2">
+              <h3 className="pt-2 text-sm font-semibold">{t.settingsDiarization()}</h3>
+              <Row label={t.localDiarization()} hint={t.localDiarizationHint()}>
+                <Switch
+                  checked={s.localDiarization}
+                  onCheckedChange={(v) => {
+                    save({ ...s, localDiarization: v });
+                    if (v && models && !models.speakerPresent) Models.downloadSpeaker().catch(fail); // it needs the models
+                  }}
+                />
+                {s.localDiarization && models && (
+                  models.speakerPresent ? (
+                    <p className="text-xs text-muted-foreground">{t.speakerModelReady()}</p>
+                  ) : models.speakerDownloading ? (
+                    <p className="text-xs">{t.speakerModelProgress(speakerPct)}</p>
+                  ) : (
+                    <Button size="sm" variant="outline" onClick={() => Models.downloadSpeaker().catch(fail)}>{t.speakerModelDownload()}</Button>
+                  )
+                )}
+              </Row>
             </section>
             <section className="py-2">
               <h3 className="pt-2 text-sm font-semibold">{t.settingsSummarize()}</h3>

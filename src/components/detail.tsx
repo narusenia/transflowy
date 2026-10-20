@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Replace, RotateCw, Users } from "lucide-react";
+import { AudioLines, Download, Replace, RotateCw, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/icon-button";
@@ -168,6 +168,9 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
                   <Users />
                 </IconButton>
               )}
+              <IconButton variant="outline" label={t.diarizeAgain()} disabled={meta.status !== "done"} onClick={() => Transcriber.diarize(meta.id).then(onChanged).catch(fail)}>
+                <AudioLines />
+              </IconButton>
               <IconButton variant="outline" label={t.replaceButton()} onClick={() => setReplacing(true)}>
                 <Replace />
               </IconButton>

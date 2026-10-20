@@ -30,7 +30,7 @@ export function App() {
   const [selected, setSelected] = useState("");
   const [detail, setDetail] = useState<Recording | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [model, setModel] = useState<ModelStatus>({ present: true, downloading: false });
+  const [model, setModel] = useState<ModelStatus>({ present: true, downloading: false, speakerPresent: false, speakerDownloading: false });
   const [percent, setPercent] = useState(0);
   const [sidebar, setSidebar] = useState(true);
   const [searching, setSearching] = useState(false);
@@ -92,6 +92,7 @@ export function App() {
       }),
       events.importFailed.on((p) => toast.error(p.message)),
       events.modelChanged.on((p) => {
+        if (p.kind !== "whisper") return; // the speaker models report in the settings
         if (p.state === "downloading") setPercent(p.total ? Math.floor((p.done / p.total) * 100) : 0);
         if (p.state === "failed") toast.error(`${tRef.current.modelFailed()}: ${p.error ?? ""}`);
         Models.status().then(setModel);
