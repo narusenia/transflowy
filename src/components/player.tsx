@@ -59,7 +59,9 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; o
             barRadius: 2,
             waveColor: style.getPropertyValue("--muted-foreground") || "#888",
             progressColor: style.getPropertyValue("--primary") || "#000",
-            cursorWidth: 0,
+            // A red bar at the playhead: the played part alone is hard to tell from the rest.
+            cursorWidth: 2,
+            cursorColor: style.getPropertyValue("--destructive") || "#e11d48",
           });
           w.on("timeupdate", (s) => {
             setTime(s);
