@@ -722,6 +722,16 @@ func (msgs Messages) PlaybackSpeed() string {
 	return Catalog.Format(msgs.locale, "playbackSpeed", nil)
 }
 
+// SkipSilence says "無音をスキップ"
+// in the language the app shows.
+func SkipSilence() string { return In(i18n.Locale()).SkipSilence() }
+
+// SkipSilence says "無音をスキップ"
+// in the language of msgs.
+func (msgs Messages) SkipSilence() string {
+	return Catalog.Format(msgs.locale, "skipSilence", nil)
+}
+
 // NoAudio says "音声がまだありません"
 // in the language the app shows.
 func NoAudio() string { return In(i18n.Locale()).NoAudio() }
