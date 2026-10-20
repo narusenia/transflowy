@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "transflowy uses the microphone to record meetings and notes and transcribe them.";
+"NSAudioCaptureUsageDescription" = "transflowy records the sound that comes out of this Mac, such as the other side of a meeting, to transcribe it.";
