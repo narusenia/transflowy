@@ -80,6 +80,19 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; o
       };
     }, [id, duration]);
 
+    // Space plays and pauses, unless it types a space or presses a control of a dialog.
+    useEffect(() => {
+      const on = (e: KeyboardEvent) => {
+        if (e.key !== " " || e.repeat || e.isComposing || e.metaKey || e.ctrlKey || e.altKey) return;
+        const el = e.target as HTMLElement;
+        if (el.closest("input, textarea, select, [contenteditable=true], [role=dialog]")) return;
+        e.preventDefault(); // also stops a focused row or button from being "clicked"
+        ws.current?.playPause();
+      };
+      window.addEventListener("keydown", on);
+      return () => window.removeEventListener("keydown", on);
+    }, []);
+
     return (
       <div className="flex items-center gap-3 border-t px-4 py-2">
         <IconButton size="icon" side="top" variant="ghost" label={playing ? t.pause() : t.play()} onClick={() => ws.current?.playPause()}>
