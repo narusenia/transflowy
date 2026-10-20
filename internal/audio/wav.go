@@ -81,6 +81,41 @@ func WAVBytes(pcm []int16, sampleRate int) []byte {
 	return b
 }
 
+// dataChunk finds the samples in a WAV: after the header chunks, which
+// afconvert pads with a 4 KB FLLR chunk, so the data does not start at 44. The
+// length is clamped to the file: a recording in progress is only as long as
+// what was written.
+func dataChunk(f *os.File) (offset, length int64, err error) {
+	fi, err := f.Stat()
+	if err != nil {
+		return 0, 0, err
+	}
+	pos := int64(12) // after "RIFF<size>WAVE"
+	var h [8]byte
+	for pos+8 <= fi.Size() {
+		if _, err := f.ReadAt(h[:], pos); err != nil {
+			return 0, 0, err
+		}
+		size := int64(binary.LittleEndian.Uint32(h[4:]))
+		if string(h[:4]) == "data" {
+			return pos + 8, min(size, fi.Size()-pos-8), nil
+		}
+		pos += 8 + size + size&1 // chunks are padded to an even size
+	}
+	return 0, 0, errors.New("wav: no data chunk")
+}
+
+// PCMSamples returns how many samples a 16-bit mono WAV holds.
+func PCMSamples(path string) (int, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+	_, n, err := dataChunk(f)
+	return int(n / 2), err
+}
+
 // ReadPCM reads up to limit samples of a 16-bit mono WAV, starting at sample
 // from. It returns fewer than limit samples at the end of the file.
 func ReadPCM(path string, from, limit int) ([]int16, error) {
@@ -89,8 +124,16 @@ func ReadPCM(path string, from, limit int) ([]int16, error) {
 		return nil, err
 	}
 	defer f.Close()
-	buf := make([]byte, limit*2)
-	n, err := f.ReadAt(buf, 44+int64(from)*2)
+	off, length, err := dataChunk(f)
+	if err != nil {
+		return nil, err
+	}
+	want := min(int64(limit)*2, length-int64(from)*2)
+	if want <= 0 {
+		return []int16{}, nil
+	}
+	buf := make([]byte, want)
+	n, err := f.ReadAt(buf, off+int64(from)*2)
 	if err != nil && !errors.Is(err, io.EOF) {
 		return nil, err
 	}

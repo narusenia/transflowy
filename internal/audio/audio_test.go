@@ -39,6 +39,26 @@ func TestWAVAndConvert(t *testing.T) {
 	if runtime.GOOS != "darwin" {
 		t.Skip("conversion is macOS only")
 	}
+	// afconvert pads its WAV with a 4 KB chunk: samples must still be found.
+	padded := filepath.Join(dir, "padded.wav")
+	if err := ToWAV16k(wav, padded); err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := os.Stat(padded); st.Size() <= int64(44+len(pcm)) {
+		t.Log("afconvert wrote no padding here")
+	}
+	want, _ := ReadPCM(wav, 0, 1<<20)
+	got, err := ReadPCM(padded, 0, 1<<20)
+	if err != nil || len(got) != len(want) || got[1234] != want[1234] || got[15999] != want[15999] {
+		t.Fatalf("padded wav: %d samples, err %v", len(got), err)
+	}
+	if n, _ := PCMSamples(padded); n != 16000 {
+		t.Fatalf("PCMSamples = %d", n)
+	}
+	if tail, _ := ReadPCM(padded, 15000, 5000); len(tail) != 1000 { // clamped at the end
+		t.Fatalf("tail %d", len(tail))
+	}
+
 	m4a := filepath.Join(dir, "a.m4a")
 	back := filepath.Join(dir, "back.wav")
 	if err := ToM4A(wav, m4a); err != nil {
