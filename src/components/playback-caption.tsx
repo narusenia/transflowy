@@ -33,8 +33,8 @@ export function PlaybackCaption({ transcript, time }: { transcript: Transcript; 
   const shown = on && seg && time <= Math.max(seg.end, seg.start) + HOLD ? seg : undefined;
   const name = shown ? speakerName(t, transcript, shown.speaker) : "";
   return (
-    <div className="flex min-h-14 items-center gap-3 border-t px-4 py-2">
-      <p className="min-w-0 flex-1 text-center text-lg leading-snug">
+    <div className="flex h-16 items-center gap-3 border-t px-4 py-2">
+      <p className="min-w-0 flex-1 line-clamp-2 text-center text-lg leading-snug" title={shown?.text}>
         {name && <span className="mr-2 text-sm font-medium text-muted-foreground">{name}</span>}
         {shown?.text}
       </p>
