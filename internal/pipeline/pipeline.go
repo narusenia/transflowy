@@ -36,6 +36,13 @@ type Job struct {
 	Diarize bool
 }
 
+// NotReadyError means the engine cannot work yet: no API key, no model, or
+// local-only on with a cloud engine chosen. The recording keeps waiting and is
+// processed when the settings change; it is not a failure.
+type NotReadyError struct{ Msg string }
+
+func (e NotReadyError) Error() string { return e.Msg }
+
 // Config connects the queue to the app. Sleep is for tests.
 type Config struct {
 	Store   func() (library.Store, error)
@@ -159,6 +166,14 @@ func (q *Queue) process(ctx context.Context, req request) {
 		return
 	}
 	job, err := q.cfg.Engine(req.kind)
+	var nr NotReadyError
+	if errors.As(err, &nr) {
+		if rec.Meta.Status != library.StatusRecording {
+			_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusQueued, nr.Msg })
+			q.changed(id)
+		}
+		return
+	}
 	if err != nil {
 		q.fail(st, id, rec.Meta.Status == library.StatusRecording, err)
 		return

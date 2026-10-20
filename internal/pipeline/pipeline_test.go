@@ -164,3 +164,17 @@ func TestWorksWhileStillRecording(t *testing.T) {
 		t.Fatalf("%v segs=%d polls=%d", r.Meta.Status, len(r.Transcript.Segments), polls)
 	}
 }
+
+func TestNotReadyWaitsInsteadOfFailing(t *testing.T) {
+	e := setup(t, library.StatusQueued, 5)
+	e.q.cfg.Engine = func(string) (Job, error) { return Job{}, NotReadyError{"no key"} }
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go e.q.Run(ctx)
+	e.q.Enqueue(e.id, "", false)
+	time.Sleep(200 * time.Millisecond)
+	r, _ := e.st.Get(e.id)
+	if r.Meta.Status != library.StatusQueued || r.Meta.Error != "no key" {
+		t.Fatalf("%v %q", r.Meta.Status, r.Meta.Error)
+	}
+}
