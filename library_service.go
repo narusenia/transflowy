@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/egoist/mygo"
+
 	"transflowy/internal/library"
 	"transflowy/internal/settings"
 )
@@ -39,4 +41,22 @@ func (l *Library) Summary(id, template string) (string, error) {
 		return "", err
 	}
 	return st.Summary(id, template)
+}
+
+// Search finds recordings by title, transcript and summary text.
+func (l *Library) Search(query string) ([]library.Hit, error) {
+	st, err := l.store()
+	if err != nil {
+		return nil, err
+	}
+	return st.Search(query, 50)
+}
+
+// ChooseFolder asks for a folder and returns it; "" when canceled.
+func (l *Library) ChooseFolder() (string, error) {
+	paths, err := mygo.Dialog.Open(mygo.OpenDialogOptions{Directory: true, CreateDirectories: true})
+	if err != nil || len(paths) == 0 {
+		return "", err
+	}
+	return paths[0], nil
 }
