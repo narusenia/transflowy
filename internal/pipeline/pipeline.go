@@ -55,7 +55,9 @@ type Config struct {
 	Engine  func(kind string) (Job, error) // kind "" means the setting
 	Phrases func() []string
 	Changed func(id string)
-	Sleep   func(ctx context.Context, d time.Duration) bool
+	// Transcribed is called once a recording's transcript is complete.
+	Transcribed func(id string)
+	Sleep       func(ctx context.Context, d time.Duration) bool
 }
 
 type request struct {
@@ -74,18 +76,21 @@ type Queue struct {
 	wake    chan struct{}
 }
 
+// Sleep waits d; false when ctx ended first.
+func Sleep(ctx context.Context, d time.Duration) bool {
+	t := time.NewTimer(d)
+	defer t.Stop()
+	select {
+	case <-t.C:
+		return true
+	case <-ctx.Done():
+		return false
+	}
+}
+
 func New(cfg Config) *Queue {
 	if cfg.Sleep == nil {
-		cfg.Sleep = func(ctx context.Context, d time.Duration) bool {
-			t := time.NewTimer(d)
-			defer t.Stop()
-			select {
-			case <-t.C:
-				return true
-			case <-ctx.Done():
-				return false
-			}
-		}
+		cfg.Sleep = Sleep
 	}
 	return &Queue{cfg: cfg, cancel: map[string]context.CancelFunc{}, wake: make(chan struct{}, 1)}
 }
@@ -347,6 +352,9 @@ func (q *Queue) finish(st library.Store, id, dir string) {
 	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusDone, "" })
 	CleanupWAV(dir)
 	q.changed(id)
+	if q.cfg.Transcribed != nil {
+		q.cfg.Transcribed(id)
+	}
 }
 
 // CleanupWAV removes recording.wav once the m4a exists and the transcript is
