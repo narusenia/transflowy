@@ -159,6 +159,18 @@ func (s Store) SaveSummary(id, template, text string) error {
 	return s.write(id, "summary-"+template+".md", text)
 }
 
+// RemoveSummary deletes summary-<template>.md. A missing file is not an error.
+func (s Store) RemoveSummary(id, template string) error {
+	d, err := s.dir(id)
+	if err != nil || template == "" || template != filepath.Base(template) || strings.HasPrefix(template, ".") {
+		return ErrNotFound
+	}
+	if err := os.Remove(filepath.Join(d, "summary-"+template+".md")); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return nil
+}
+
 // Summary reads summary-<template>.md.
 func (s Store) Summary(id, template string) (string, error) {
 	d, err := s.dir(id)

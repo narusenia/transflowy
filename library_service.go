@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"github.com/egoist/mygo"
+	"strings"
 
 	"transflowy/internal/library"
 	"transflowy/internal/settings"
@@ -170,4 +171,17 @@ func (l *Library) SetSpeakers(id string, names map[string]string) error {
 		return err
 	}
 	return st.SetSpeakers(id, names)
+}
+
+// SaveSummary stores a summary the user wrote or edited, under the name of a
+// template or any other plain name. An empty text deletes it.
+func (l *Library) SaveSummary(id, name, text string) error {
+	st, err := l.store()
+	if err != nil {
+		return err
+	}
+	if strings.TrimSpace(text) == "" {
+		return st.RemoveSummary(id, name)
+	}
+	return st.SaveSummary(id, name, strings.TrimSpace(text)+"\n")
 }

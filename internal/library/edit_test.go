@@ -96,3 +96,26 @@ func TestAppendSegmentsKeepsTimeOrder(t *testing.T) {
 		t.Fatalf("%v", starts)
 	}
 }
+
+func TestSummaryNamesAreRestrictedAndRemovable(t *testing.T) {
+	st, id := newRec(t)
+	if err := st.SaveSummary(id, "../x", "a"); err == nil {
+		t.Fatal("a path as a name must be refused")
+	}
+	if err := st.RemoveSummary(id, "../x"); err == nil {
+		t.Fatal("a path as a name must be refused")
+	}
+	st.SaveSummary(id, "メモ", "手で書いた")
+	if r, _ := st.Get(id); len(r.Summaries) != 1 {
+		t.Fatalf("%v", r.Summaries)
+	}
+	if err := st.RemoveSummary(id, "メモ"); err != nil {
+		t.Fatal(err)
+	}
+	if err := st.RemoveSummary(id, "メモ"); err != nil {
+		t.Fatalf("removing twice: %v", err)
+	}
+	if r, _ := st.Get(id); len(r.Summaries) != 0 {
+		t.Fatalf("%v", r.Summaries)
+	}
+}
