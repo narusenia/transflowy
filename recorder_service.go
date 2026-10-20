@@ -115,17 +115,14 @@ func (r *Recorder) Stop() (library.Meta, error) {
 	if err != nil {
 		return library.Meta{}, err
 	}
-	rc, err := st.Get(id)
+	m, err := st.UpdateMeta(id, func(m *library.Meta) {
+		m.Duration = secs
+		m.Status = library.StatusQueued
+		if stopErr != nil { // keep what was written; the user sees why it may be short
+			m.Error = stopErr.Error()
+		}
+	})
 	if err != nil {
-		return library.Meta{}, err
-	}
-	m := rc.Meta
-	m.Duration = secs
-	m.Status = library.StatusQueued
-	if stopErr != nil { // keep what was written; the user sees why it may be short
-		m.Error = stopErr.Error()
-	}
-	if err := st.SaveMeta(m); err != nil {
 		return m, err
 	}
 	go finalizeAudio(st, id)

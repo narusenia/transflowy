@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 )
@@ -45,5 +46,24 @@ func TestStoreRoundTrip(t *testing.T) {
 		if _, err := s.Get(id); !errors.Is(err, ErrNotFound) {
 			t.Errorf("Get(%q) = %v, want ErrNotFound", id, err)
 		}
+	}
+}
+
+func TestUpdateIsSerialized(t *testing.T) {
+	s := Store{Root: t.TempDir()}
+	m, _ := s.Create("x", time.Now())
+	var wg sync.WaitGroup
+	for i := 0; i < 50; i++ { // concurrent writers must not lose each other's change
+		wg.Add(2)
+		go func() { defer wg.Done(); s.UpdateMeta(m.ID, func(m *Meta) { m.Duration++ }) }()
+		go func() {
+			defer wg.Done()
+			s.UpdateTranscript(m.ID, func(t *Transcript) { t.Segments = append(t.Segments, Segment{}) })
+		}()
+	}
+	wg.Wait()
+	r, _ := s.Get(m.ID)
+	if r.Meta.Duration != 50 || len(r.Transcript.Segments) != 50 {
+		t.Fatalf("duration %v, segments %d", r.Meta.Duration, len(r.Transcript.Segments))
 	}
 }

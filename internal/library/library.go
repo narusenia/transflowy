@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -104,6 +105,36 @@ func (s Store) dir(id string) (string, error) {
 
 // Path returns a recording's folder.
 func (s Store) Path(id string) (string, error) { return s.dir(id) }
+
+// writeMu serializes read-modify-write of meta.json and transcript.json: the
+// recorder, the importer and the pipeline all update the same recording.
+var writeMu sync.Mutex
+
+// UpdateMeta applies fn to a recording's meta and saves it.
+func (s Store) UpdateMeta(id string, fn func(*Meta)) (Meta, error) {
+	writeMu.Lock()
+	defer writeMu.Unlock()
+	r, err := s.Get(id)
+	if err != nil {
+		return Meta{}, err
+	}
+	m := r.Meta
+	fn(&m)
+	return m, s.SaveMeta(m)
+}
+
+// UpdateTranscript applies fn to a recording's transcript and saves it.
+func (s Store) UpdateTranscript(id string, fn func(*Transcript)) error {
+	writeMu.Lock()
+	defer writeMu.Unlock()
+	r, err := s.Get(id)
+	if err != nil {
+		return err
+	}
+	t := r.Transcript
+	fn(&t)
+	return s.SaveTranscript(id, t)
+}
 
 // SaveMeta writes meta.json.
 func (s Store) SaveMeta(m Meta) error { return s.write(m.ID, "meta.json", m) }
