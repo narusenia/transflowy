@@ -4,6 +4,15 @@ import { call, event } from "mygo-runtime";
 
 // ---- Types ----
 
+export interface Hit {
+  id: string;
+  title: string;
+  kind: string;
+  snippet: string;
+  time?: number;
+  template?: string;
+}
+
 /** ImportProblem is sent when a file cannot be imported. */
 export interface ImportProblem {
   name: string;
@@ -127,6 +136,10 @@ export const Settings = {
  * settings name. Creating and changing recordings is done on the Go side.
  */
 export const Library = {
+  /** ChooseFolder asks for a folder and returns it; "" when canceled. */
+  chooseFolder(): Promise<string> {
+    return call("Library.ChooseFolder");
+  },
   /** Get returns one recording with its transcript. */
   get(id: string): Promise<Recording> {
     return call("Library.Get", id);
@@ -134,6 +147,10 @@ export const Library = {
   /** List returns every recording's meta, newest first. */
   list(): Promise<Meta[]> {
     return call("Library.List");
+  },
+  /** Search finds recordings by title, transcript and summary text. */
+  search(query: string): Promise<Hit[]> {
+    return call("Library.Search", query);
   },
   /** Summary returns the Markdown of a recording's summary made with a template. */
   summary(id: string, template: string): Promise<string> {

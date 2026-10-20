@@ -167,6 +167,10 @@ export interface Messages {
    * `要約待ち`
    */
   statusSummarizing(): string;
+  /**
+   * `要約が完成しました`
+   */
+  notifyDone(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -217,6 +221,7 @@ const catalog = createCatalog<Messages>({
     "errSummarize": ["detail"],
     "errNoTemplate": ["name"],
     "statusSummarizing": [],
+    "notifyDone": [],
   },
   messages: {
     "ja": {
@@ -261,6 +266,7 @@ const catalog = createCatalog<Messages>({
       "errSummarize": "要約に失敗しました: {detail}",
       "errNoTemplate": "テンプレート「{name}」が見つかりません",
       "statusSummarizing": "要約待ち",
+      "notifyDone": "要約が完成しました",
     },
   },
 });

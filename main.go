@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -14,6 +15,7 @@ import (
 	"transflowy/internal/settings"
 	"transflowy/internal/summarize"
 	"transflowy/internal/transcribe"
+	"transflowy/locales"
 )
 
 func main() {
@@ -36,12 +38,24 @@ func main() {
 	engines := &Engines{cfg: cfg, server: server, modelDir: modelDir}
 	store := func() (library.Store, error) { s, err := cfg.Get(); return library.Store{Root: s.LibraryDir}, err }
 	changed := func(id string) { _ = LibraryChanged.Broadcast(id) }
+	notify := func(id string) {
+		st, err := store()
+		if err != nil {
+			return
+		}
+		r, err := st.Get(id)
+		if err != nil || !mygo.NotificationsSupported() {
+			return
+		}
+		_ = mygo.NewNotification(mygo.NotificationOptions{ID: "done-" + id, Title: locales.NotifyDone(), Body: r.Meta.Title}).Show()
+	}
 	sumQueue := summarize.New(summarize.Config{
 		Store:     store,
 		Templates: func() []summarize.Template { s, _ := cfg.Get(); return summarize.Templates(s.LibraryDir) },
 		Default:   func() string { s, _ := cfg.Get(); return s.Template },
 		Chat:      engines.Chat,
 		Changed:   changed,
+		Finished:  notify,
 	})
 	queue := pipeline.New(pipeline.Config{
 		Store:       store,
@@ -71,6 +85,15 @@ func main() {
 	mygo.BindAs("Transcriber", &Transcriber{cfg: cfg, queue: queue})
 	mygo.BindAs("Summarizer", &Summarizer{cfg: cfg, engines: engines, queue: sumQueue})
 	mygo.BindAs("Models", &Models{dir: modelDir, onReady: func() { resumeAll(cfg, queue, sumQueue) }})
+
+	// The page plays audio and reads peaks.json from the library through media://localhost/<id>/<file>.
+	// The folder is read per request, so changing it in the settings needs no restart.
+	if err := mygo.Protocol.HandleFunc("media", func(w http.ResponseWriter, r *http.Request) {
+		s, _ := cfg.Get()
+		mygo.FileServer(os.DirFS(s.LibraryDir)).ServeHTTP(w, r)
+	}); err != nil {
+		log.Println("media:", err)
+	}
 
 	var win *mygo.Window
 	openWindow := func() {

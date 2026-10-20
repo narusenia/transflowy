@@ -96,5 +96,6 @@
       }
     }
   },
-  "statusSummarizing": "要約待ち"
+  "statusSummarizing": "要約待ち",
+  "notifyDone": "要約が完成しました"
 }

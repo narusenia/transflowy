@@ -72,7 +72,9 @@ type Config struct {
 	// missing or local-only forbids the cloud: the summary then waits.
 	Chat    func() (Chat, error)
 	Changed func(id string)
-	Sleep   func(ctx context.Context, d time.Duration) bool
+	// Finished is called when a summary was written.
+	Finished func(id string)
+	Sleep    func(ctx context.Context, d time.Duration) bool
 }
 
 type request struct{ id, template string }
@@ -217,6 +219,9 @@ func (q *Queue) process(ctx context.Context, req request) {
 		}
 	})
 	q.status(st, req.id, library.StatusDone, "")
+	if q.cfg.Finished != nil {
+		q.cfg.Finished(req.id)
+	}
 }
 
 // complete retries like the transcript pipeline: a lost connection is waited

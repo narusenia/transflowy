@@ -441,3 +441,13 @@ func StatusSummarizing() string { return In(i18n.Locale()).StatusSummarizing() }
 func (msgs Messages) StatusSummarizing() string {
 	return Catalog.Format(msgs.locale, "statusSummarizing", nil)
 }
+
+// NotifyDone says "要約が完成しました"
+// in the language the app shows.
+func NotifyDone() string { return In(i18n.Locale()).NotifyDone() }
+
+// NotifyDone says "要約が完成しました"
+// in the language of msgs.
+func (msgs Messages) NotifyDone() string {
+	return Catalog.Format(msgs.locale, "notifyDone", nil)
+}
