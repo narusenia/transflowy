@@ -43,5 +43,22 @@
         "type": "String"
       }
     }
+  },
+  "errLocalOnly": "ローカル限定がオンのため、クラウドには送信できません",
+  "errNoKey": "APIキーが設定されていません",
+  "errBadKey": "APIキーが無効です。設定を確認してください",
+  "errNoBinary": "whisper-server が見つかりません",
+  "errNoModel": "ローカルモデルがまだダウンロードされていません",
+  "errServerExit": "whisper-server が起動直後に終了しました",
+  "errServerTimeout": "whisper-server の起動がタイムアウトしました",
+  "statusOffline": "オフラインです。接続が戻ると自動で再開します",
+  "statusRetrying": "処理に失敗したため再試行しています",
+  "errProcessing": "文字起こしに失敗しました: {detail}",
+  "@errProcessing": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
   }
 }

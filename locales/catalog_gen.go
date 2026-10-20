@@ -191,3 +191,103 @@ func ImportFailed(name string) string { return In(i18n.Locale()).ImportFailed(na
 func (msgs Messages) ImportFailed(name string) string {
 	return Catalog.Format(msgs.locale, "importFailed", map[string]any{"name": name})
 }
+
+// ErrLocalOnly says "ローカル限定がオンのため、クラウドには送信できません"
+// in the language the app shows.
+func ErrLocalOnly() string { return In(i18n.Locale()).ErrLocalOnly() }
+
+// ErrLocalOnly says "ローカル限定がオンのため、クラウドには送信できません"
+// in the language of msgs.
+func (msgs Messages) ErrLocalOnly() string {
+	return Catalog.Format(msgs.locale, "errLocalOnly", nil)
+}
+
+// ErrNoKey says "APIキーが設定されていません"
+// in the language the app shows.
+func ErrNoKey() string { return In(i18n.Locale()).ErrNoKey() }
+
+// ErrNoKey says "APIキーが設定されていません"
+// in the language of msgs.
+func (msgs Messages) ErrNoKey() string {
+	return Catalog.Format(msgs.locale, "errNoKey", nil)
+}
+
+// ErrBadKey says "APIキーが無効です。設定を確認してください"
+// in the language the app shows.
+func ErrBadKey() string { return In(i18n.Locale()).ErrBadKey() }
+
+// ErrBadKey says "APIキーが無効です。設定を確認してください"
+// in the language of msgs.
+func (msgs Messages) ErrBadKey() string {
+	return Catalog.Format(msgs.locale, "errBadKey", nil)
+}
+
+// ErrNoBinary says "whisper-server が見つかりません"
+// in the language the app shows.
+func ErrNoBinary() string { return In(i18n.Locale()).ErrNoBinary() }
+
+// ErrNoBinary says "whisper-server が見つかりません"
+// in the language of msgs.
+func (msgs Messages) ErrNoBinary() string {
+	return Catalog.Format(msgs.locale, "errNoBinary", nil)
+}
+
+// ErrNoModel says "ローカルモデルがまだダウンロードされていません"
+// in the language the app shows.
+func ErrNoModel() string { return In(i18n.Locale()).ErrNoModel() }
+
+// ErrNoModel says "ローカルモデルがまだダウンロードされていません"
+// in the language of msgs.
+func (msgs Messages) ErrNoModel() string {
+	return Catalog.Format(msgs.locale, "errNoModel", nil)
+}
+
+// ErrServerExit says "whisper-server が起動直後に終了しました"
+// in the language the app shows.
+func ErrServerExit() string { return In(i18n.Locale()).ErrServerExit() }
+
+// ErrServerExit says "whisper-server が起動直後に終了しました"
+// in the language of msgs.
+func (msgs Messages) ErrServerExit() string {
+	return Catalog.Format(msgs.locale, "errServerExit", nil)
+}
+
+// ErrServerTimeout says "whisper-server の起動がタイムアウトしました"
+// in the language the app shows.
+func ErrServerTimeout() string { return In(i18n.Locale()).ErrServerTimeout() }
+
+// ErrServerTimeout says "whisper-server の起動がタイムアウトしました"
+// in the language of msgs.
+func (msgs Messages) ErrServerTimeout() string {
+	return Catalog.Format(msgs.locale, "errServerTimeout", nil)
+}
+
+// StatusOffline says "オフラインです。接続が戻ると自動で再開します"
+// in the language the app shows.
+func StatusOffline() string { return In(i18n.Locale()).StatusOffline() }
+
+// StatusOffline says "オフラインです。接続が戻ると自動で再開します"
+// in the language of msgs.
+func (msgs Messages) StatusOffline() string {
+	return Catalog.Format(msgs.locale, "statusOffline", nil)
+}
+
+// StatusRetrying says "処理に失敗したため再試行しています"
+// in the language the app shows.
+func StatusRetrying() string { return In(i18n.Locale()).StatusRetrying() }
+
+// StatusRetrying says "処理に失敗したため再試行しています"
+// in the language of msgs.
+func (msgs Messages) StatusRetrying() string {
+	return Catalog.Format(msgs.locale, "statusRetrying", nil)
+}
+
+// ErrProcessing says "文字起こしに失敗しました: {detail}"
+// in the language the app shows.
+func ErrProcessing(detail string) string { return In(i18n.Locale()).ErrProcessing(detail) }
+
+// ErrProcessing says "文字起こしに失敗しました: {detail}"
+// in the language of msgs.
+func (msgs Messages) ErrProcessing(detail string) string {
+	return Catalog.Format(msgs.locale, "errProcessing", map[string]any{"detail": detail})
+}

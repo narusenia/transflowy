@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"sync"
 	"time"
+
+	"transflowy/locales"
 )
 
 const idleStop = 5 * time.Minute // the model holds about a gigabyte of memory
@@ -41,7 +43,7 @@ func FindBinary() (string, error) {
 			return p, nil
 		}
 	}
-	return "", errors.New("whisper-server が見つかりません")
+	return "", errors.New(locales.ErrNoBinary())
 }
 
 // URL starts the server when it is not running and returns its endpoint. A
@@ -67,7 +69,7 @@ func (s *Server) start(ctx context.Context) error {
 		return err
 	}
 	if _, err := os.Stat(s.Model); err != nil {
-		return errors.New("ローカルモデルがまだダウンロードされていません")
+		return errors.New(locales.ErrNoModel())
 	}
 	l, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -100,10 +102,10 @@ func (s *Server) start(ctx context.Context) error {
 		}
 		select {
 		case <-exited:
-			return errors.New("whisper-server が起動直後に終了しました")
+			return errors.New(locales.ErrServerExit())
 		case <-deadline:
 			_ = cmd.Process.Kill()
-			return errors.New("whisper-server の起動がタイムアウトしました")
+			return errors.New(locales.ErrServerTimeout())
 		case <-ctx.Done():
 			_ = cmd.Process.Kill()
 			return ctx.Err()

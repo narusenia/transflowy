@@ -4,13 +4,20 @@
 package netguard
 
 import (
-	"errors"
 	"net"
 	"net/http"
+
+	"transflowy/locales"
 )
 
-// ErrLocalOnly is returned for a request to another machine while local-only is on.
-var ErrLocalOnly = errors.New("ローカル限定がオンのため、クラウドには送信できません")
+// LocalOnlyError is returned for a request to another machine while
+// local-only is on. Test for it with errors.As.
+type LocalOnlyError struct{}
+
+func (LocalOnlyError) Error() string { return locales.ErrLocalOnly() }
+
+// ErrLocalOnly is a LocalOnlyError, for errors.Is.
+var ErrLocalOnly error = LocalOnlyError{}
 
 type guard struct {
 	localOnly func() bool

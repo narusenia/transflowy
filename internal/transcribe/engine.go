@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"transflowy/internal/library"
+	"transflowy/internal/netguard"
 )
 
 // Request is one chunk: a 16 kHz mono WAV file.
@@ -42,6 +43,9 @@ func (e *HTTPError) Error() string { return fmt.Sprintf("HTTP %d: %s", e.Status,
 // network or the server failed, or it asked to slow down. A bad key or a
 // refused file will not get better.
 func Retryable(err error) bool {
+	if errors.Is(err, netguard.ErrLocalOnly) || errors.Is(err, context.Canceled) {
+		return false
+	}
 	var he *HTTPError
 	if errors.As(err, &he) {
 		return he.Status == 429 || he.Status >= 500

@@ -16,7 +16,9 @@ export interface Meta {
   createdAt: string;
   duration: number;
   language?: string;
+  detected?: string;
   engine?: string;
+  processedUntil?: number;
   status: Status;
   error?: string;
 }

@@ -67,6 +67,46 @@ export interface Messages {
    * `{name} を取り込めませんでした`
    */
   importFailed(name: string): string;
+  /**
+   * `ローカル限定がオンのため、クラウドには送信できません`
+   */
+  errLocalOnly(): string;
+  /**
+   * `APIキーが設定されていません`
+   */
+  errNoKey(): string;
+  /**
+   * `APIキーが無効です。設定を確認してください`
+   */
+  errBadKey(): string;
+  /**
+   * `whisper-server が見つかりません`
+   */
+  errNoBinary(): string;
+  /**
+   * `ローカルモデルがまだダウンロードされていません`
+   */
+  errNoModel(): string;
+  /**
+   * `whisper-server が起動直後に終了しました`
+   */
+  errServerExit(): string;
+  /**
+   * `whisper-server の起動がタイムアウトしました`
+   */
+  errServerTimeout(): string;
+  /**
+   * `オフラインです。接続が戻ると自動で再開します`
+   */
+  statusOffline(): string;
+  /**
+   * `処理に失敗したため再試行しています`
+   */
+  statusRetrying(): string;
+  /**
+   * `文字起こしに失敗しました: {detail}`
+   */
+  errProcessing(detail: string): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -92,6 +132,16 @@ const catalog = createCatalog<Messages>({
     "importInterrupted": [],
     "importUnsupported": ["name"],
     "importFailed": ["name"],
+    "errLocalOnly": [],
+    "errNoKey": [],
+    "errBadKey": [],
+    "errNoBinary": [],
+    "errNoModel": [],
+    "errServerExit": [],
+    "errServerTimeout": [],
+    "statusOffline": [],
+    "statusRetrying": [],
+    "errProcessing": ["detail"],
   },
   messages: {
     "ja": {
@@ -111,6 +161,16 @@ const catalog = createCatalog<Messages>({
       "importInterrupted": "取り込みが中断されました。もう一度取り込んでください",
       "importUnsupported": "{name} は取り込めない形式です",
       "importFailed": "{name} を取り込めませんでした",
+      "errLocalOnly": "ローカル限定がオンのため、クラウドには送信できません",
+      "errNoKey": "APIキーが設定されていません",
+      "errBadKey": "APIキーが無効です。設定を確認してください",
+      "errNoBinary": "whisper-server が見つかりません",
+      "errNoModel": "ローカルモデルがまだダウンロードされていません",
+      "errServerExit": "whisper-server が起動直後に終了しました",
+      "errServerTimeout": "whisper-server の起動がタイムアウトしました",
+      "statusOffline": "オフラインです。接続が戻ると自動で再開します",
+      "statusRetrying": "処理に失敗したため再試行しています",
+      "errProcessing": "文字起こしに失敗しました: {detail}",
     },
   },
 });
