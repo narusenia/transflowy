@@ -70,3 +70,16 @@ func TestStaleSummary(t *testing.T) {
 		t.Fatalf("fresh summary is stale: %v", r.Stale)
 	}
 }
+
+func TestSetSpeakers(t *testing.T) {
+	st, id := newRec(t)
+	st.SetSpeakers(id, map[string]string{"0": " 田中 ", "1": ""})
+	r, _ := st.Get(id)
+	if len(r.Transcript.Speakers) != 1 || r.Transcript.Speakers["0"] != "田中" {
+		t.Fatalf("%v", r.Transcript.Speakers)
+	}
+	st.SetSpeakers(id, map[string]string{})
+	if r, _ = st.Get(id); r.Transcript.Speakers != nil {
+		t.Fatalf("%v", r.Transcript.Speakers)
+	}
+}

@@ -161,3 +161,13 @@ func (l *Library) confirmDelete(win *mygo.Window, m library.Meta, dir string) {
 	}
 	_ = LibraryChanged.Broadcast(m.ID)
 }
+
+// SetSpeakers names the speakers of a recording: speaker number (as a string)
+// to name. Blank names go back to the default.
+func (l *Library) SetSpeakers(id string, names map[string]string) error {
+	st, err := l.store()
+	if err != nil {
+		return err
+	}
+	return st.SetSpeakers(id, names)
+}

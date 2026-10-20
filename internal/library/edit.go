@@ -42,6 +42,22 @@ func (s Store) editSegment(id string, index int, start float64, fn func(*Segment
 	return err
 }
 
+// SetSpeakers saves the names the user gave to speakers: speaker number (as a
+// string) to name. A blank name goes back to the default "話者N".
+func (s Store) SetSpeakers(id string, names map[string]string) error {
+	return s.UpdateTranscript(id, func(t *Transcript) {
+		t.Speakers = map[string]string{}
+		for k, v := range names {
+			if v = strings.TrimSpace(v); v != "" {
+				t.Speakers[k] = v
+			}
+		}
+		if len(t.Speakers) == 0 {
+			t.Speakers = nil
+		}
+	})
+}
+
 // Replace changes every occurrence of find in the transcript's lines and
 // returns how many lines changed.
 func (s Store) Replace(id, find, with string) (int, error) {

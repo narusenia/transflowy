@@ -24,7 +24,7 @@ func speaker(t library.Transcript, n int) string {
 	if name := t.Speakers[strconv.Itoa(n)]; name != "" {
 		return name
 	}
-	return "話者" + strconv.Itoa(n)
+	return locales.SpeakerLabel(n + 1) // speaker 0 is 話者1, as the page shows it
 }
 
 // Lines renders a transcript as "[12:34] 話者1: text" lines, without the
