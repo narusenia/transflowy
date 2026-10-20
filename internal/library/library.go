@@ -22,6 +22,7 @@ const (
 	StatusImporting   Status = "importing" // an imported file is being converted
 	StatusQueued      Status = "queued"
 	StatusProcessing  Status = "processing"
+	StatusDiarizing   Status = "diarizing"   // the transcript is done; voices are being told apart
 	StatusSummarizing Status = "summarizing" // transcript is done; the summary is waiting or running
 	StatusDone        Status = "done"
 	StatusFailed      Status = "failed"

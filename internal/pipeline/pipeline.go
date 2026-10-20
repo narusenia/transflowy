@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"transflowy/internal/audio"
+	"transflowy/internal/diarize"
 	"transflowy/internal/library"
 	"transflowy/internal/netguard"
 	"transflowy/internal/transcribe"
@@ -59,7 +60,12 @@ type Config struct {
 	Store   func() (library.Store, error)
 	Engine  func(kind string) (Job, error) // kind "" means the setting
 	Phrases func() []string
-	Changed func(id string)
+	// Diarizer returns the local speaker diarization, or nil when it is off
+	// or its models are missing. auto is true after a transcription (the
+	// setting decides) and false when the user asked for it. A NotReadyError
+	// says why it cannot run now.
+	Diarizer func(auto bool) (func([]int16) ([]diarize.Turn, error), error)
+	Changed  func(id string)
 	// Transcribed is called once a recording's transcript is complete.
 	Transcribed func(id string)
 	Sleep       func(ctx context.Context, d time.Duration) bool
@@ -69,6 +75,7 @@ type request struct {
 	id      string
 	kind    string
 	restart bool // throw away the transcript and start over
+	diarize bool // only tell the voices apart again, in the transcript that is there
 }
 
 // Queue runs one recording at a time.
@@ -111,10 +118,22 @@ func (q *Queue) Enqueue(id, kind string, restart bool) {
 			break
 		}
 	}
-	q.pending = append(q.pending, request{id, kind, restart})
+	q.pending = append(q.pending, request{id: id, kind: kind, restart: restart})
 	if c := q.cancel[id]; c != nil {
 		c()
 	}
+	q.mu.Unlock()
+	select {
+	case q.wake <- struct{}{}:
+	default:
+	}
+}
+
+// Diarize tells the voices apart again in a transcribed recording, with the
+// local models, and leaves the text as it is.
+func (q *Queue) Diarize(id string) {
+	q.mu.Lock()
+	q.pending = append(q.pending, request{id: id, diarize: true})
 	q.mu.Unlock()
 	select {
 	case q.wake <- struct{}{}:
@@ -196,6 +215,11 @@ func (q *Queue) process(ctx context.Context, req request) {
 	}
 
 	tracks := tracksOf(dir, job)
+	if req.diarize {
+		q.diarizeLocal(ctx, st, id, tracks, false)
+		q.setDone(st, id, dir)
+		return
+	}
 	var wg sync.WaitGroup
 	ok := make([]bool, len(tracks))
 	for i, tr := range tracks {
@@ -211,7 +235,49 @@ func (q *Queue) process(ctx context.Context, req request) {
 			return
 		}
 	}
+	q.diarizeLocal(ctx, st, id, tracks, true)
 	q.finish(st, id, dir)
+}
+
+// diarizeLocal tells the voices apart on this machine, for engines that do not
+// (the cloud one does). It reads the system track when there are two: the
+// microphone is the user. Lines of other voices get the speaker numbers.
+// A failure leaves the transcript as it is.
+func (q *Queue) diarizeLocal(ctx context.Context, st library.Store, id string, tracks []track, auto bool) {
+	if q.cfg.Diarizer == nil || ctx.Err() != nil {
+		return
+	}
+	run, err := q.cfg.Diarizer(auto)
+	var nr NotReadyError
+	if errors.As(err, &nr) && !auto {
+		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Error = nr.Msg })
+		return
+	}
+	if err != nil || run == nil {
+		return
+	}
+	tr := tracks[len(tracks)-1]
+	if _, err := os.Stat(tr.wav); err != nil { // processed before: rebuild it from the m4a
+		if err := audio.ToWAV16k(tr.m4a, tr.wav); err != nil {
+			log.Println("pipeline:", id, err)
+			return
+		}
+	}
+	pcm, err := audio.ReadPCM(tr.wav, 0, 1<<30)
+	if err != nil || len(pcm) == 0 {
+		return
+	}
+	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusDiarizing, "" })
+	q.changed(id)
+	turns, err := run(pcm)
+	if err != nil {
+		log.Println("pipeline:", id, err)
+		_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Error = describe(err) })
+		return
+	}
+	_ = st.UpdateTranscript(id, func(t *library.Transcript) {
+		diarize.Assign(t.Segments, turns, func(s int) bool { return s != library.SpeakerMe })
+	})
 }
 
 // track is one audio file of a recording. A recording made with system audio
@@ -412,6 +478,15 @@ func describe(err error) string {
 		return locales.ErrBadKey()
 	}
 	return locales.ErrProcessing(err.Error())
+}
+
+// setDone marks the recording done and tidies its files. A note in Error (the
+// diarization could not run) stays.
+func (q *Queue) setDone(st library.Store, id, dir string) {
+	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status = library.StatusDone })
+	savePeaks(dir)
+	CleanupWAV(dir)
+	q.changed(id)
 }
 
 func (q *Queue) finish(st library.Store, id, dir string) {
