@@ -60,5 +60,23 @@
         "type": "String"
       }
     }
-  }
+  },
+  "errNoBaseURL": "サーバーの URL が設定されていません",
+  "statusRecording": "録音中",
+  "statusImporting": "取り込み中",
+  "statusQueued": "待機中",
+  "statusProcessing": "処理中",
+  "statusDone": "完了",
+  "statusFailed": "失敗",
+  "modelDownload": "ローカルモデルをダウンロード",
+  "modelDownloading": "ダウンロード中 {percent}%",
+  "@modelDownloading": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "modelFailed": "ダウンロードに失敗しました",
+  "reprocess": "再処理"
 }

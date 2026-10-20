@@ -23,6 +23,21 @@ export interface Meta {
   error?: string;
 }
 
+/** ModelProgress is sent while the local model downloads. */
+export interface ModelProgress {
+  /** downloading, done, failed */
+  state: string;
+  done: number;
+  total: number;
+  error?: string;
+}
+
+/** ModelStatus tells the page whether the local model is there. */
+export interface ModelStatus {
+  present: boolean;
+  downloading: boolean;
+}
+
 /** Provider picks the engine for one job (transcribe or summarize). */
 export interface Provider {
   kind: string;
@@ -151,6 +166,34 @@ export const Importer = {
   },
 } as const;
 
+/** Transcriber is callable from the page. */
+export const Transcriber = {
+  /**
+   * Reprocess transcribes a recording again from the start. kind names the
+   * engine for this run ("local", "openrouter", "openai-compat"); "" uses the
+   * setting. It is also the retry after a failure.
+   */
+  reprocess(id: string, kind: string): Promise<void> {
+    return call("Transcriber.Reprocess", id, kind);
+  },
+} as const;
+
+/** Models is callable from the page. */
+export const Models = {
+  /**
+   * Download starts the download in the background and returns at once;
+   * progress arrives as modelChanged events. A second call while one runs does
+   * nothing.
+   */
+  download(): Promise<void> {
+    return call("Models.Download");
+  },
+  /** Status reports whether the model is downloaded or downloading. */
+  status(): Promise<ModelStatus> {
+    return call("Models.Status");
+  },
+} as const;
+
 // ---- Events ----
 
 /** Events sent by the Go side. Subscribe with `events.name.on(listener)`. */
@@ -159,6 +202,8 @@ export const events = {
   libraryChanged: event<string>("libraryChanged"),
   /** ImportFailed fires for an unsupported or unreadable file. */
   importFailed: event<ImportProblem>("importFailed"),
+  /** ModelChanged fires during a download. */
+  modelChanged: event<ModelProgress>("modelChanged"),
   /** RecordingChanged fires on start, stop and about five times a second while recording. */
   recordingChanged: event<RecordingState>("recordingChanged"),
 } as const;

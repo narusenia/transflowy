@@ -107,6 +107,50 @@ export interface Messages {
    * `文字起こしに失敗しました: {detail}`
    */
   errProcessing(detail: string): string;
+  /**
+   * `サーバーの URL が設定されていません`
+   */
+  errNoBaseURL(): string;
+  /**
+   * `録音中`
+   */
+  statusRecording(): string;
+  /**
+   * `取り込み中`
+   */
+  statusImporting(): string;
+  /**
+   * `待機中`
+   */
+  statusQueued(): string;
+  /**
+   * `処理中`
+   */
+  statusProcessing(): string;
+  /**
+   * `完了`
+   */
+  statusDone(): string;
+  /**
+   * `失敗`
+   */
+  statusFailed(): string;
+  /**
+   * `ローカルモデルをダウンロード`
+   */
+  modelDownload(): string;
+  /**
+   * `ダウンロード中 {percent}%`
+   */
+  modelDownloading(percent: number): string;
+  /**
+   * `ダウンロードに失敗しました`
+   */
+  modelFailed(): string;
+  /**
+   * `再処理`
+   */
+  reprocess(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -142,6 +186,17 @@ const catalog = createCatalog<Messages>({
     "statusOffline": [],
     "statusRetrying": [],
     "errProcessing": ["detail"],
+    "errNoBaseURL": [],
+    "statusRecording": [],
+    "statusImporting": [],
+    "statusQueued": [],
+    "statusProcessing": [],
+    "statusDone": [],
+    "statusFailed": [],
+    "modelDownload": [],
+    "modelDownloading": ["percent"],
+    "modelFailed": [],
+    "reprocess": [],
   },
   messages: {
     "ja": {
@@ -171,6 +226,17 @@ const catalog = createCatalog<Messages>({
       "statusOffline": "オフラインです。接続が戻ると自動で再開します",
       "statusRetrying": "処理に失敗したため再試行しています",
       "errProcessing": "文字起こしに失敗しました: {detail}",
+      "errNoBaseURL": "サーバーの URL が設定されていません",
+      "statusRecording": "録音中",
+      "statusImporting": "取り込み中",
+      "statusQueued": "待機中",
+      "statusProcessing": "処理中",
+      "statusDone": "完了",
+      "statusFailed": "失敗",
+      "modelDownload": "ローカルモデルをダウンロード",
+      "modelDownloading": "ダウンロード中 {percent}%",
+      "modelFailed": "ダウンロードに失敗しました",
+      "reprocess": "再処理",
     },
   },
 });

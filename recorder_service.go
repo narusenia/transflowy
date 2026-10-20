@@ -12,6 +12,7 @@ import (
 
 	"transflowy/internal/audio"
 	"transflowy/internal/library"
+	"transflowy/internal/pipeline"
 	"transflowy/internal/recorder"
 	"transflowy/internal/settings"
 	"transflowy/locales"
@@ -29,15 +30,16 @@ type RecordingState struct {
 var RecordingChanged = mygo.NewEvent[RecordingState]("recordingChanged")
 
 const (
-	wavName = "recording.wav" // kept until the transcription pipeline has used it
+	wavName = "recording.wav" // removed by the pipeline once transcribed and the m4a exists
 	m4aName = "audio.m4a"
 )
 
 // Recorder is callable from the page. The shortcut and the menu bar call the
 // same methods on the Go side.
 type Recorder struct {
-	cfg *settings.Service
-	rec recorder.Recorder
+	cfg   *settings.Service
+	queue *pipeline.Queue // nil in tests
+	rec   recorder.Recorder
 
 	// onState is called with every state change, for the menu bar.
 	onState func(RecordingState)
@@ -74,6 +76,7 @@ func (r *Recorder) Start() (library.Meta, error) {
 	r.quit = make(chan struct{})
 	go r.publish(r.quit, m.ID)
 	r.emit(true, m.ID)
+	r.enqueue(m.ID) // transcribing starts while the recording runs
 	return m, nil
 }
 
@@ -126,7 +129,14 @@ func (r *Recorder) Stop() (library.Meta, error) {
 		return m, err
 	}
 	go finalizeAudio(st, id)
+	r.enqueue(id)
 	return m, nil
+}
+
+func (r *Recorder) enqueue(id string) {
+	if r.queue != nil {
+		r.queue.Enqueue(id, "", false)
+	}
 }
 
 // toggle starts or stops: what the shortcut and the menu bar do.
@@ -199,6 +209,11 @@ func finalizeAudio(st library.Store, id string) {
 	}
 	if err := audio.ToM4A(filepath.Join(dir, wavName), filepath.Join(dir, m4aName)); err != nil {
 		log.Println("m4a:", err)
+		return
+	}
+	// The pipeline may have finished first and kept the wav for lack of an m4a.
+	if r, err := st.Get(id); err == nil && r.Meta.Status == library.StatusDone {
+		pipeline.CleanupWAV(dir)
 	}
 }
 

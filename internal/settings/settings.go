@@ -59,6 +59,8 @@ type Service struct {
 	Keys KeyStore
 	// ErrKeyNotFound is the KeyStore's "no such key" error.
 	ErrKeyNotFound error
+	// OnChange is called after settings or a key changed.
+	OnChange func()
 
 	mu sync.Mutex
 }
@@ -98,7 +100,17 @@ func (s *Service) Set(v Settings) error {
 	if err := os.WriteFile(tmp, b, 0o600); err != nil {
 		return err
 	}
-	return os.Rename(tmp, s.Path)
+	if err := os.Rename(tmp, s.Path); err != nil {
+		return err
+	}
+	s.changed()
+	return nil
+}
+
+func (s *Service) changed() {
+	if s.OnChange != nil {
+		go s.OnChange() // not under the caller's lock or call
+	}
 }
 
 // SetKey stores an API key for a provider kind ("openrouter", "openai-compat").
@@ -106,7 +118,11 @@ func (s *Service) SetKey(kind, value string) error {
 	if value == "" {
 		return s.DeleteKey(kind)
 	}
-	return s.Keys.Set(kind, []byte(value))
+	if err := s.Keys.Set(kind, []byte(value)); err != nil {
+		return err
+	}
+	s.changed()
+	return nil
 }
 
 // DeleteKey removes a stored key. Removing a missing key is not an error.
@@ -114,6 +130,7 @@ func (s *Service) DeleteKey(kind string) error {
 	if err := s.Keys.Delete(kind); err != nil && !errors.Is(err, s.ErrKeyNotFound) {
 		return err
 	}
+	s.changed()
 	return nil
 }
 

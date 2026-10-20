@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -11,6 +10,7 @@ import (
 
 	"transflowy/internal/audio"
 	"transflowy/internal/library"
+	"transflowy/internal/pipeline"
 	"transflowy/internal/settings"
 	"transflowy/locales"
 )
@@ -32,7 +32,10 @@ var ImportFailed = mygo.NewEvent[ImportProblem]("importFailed")
 
 // Importer is callable from the page. Files dropped on the window or the Dock
 // icon reach importFiles on the Go side.
-type Importer struct{ cfg *settings.Service }
+type Importer struct {
+	cfg   *settings.Service
+	queue *pipeline.Queue
+}
 
 // ImportDialog asks for files and imports them.
 func (im *Importer) ImportDialog() error {
@@ -73,7 +76,7 @@ func (im *Importer) importFiles(paths []string) {
 			continue
 		}
 		go func() {
-			if err := importOne(st, p); err != nil {
+			if err := importOne(st, im.queue, p); err != nil {
 				log.Println("import:", name, err)
 				_ = ImportFailed.Broadcast(ImportProblem{Name: name, Message: locales.ImportFailed(name)})
 			}
@@ -81,7 +84,7 @@ func (im *Importer) importFiles(paths []string) {
 	}
 }
 
-func importOne(st library.Store, path string) error {
+func importOne(st library.Store, q *pipeline.Queue, path string) error {
 	title := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 	m, err := st.Create(title, time.Now())
 	if err != nil {
@@ -102,16 +105,17 @@ func importOne(st library.Store, path string) error {
 	if err := audio.ToWAV16k(path, wav); err != nil {
 		return fail(err)
 	}
-	fi, err := os.Stat(wav)
+	n, err := audio.PCMSamples(wav)
 	if err != nil {
 		return fail(err)
 	}
-	m.Duration = float64(max(fi.Size()-44, 0)) / 32000
+	m.Duration = float64(n) / 16000
 	m.Status = library.StatusQueued
 	if err := st.SaveMeta(m); err != nil {
 		return err
 	}
 	_ = LibraryChanged.Broadcast(m.ID)
+	q.Enqueue(m.ID, "", false)
 	finalizeAudio(st, m.ID)
 	return nil
 }

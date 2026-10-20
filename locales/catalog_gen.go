@@ -291,3 +291,113 @@ func ErrProcessing(detail string) string { return In(i18n.Locale()).ErrProcessin
 func (msgs Messages) ErrProcessing(detail string) string {
 	return Catalog.Format(msgs.locale, "errProcessing", map[string]any{"detail": detail})
 }
+
+// ErrNoBaseURL says "サーバーの URL が設定されていません"
+// in the language the app shows.
+func ErrNoBaseURL() string { return In(i18n.Locale()).ErrNoBaseURL() }
+
+// ErrNoBaseURL says "サーバーの URL が設定されていません"
+// in the language of msgs.
+func (msgs Messages) ErrNoBaseURL() string {
+	return Catalog.Format(msgs.locale, "errNoBaseURL", nil)
+}
+
+// StatusRecording says "録音中"
+// in the language the app shows.
+func StatusRecording() string { return In(i18n.Locale()).StatusRecording() }
+
+// StatusRecording says "録音中"
+// in the language of msgs.
+func (msgs Messages) StatusRecording() string {
+	return Catalog.Format(msgs.locale, "statusRecording", nil)
+}
+
+// StatusImporting says "取り込み中"
+// in the language the app shows.
+func StatusImporting() string { return In(i18n.Locale()).StatusImporting() }
+
+// StatusImporting says "取り込み中"
+// in the language of msgs.
+func (msgs Messages) StatusImporting() string {
+	return Catalog.Format(msgs.locale, "statusImporting", nil)
+}
+
+// StatusQueued says "待機中"
+// in the language the app shows.
+func StatusQueued() string { return In(i18n.Locale()).StatusQueued() }
+
+// StatusQueued says "待機中"
+// in the language of msgs.
+func (msgs Messages) StatusQueued() string {
+	return Catalog.Format(msgs.locale, "statusQueued", nil)
+}
+
+// StatusProcessing says "処理中"
+// in the language the app shows.
+func StatusProcessing() string { return In(i18n.Locale()).StatusProcessing() }
+
+// StatusProcessing says "処理中"
+// in the language of msgs.
+func (msgs Messages) StatusProcessing() string {
+	return Catalog.Format(msgs.locale, "statusProcessing", nil)
+}
+
+// StatusDone says "完了"
+// in the language the app shows.
+func StatusDone() string { return In(i18n.Locale()).StatusDone() }
+
+// StatusDone says "完了"
+// in the language of msgs.
+func (msgs Messages) StatusDone() string {
+	return Catalog.Format(msgs.locale, "statusDone", nil)
+}
+
+// StatusFailed says "失敗"
+// in the language the app shows.
+func StatusFailed() string { return In(i18n.Locale()).StatusFailed() }
+
+// StatusFailed says "失敗"
+// in the language of msgs.
+func (msgs Messages) StatusFailed() string {
+	return Catalog.Format(msgs.locale, "statusFailed", nil)
+}
+
+// ModelDownload says "ローカルモデルをダウンロード"
+// in the language the app shows.
+func ModelDownload() string { return In(i18n.Locale()).ModelDownload() }
+
+// ModelDownload says "ローカルモデルをダウンロード"
+// in the language of msgs.
+func (msgs Messages) ModelDownload() string {
+	return Catalog.Format(msgs.locale, "modelDownload", nil)
+}
+
+// ModelDownloading says "ダウンロード中 {percent}%"
+// in the language the app shows.
+func ModelDownloading(percent int) string { return In(i18n.Locale()).ModelDownloading(percent) }
+
+// ModelDownloading says "ダウンロード中 {percent}%"
+// in the language of msgs.
+func (msgs Messages) ModelDownloading(percent int) string {
+	return Catalog.Format(msgs.locale, "modelDownloading", map[string]any{"percent": percent})
+}
+
+// ModelFailed says "ダウンロードに失敗しました"
+// in the language the app shows.
+func ModelFailed() string { return In(i18n.Locale()).ModelFailed() }
+
+// ModelFailed says "ダウンロードに失敗しました"
+// in the language of msgs.
+func (msgs Messages) ModelFailed() string {
+	return Catalog.Format(msgs.locale, "modelFailed", nil)
+}
+
+// Reprocess says "再処理"
+// in the language the app shows.
+func Reprocess() string { return In(i18n.Locale()).Reprocess() }
+
+// Reprocess says "再処理"
+// in the language of msgs.
+func (msgs Messages) Reprocess() string {
+	return Catalog.Format(msgs.locale, "reprocess", nil)
+}
