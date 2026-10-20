@@ -151,6 +151,22 @@ export interface Messages {
    * `再処理`
    */
   reprocess(): string;
+  /**
+   * `要約に使うモデルが選択されていません`
+   */
+  errNoSummaryModel(): string;
+  /**
+   * `要約に失敗しました: {detail}`
+   */
+  errSummarize(detail: string): string;
+  /**
+   * `テンプレート「{name}」が見つかりません`
+   */
+  errNoTemplate(name: string): string;
+  /**
+   * `要約待ち`
+   */
+  statusSummarizing(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -197,6 +213,10 @@ const catalog = createCatalog<Messages>({
     "modelDownloading": ["percent"],
     "modelFailed": [],
     "reprocess": [],
+    "errNoSummaryModel": [],
+    "errSummarize": ["detail"],
+    "errNoTemplate": ["name"],
+    "statusSummarizing": [],
   },
   messages: {
     "ja": {
@@ -237,6 +257,10 @@ const catalog = createCatalog<Messages>({
       "modelDownloading": "ダウンロード中 {percent}%",
       "modelFailed": "ダウンロードに失敗しました",
       "reprocess": "再処理",
+      "errNoSummaryModel": "要約に使うモデルが選択されていません",
+      "errSummarize": "要約に失敗しました: {detail}",
+      "errNoTemplate": "テンプレート「{name}」が見つかりません",
+      "statusSummarizing": "要約待ち",
     },
   },
 });
