@@ -13,7 +13,7 @@ export function TitleBar({ onToggleSidebar, onSearch, onSettings }: { onToggleSi
     <header
       className="flex shrink-0 items-center gap-1 border-b bg-sidebar px-2 [--app-region:drag]"
       style={{
-        height: 40, // the traffic lights are centered in 40 px (TrafficLightPosition in main.go)
+        height: 40, // the traffic lights are centered in 40 px (TrafficLightPosition in internal/app/app.go)
         paddingLeft: "calc(var(--mygo-titlebar-inset-left, 0px) + 0.5rem)",
         paddingRight: "calc(var(--mygo-titlebar-inset-right, 0px) + 0.5rem)",
       }}
