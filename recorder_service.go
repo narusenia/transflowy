@@ -187,7 +187,11 @@ func (r *Recorder) Discard(id string) error {
 		return err
 	}
 	r.last = ""
-	return os.RemoveAll(dir)
+	if err := os.RemoveAll(dir); err != nil {
+		return err
+	}
+	_ = LibraryChanged.Broadcast(id) // the page reloads its list
+	return nil
 }
 
 // finalizeAudio encodes recording.wav as audio.m4a.
