@@ -349,5 +349,6 @@
       }
     }
   },
-  "captionsToggle": "字幕の表示"
+  "captionsToggle": "字幕の表示",
+  "defaultTemplateName": "汎用メモ"
 }

@@ -11,9 +11,8 @@ import (
 //go:embed *.json
 var files embed.FS
 
-// Catalog holds the messages in ja, the source language, and no other
-// language. It is registered with package i18n, which makes its languages
-// the app's.
+// Catalog holds the messages in ja, the source language, and en. It is
+// registered with package i18n, which makes its languages the app's.
 var Catalog *i18n.Catalog
 
 func init() {
@@ -2200,4 +2199,14 @@ func CaptionsToggle() string { return In(i18n.Locale()).CaptionsToggle() }
 // in the language of msgs.
 func (msgs Messages) CaptionsToggle() string {
 	return Catalog.Format(msgs.locale, "captionsToggle", nil)
+}
+
+// DefaultTemplateName says "汎用メモ"
+// in the language the app shows.
+func DefaultTemplateName() string { return In(i18n.Locale()).DefaultTemplateName() }
+
+// DefaultTemplateName says "汎用メモ"
+// in the language of msgs.
+func (msgs Messages) DefaultTemplateName() string {
+	return Catalog.Format(msgs.locale, "defaultTemplateName", nil)
 }
