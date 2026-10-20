@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
@@ -30,7 +31,7 @@ function dayLabel(t: Messages, iso: string) {
   return d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric", weekday: "short" });
 }
 
-export function Sidebar({ recordings, selected, onSelect, recording, elapsed, level, onRecord, onImport }: {
+export function Sidebar({ recordings, selected, onSelect, recording, elapsed, level, onRecord, onImport, canCapture, capture, onCapture }: {
   recordings: Meta[];
   selected: string;
   onSelect(id: string): void;
@@ -39,6 +40,9 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
   level: number;
   onRecord(): void;
   onImport(): void;
+  canCapture: boolean; // this build can record system audio
+  capture: boolean;
+  onCapture(on: boolean): void;
 }) {
   const t = useMessages();
   const groups: { label: string; items: Meta[] }[] = [];
@@ -59,6 +63,12 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
           <div className="h-1 overflow-hidden rounded bg-muted">
             <div className="h-full bg-primary transition-[width] duration-150" style={{ width: `${Math.min(1, level * 2) * 100}%` }} />
           </div>
+        )}
+        {canCapture && (
+          <label className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground" title={t.captureSystemHint()}>
+            {t.captureSystem()}
+            <Switch size="sm" checked={capture} disabled={recording} onCheckedChange={onCapture} />
+          </label>
         )}
         <Button className="w-full" variant="outline" size="sm" onClick={onImport}>
           <Upload /> {t.importButton()}

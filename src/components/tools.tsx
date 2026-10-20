@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useMessages } from "@/i18n";
+import { defaultSpeaker } from "@/lib/speaker";
 import { Exporter, Library, type Transcript } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
@@ -137,13 +138,13 @@ export function SpeakersDialog({ id, transcript, open, onOpenChange, onChanged }
           {speakers.map((s, i) => (
             <label key={s.n} className="block min-w-0 space-y-1 text-sm">
               <span className="flex items-baseline justify-between gap-2">
-                <span className="font-medium">{t.speakerLabel(s.n + 1)}</span>
+                <span className="font-medium">{defaultSpeaker(t, s.n)}</span>
                 <span className="text-xs text-muted-foreground">{t.speakerLines(s.count)}</span>
               </span>
               <Input
                 autoFocus={i === 0}
                 value={names[String(s.n)] ?? ""}
-                placeholder={t.speakerLabel(s.n + 1)}
+                placeholder={defaultSpeaker(t, s.n)}
                 onChange={(e) => setNames({ ...names, [String(s.n)]: e.target.value })}
                 onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && save()}
               />

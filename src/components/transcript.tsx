@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/icon-button";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
+import { speakerName } from "@/lib/speaker";
 import type { Transcript as T } from "@/mygo";
 
 /** Index of the line playing at time t: the last one that started, -1 before the first. */
@@ -49,7 +50,7 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   useEffect(() => setShown(!follow), [follow]);
 
   if (!segs.length) return <p className="p-4 text-sm text-muted-foreground">{t.transcriptEmpty()}</p>;
-  const speaker = (n: number) => (n < 0 ? "" : transcript.speakers?.[String(n)] || t.speakerLabel(n + 1));
+  const speaker = (n: number) => speakerName(t, transcript, n);
   return (
     <div className="relative h-full">
       <div

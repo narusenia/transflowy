@@ -35,6 +35,8 @@ export function App() {
   const [sidebar, setSidebar] = useState(true);
   const [searching, setSearching] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [canCapture, setCanCapture] = useState(false);
+  const [capture, setCapture] = useState(false);
   const [renameId, setRenameId] = useState("");
   const [jump, setJump] = useState<Jump | null>(null);
   const [first, setFirst] = useState<S | null>(null); // settings, while the first-run screen is up
@@ -55,7 +57,11 @@ export function App() {
   };
 
   useEffect(() => {
-    Settings.get().then((c) => !c.onboarded && setFirst(c)).catch(() => {});
+    Settings.get().then((c) => {
+      setCapture(c.captureSystem);
+      if (!c.onboarded) setFirst(c);
+    }).catch(() => {});
+    Recorder.canCaptureSystem().then(setCanCapture).catch(() => {});
     Models.status().then(setModel);
     Summarizer.templates().then(setTemplates).catch(() => {});
     Recorder.state().then((s) => {
@@ -77,6 +83,7 @@ export function App() {
         if (!s.recording) reload();
       }),
       events.libraryChanged.on(reload),
+      events.recorderWarning.on((m) => toast.warning(m)),
       events.libraryMenu.on((a) => {
         if (a.action === "rename") {
           select(a.id);
@@ -131,6 +138,12 @@ export function App() {
           level={state.level}
           onRecord={() => (state.recording ? Recorder.stop() : Recorder.start()).catch(fail)}
           onImport={() => Importer.importDialog().catch(fail)}
+          canCapture={canCapture}
+          capture={capture}
+          onCapture={(on) => {
+            setCapture(on);
+            Settings.get().then((c) => Settings.set({ ...c, captureSystem: on })).catch(fail);
+          }}
         />
       )}
       <main className="flex min-w-0 flex-1 flex-col">
