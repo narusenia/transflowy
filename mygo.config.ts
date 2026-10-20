@@ -12,6 +12,8 @@ export default defineConfig({
   frontendDist: "dist",
   bindings: "src/mygo.ts",
   out: "build",
+  // Messages live in locales/<tag>.json; Japanese is the source, others fall back to it.
+  i18n: { dir: "locales", source: "ja" },
   macos: {
     // Core Audio Tap (system audio, a later stage) needs 14.2.
     minimumSystemVersion: "14.2",

@@ -1,0 +1,16 @@
+{
+  "@@locale": "ja",
+  "trayRecordStart": "録音を開始",
+  "trayRecordStop": "録音を停止",
+  "trayOpenWindow": "ウィンドウを開く",
+  "trayQuit": "transflowy を終了",
+  "recordingRecovered": "アプリが予期せず終了したため、途中までの録音を復旧しました",
+  "recordStart": "録音を開始",
+  "recordStop": "停止 {time}",
+  "@recordStop": { "placeholders": { "time": { "type": "String" } } },
+  "recordingSaved": "録音を保存しました",
+  "undo": "取り消し",
+  "recordingDeleted": "録音を削除しました",
+  "recordingCount": "{count, plural, other{#件}}",
+  "@recordingCount": { "placeholders": { "count": { "type": "int" } } }
+}
