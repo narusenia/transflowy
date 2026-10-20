@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { onLocaleChange } from "mygo-runtime";
 import { toast, Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -66,6 +67,7 @@ export function App() {
     Recorder.canCaptureSystem().then(setCanCapture).catch(() => {});
     Models.status().then(setModel);
     Summarizer.templates().then(setTemplates).catch(() => {});
+    const offLocale = onLocaleChange(() => Summarizer.templates().then(setTemplates).catch(() => {}));
     Recorder.state().then((s) => {
       wasRecording.current = s.recording;
       setState(s);
@@ -100,7 +102,10 @@ export function App() {
         Models.status().then(setModel);
       }),
     ];
-    return () => offs.forEach((off) => off());
+    return () => {
+      offLocale();
+      offs.forEach((off) => off());
+    };
   }, []);
 
   useEffect(() => {

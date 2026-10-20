@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useMessages } from "@/i18n";
 import { getMode, setMode, type Mode } from "@/lib/theme";
-import { events, Library, Models, Recorder, Settings, Summarizer, type ModelStatus, type Provider, type Settings as S, type Template } from "@/mygo";
+import { events, Language, Library, Models, Recorder, Settings, Summarizer, type LanguageOption, type ModelStatus, type Provider, type Settings as S, type Template } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
 const select = "h-8 rounded-md border bg-transparent px-2 text-sm";
@@ -79,6 +79,7 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
   const [templates, setTemplates] = useState<Template[]>([]);
   const [ollama, setOllama] = useState<string[] | null>(null);
   const [devices, setDevices] = useState<string[]>([]);
+  const [langs, setLangs] = useState<LanguageOption[]>([]);
   const [models, setModels] = useState<ModelStatus | null>(null);
   const [speakerPct, setSpeakerPct] = useState(0);
   const [mode, setModeState] = useState<Mode>(getMode);
@@ -87,6 +88,7 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
     if (!open) return;
     Settings.get().then(setS).catch(fail);
     Summarizer.templates().then(setTemplates).catch(() => setTemplates([]));
+    Language.options().then(setLangs).catch(() => setLangs([]));
     Recorder.devices().then(setDevices).catch(() => setDevices([]));
     Models.status().then(setModels).catch(() => {});
     const off = events.modelChanged.on((p) => {
@@ -102,6 +104,17 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
   const save = (next: S) => {
     setS(next);
     Settings.set(next).then(onChanged).catch(fail);
+  };
+  // The built-in templates are in the language of the app: after a change the saved
+  // default may not exist, so it moves to the memo template.
+  const changeLanguage = async (tag: string) => {
+    if (!s) return;
+    await Language.set(tag);
+    const ts = await Summarizer.templates();
+    setTemplates(ts);
+    const memo = ts.find((x) => x.key === "06-memo");
+    const template = ts.some((x) => x.name === s.template) || !memo ? s.template : memo.name;
+    save({ ...s, language: tag, template });
   };
   const detect = () =>
     Summarizer.detectOllama().then((m) => {
@@ -124,6 +137,12 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
                   <option value="system">{t.themeSystem()}</option>
                   <option value="light">{t.themeLight()}</option>
                   <option value="dark">{t.themeDark()}</option>
+                </select>
+              </Row>
+              <Row label={t.appLanguage()}>
+                <select className={select} value={s.language} onChange={(e) => void changeLanguage(e.target.value).catch(fail)}>
+                  <option value="">{t.languageSystem()}</option>
+                  {langs.map((l) => <option key={l.tag} value={l.tag}>{l.name}</option>)}
                 </select>
               </Row>
               <Row label={t.localOnly()} hint={t.localOnlyHint()}>
