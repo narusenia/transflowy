@@ -503,14 +503,14 @@ func describe(err error) string {
 // diarization could not run) stays.
 func (q *Queue) setDone(st library.Store, id, dir string) {
 	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status = library.StatusDone })
-	savePeaks(dir)
+	SavePeaks(dir)
 	CleanupWAV(dir)
 	q.changed(id)
 }
 
 func (q *Queue) finish(st library.Store, id, dir string) {
 	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusDone, "" })
-	savePeaks(dir)
+	SavePeaks(dir)
 	CleanupWAV(dir)
 	q.changed(id)
 	if q.cfg.Transcribed != nil {
@@ -521,10 +521,12 @@ func (q *Queue) finish(st library.Store, id, dir string) {
 // peakCount is how many bars the player's waveform has.
 const peakCount = 2000
 
-// savePeaks writes peaks.json from the WAVs, so the page draws the waveform
+// SavePeaks writes peaks.json from the WAVs, so the page draws the waveform
 // without decoding a long audio file. With two tracks the bars are the louder
-// of the two. Call it before CleanupWAV.
-func savePeaks(dir string) {
+// of the two. Call it before CleanupWAV; the page draws the waveform from the
+// moment a recording has a duration, so the recorder and the importer call it
+// as soon as the WAVs are complete, and the pipeline again at the end.
+func SavePeaks(dir string) {
 	var peaks []float32
 	for _, name := range []string{wavName, systemWAV} {
 		p, err := audio.Peaks(filepath.Join(dir, name), peakCount)

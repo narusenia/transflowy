@@ -110,6 +110,7 @@ func importOne(st library.Store, q *pipeline.Queue, path string) error {
 		return fail(err)
 	}
 	m.Duration = float64(n) / 16000
+	pipeline.SavePeaks(dir) // before the duration is saved: the page draws the waveform from then on
 	m.Status = library.StatusQueued
 	if err := st.SaveMeta(m); err != nil {
 		return err

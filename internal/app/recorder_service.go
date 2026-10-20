@@ -146,6 +146,9 @@ func (r *Recorder) Stop() (library.Meta, error) {
 	if err != nil {
 		return library.Meta{}, err
 	}
+	if dir, err := st.Path(id); err == nil {
+		pipeline.SavePeaks(dir) // the page draws the waveform as soon as there is a duration
+	}
 	m, err := st.UpdateMeta(id, func(m *library.Meta) {
 		m.Duration = secs
 		m.Status = library.StatusQueued
@@ -291,6 +294,7 @@ func recoverRecordings(st library.Store) {
 			continue
 		}
 		m.Duration = float64(fi.Size()-44) / 32000
+		pipeline.SavePeaks(dir)
 		m.Status = library.StatusQueued
 		m.Error = locales.RecordingRecovered()
 		if st.SaveMeta(m) == nil {
