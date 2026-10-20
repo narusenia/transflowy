@@ -45,15 +45,19 @@
 - [x] データモデル（`meta.json` / `transcript.json`、`speaker` / `original` を含む）と録音フォルダの読み書き（`internal/library`、原子的書き込み、テストあり）
 - [x] 設定の保存（保存先、既定プロバイダ、ローカル限定、ショートカット）と API キーのキーチェーン保存（`internal/settings`、`mygo.Secrets`。キーの値はページに返さない）
 
+- [x] i18n 基盤（追加）: `locales/ja.json`（ソース言語 = 日本語）、`mygo generate` が `locales/catalog_gen.go` と `src/locales.ts` を生成。Go は `locales.Xxx()`、画面は `useMessages()`。メニューバーは言語変更時に再設定。**文言は今後ここに追加する**（直書きしない）。他言語は `locales/<tag>.json` を足すだけ（未訳は日本語に fall back）。未対応: マイク権限の説明文（Info.plist）の多言語化は `resources/darwin/<lang>.lproj/InfoPlist.strings` で行う
+
 ## Phase 2: 録音と取り込み
 
-- [ ] malgo でマイク録音、数秒ごとの WAV 追記
-- [ ] 停止後の m4a 変換（afconvert）
+- [x] malgo でマイク録音、数秒ごとの WAV 追記（2 秒ごとに追記・ヘッダ更新。起動時に前回クラッシュした録音を復旧）
+  - **`mygo build` は既定で cgo 無効** → malgo が未定義でビルド失敗。`CGO_ENABLED=1` を dev / build / generate のスクリプトに設定済み。Windows は C コンパイラが要る（Windows 着手時に確認）
+  - 録音中は `recording.wav` を残す（Phase 3 の処理で使う。処理完了後に削除する）
+- [x] 停止後の m4a 変換（afconvert、`audio.m4a`。アプリ終了時・クラッシュ時にも変換を完了させる）
 - [ ] ファイル取り込み（ドロップ → afconvert で 16kHz WAV 化）
 - [ ] 動画ファイル（mp4 / mov）の取り込み
-- [ ] グローバルショートカット `⌥⌘R`
-- [ ] メニューバーアイコン（開始 / 停止、経過時間、ローカル限定の鍵マーク）
-- [ ] 停止直後 5 秒の「取り消し」トースト
+- [x] グローバルショートカット `⌥⌘R`（設定の `shortcut`。起動時にエラーなく登録できることを確認、押下での動作は未確認）
+- [x] メニューバーアイコン（開始 / 停止、経過時間。窓を閉じても録音継続）。残り: ローカル限定の鍵マーク（Phase 3 のガードと同時）
+- [x] 停止直後 5 秒の「取り消し」トースト（直前に止めた録音だけ削除可）
 
 ## Phase 3: 文字起こし
 
