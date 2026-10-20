@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Pencil, Undo2 } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Button } from "@/components/ui/button";
+import { Shimmer } from "@/components/ui/shimmer";
 import { IconButton } from "@/components/icon-button";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
@@ -20,7 +21,7 @@ export function activeIndex(segments: T["segments"], t: number) {
 }
 
 /** The lines of a transcript. Only the visible ones are drawn (TanStack Virtual). */
-export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert, onSpeakers, live }: {
+export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert, onSpeakers, live, progress }: {
   transcript: T;
   time: number;
   onSeek(seconds: number): void;
@@ -30,6 +31,7 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   onRevert(index: number, start: number): void;
   onSpeakers(): void; // the speaker label was clicked: name the speakers
   live: boolean; // a recording is running: follow the newest line, not the playhead
+  progress: string | null; // what the recording is doing now, shown while there are no lines
 }) {
   const t = useMessages();
   const scroller = useRef<HTMLDivElement>(null);
@@ -50,7 +52,7 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   const [shown, setShown] = useState(false); // the button, once the user scrolled away
   useEffect(() => setShown(!follow), [follow]);
 
-  if (!segs.length) return <p className="p-4 text-sm text-muted-foreground">{t.transcriptEmpty()}</p>;
+  if (!segs.length) return <p className="p-4 text-sm text-muted-foreground">{progress ? <Shimmer>{progress}</Shimmer> : t.transcriptEmpty()}</p>;
   const speaker = (n: number) => speakerName(t, transcript, n);
   return (
     <div className="relative h-full">

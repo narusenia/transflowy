@@ -203,6 +203,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       onRevert={(i, start) => Library.resetSegment(meta.id, i, start).then(onChanged).catch(fail)}
       onSpeakers={() => setNaming(true)}
       live={recording}
+      progress={progress}
     />;
 
   return (

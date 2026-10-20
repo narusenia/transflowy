@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Shimmer } from "@/components/ui/shimmer";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { clock } from "@/lib/media";
@@ -9,8 +10,8 @@ import { Library, type Meta } from "@/mygo";
 import { Mic, Square, Upload, X } from "lucide-react";
 
 function statusBadge(t: Messages, m: Meta) {
-  const text = progressText(t, m) ?? (m.status === "recording" ? t.statusRecording() : m.status === "failed" ? t.statusFailed() : null);
-  if (!text) return null; // done: no badge
+  const text = m.status === "recording" ? t.statusRecording() : m.status === "failed" ? t.statusFailed() : null;
+  if (!text) return null; // in progress shimmers instead; done has no badge
   return { text, variant: m.status === "failed" ? ("destructive" as const) : m.status === "recording" ? ("default" as const) : ("secondary" as const) };
 }
 
@@ -73,6 +74,7 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
           <section key={g.label}>
             <h2 className="px-2 pt-3 pb-1 text-xs font-medium text-muted-foreground">{g.label}</h2>
             {g.items.map((m) => {
+              const busy = progressText(t, m);
               const badge = statusBadge(t, m);
               return (
                 <div key={m.id} className="group relative">
@@ -89,7 +91,7 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
                   <span className="truncate font-medium">{m.title || new Date(m.createdAt).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</span>
                   <span className="flex items-center gap-2 text-xs text-muted-foreground">
                     {m.duration > 0 && <span className="tabular-nums">{clock(m.duration)}</span>}
-                    {badge && <Badge variant={badge.variant}>{badge.text}</Badge>}
+                    {busy ? <Shimmer>{busy}</Shimmer> : badge && <Badge variant={badge.variant}>{badge.text}</Badge>}
                   </span>
                 </button>
                 {m.status !== "recording" && m.status !== "importing" && (
