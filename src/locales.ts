@@ -687,6 +687,30 @@ export interface Messages {
    * `ダーク`
    */
   themeDark(): string;
+  /**
+   * `話者{n}`
+   */
+  speakerLabel(n: number): string;
+  /**
+   * `話者名`
+   */
+  speakersButton(): string;
+  /**
+   * `話者名を付ける`
+   */
+  speakersTitle(): string;
+  /**
+   * `名前は文字起こし・要約・書き出しに使われます。空欄は「話者N」に戻ります`
+   */
+  speakersHint(): string;
+  /**
+   * `保存`
+   */
+  speakersSave(): string;
+  /**
+   * `{count}行`
+   */
+  speakerLines(count: number): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -867,6 +891,12 @@ const catalog = createCatalog<Messages>({
     "themeSystem": [],
     "themeLight": [],
     "themeDark": [],
+    "speakerLabel": ["n"],
+    "speakersButton": [],
+    "speakersTitle": [],
+    "speakersHint": [],
+    "speakersSave": [],
+    "speakerLines": ["count"],
   },
   messages: {
     "ja": {
@@ -1041,6 +1071,12 @@ const catalog = createCatalog<Messages>({
       "themeSystem": "システムに合わせる",
       "themeLight": "ライト",
       "themeDark": "ダーク",
+      "speakerLabel": "話者{n}",
+      "speakersButton": "話者名",
+      "speakersTitle": "話者名を付ける",
+      "speakersHint": "名前は文字起こし・要約・書き出しに使われます。空欄は「話者N」に戻ります",
+      "speakersSave": "保存",
+      "speakerLines": "{count}行",
     },
   },
 });

@@ -192,6 +192,13 @@ export const Library = {
   search(query: string): Promise<Hit[]> {
     return call("Library.Search", query);
   },
+  /**
+   * SetSpeakers names the speakers of a recording: speaker number (as a string)
+   * to name. Blank names go back to the default.
+   */
+  setSpeakers(id: string, names: Record<string, string>): Promise<void> {
+    return call("Library.SetSpeakers", id, names);
+  },
   /** SetTitle renames a recording. */
   setTitle(id: string, title: string): Promise<void> {
     return call("Library.SetTitle", id, title);

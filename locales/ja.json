@@ -261,5 +261,25 @@
   "appearance": "外観",
   "themeSystem": "システムに合わせる",
   "themeLight": "ライト",
-  "themeDark": "ダーク"
+  "themeDark": "ダーク",
+  "speakerLabel": "話者{n}",
+  "@speakerLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "speakersButton": "話者名",
+  "speakersTitle": "話者名を付ける",
+  "speakersHint": "名前は文字起こし・要約・書き出しに使われます。空欄は「話者N」に戻ります",
+  "speakersSave": "保存",
+  "speakerLines": "{count}行",
+  "@speakerLines": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

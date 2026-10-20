@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useMessages } from "@/i18n";
-import { Exporter, Library } from "@/mygo";
+import { Exporter, Library, type Transcript } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
 const select = "h-8 rounded-md border bg-transparent px-2 text-sm";
@@ -95,6 +95,63 @@ export function ExportDialog({ id, summaries, template, open, onOpenChange }: { 
           </div>
           <p className="text-xs text-muted-foreground">{t.exportNote()}</p>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** The speakers of a transcript with how many lines each has and a sample. */
+export function speakersOf(t: Transcript) {
+  const found = new Map<number, { count: number; sample: string }>();
+  for (const s of t.segments) {
+    if (s.speaker < 0) continue;
+    const f = found.get(s.speaker) ?? { count: 0, sample: s.text };
+    found.set(s.speaker, { count: f.count + 1, sample: f.sample });
+  }
+  return [...found].sort((a, b) => a[0] - b[0]).map(([n, v]) => ({ n, ...v }));
+}
+
+/** Give the speakers of a recording names. A blank name goes back to "話者N". */
+export function SpeakersDialog({ id, transcript, open, onOpenChange, onChanged }: { id: string; transcript: Transcript; open: boolean; onOpenChange(o: boolean): void; onChanged(): void }) {
+  const t = useMessages();
+  const speakers = speakersOf(transcript);
+  const [names, setNames] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (open) setNames({ ...transcript.speakers });
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  const save = () =>
+    Library.setSpeakers(id, names)
+      .then(() => {
+        onOpenChange(false);
+        onChanged();
+      })
+      .catch(fail);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t.speakersTitle()}</DialogTitle>
+        </DialogHeader>
+        <p className="text-xs text-muted-foreground">{t.speakersHint()}</p>
+        <div className="min-w-0 space-y-3">
+          {speakers.map((s, i) => (
+            <label key={s.n} className="block min-w-0 space-y-1 text-sm">
+              <span className="flex items-baseline justify-between gap-2">
+                <span className="font-medium">{t.speakerLabel(s.n + 1)}</span>
+                <span className="text-xs text-muted-foreground">{t.speakerLines(s.count)}</span>
+              </span>
+              <Input
+                autoFocus={i === 0}
+                value={names[String(s.n)] ?? ""}
+                placeholder={t.speakerLabel(s.n + 1)}
+                onChange={(e) => setNames({ ...names, [String(s.n)]: e.target.value })}
+                onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && save()}
+              />
+              <span className="block truncate text-xs text-muted-foreground">{s.sample}</span>
+            </label>
+          ))}
+        </div>
+        <Button onClick={save}>{t.speakersSave()}</Button>
       </DialogContent>
     </Dialog>
   );

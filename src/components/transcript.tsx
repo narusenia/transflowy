@@ -19,7 +19,7 @@ function activeIndex(segments: T["segments"], t: number) {
 }
 
 /** The lines of a transcript. Only the visible ones are drawn (TanStack Virtual). */
-export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert }: {
+export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit, onRevert, onSpeakers }: {
   transcript: T;
   time: number;
   onSeek(seconds: number): void;
@@ -27,6 +27,7 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   setFollow(on: boolean): void;
   onEdit(index: number, start: number, text: string): void;
   onRevert(index: number, start: number): void;
+  onSpeakers(): void; // the speaker label was clicked: name the speakers
 }) {
   const t = useMessages();
   const scroller = useRef<HTMLDivElement>(null);
@@ -48,7 +49,7 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
   useEffect(() => setShown(!follow), [follow]);
 
   if (!segs.length) return <p className="p-4 text-sm text-muted-foreground">{t.transcriptEmpty()}</p>;
-  const speaker = (n: number) => (n < 0 ? "" : transcript.speakers?.[String(n)] || `${n + 1}`);
+  const speaker = (n: number) => (n < 0 ? "" : transcript.speakers?.[String(n)] || t.speakerLabel(n + 1));
   return (
     <div className="relative h-full">
       <div
@@ -82,7 +83,11 @@ export function Transcript({ transcript, time, onSeek, follow, setFollow, onEdit
                 ) : (
                   <>
                     <span className="min-w-0 flex-1">
-                      {speaker(s.speaker) && <span className="mr-2 font-medium">{speaker(s.speaker)}</span>}
+                      {speaker(s.speaker) && (
+                        <button className="mr-2 cursor-pointer font-medium hover:underline" onClick={(e) => { e.stopPropagation(); onSpeakers(); }}>
+                          {speaker(s.speaker)}
+                        </button>
+                      )}
                       {s.text}
                     </span>
                     <span className="flex shrink-0 gap-1 opacity-0 group-hover:opacity-100">

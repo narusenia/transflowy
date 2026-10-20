@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Replace, RotateCw } from "lucide-react";
+import { Download, Replace, RotateCw, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/icon-button";
@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Player, type PlayerHandle } from "@/components/player";
 import { Transcript } from "@/components/transcript";
 import { Markdown } from "@/components/summary";
-import { ExportDialog, ReplaceDialog } from "@/components/tools";
+import { ExportDialog, ReplaceDialog, SpeakersDialog, speakersOf } from "@/components/tools";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { clock } from "@/lib/media";
@@ -62,6 +62,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
   const [tpl, setTpl] = useState(""); // the template the button uses
   const [text, setText] = useState("");
   const [replacing, setReplacing] = useState(false);
+  const [naming, setNaming] = useState(false);
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
@@ -148,6 +149,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       setFollow={setFollow}
       onEdit={(i, start, text) => Library.editSegment(meta.id, i, start, text).then(onChanged).catch(fail)}
       onRevert={(i, start) => Library.resetSegment(meta.id, i, start).then(onChanged).catch(fail)}
+      onSpeakers={() => setNaming(true)}
     />;
 
   return (
@@ -161,6 +163,11 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
           <div className="flex items-center gap-1.5">
           {!recording && rec.transcript.segments.length > 0 && (
             <>
+              {speakersOf(rec.transcript).length > 0 && (
+                <IconButton variant="outline" label={t.speakersButton()} onClick={() => setNaming(true)}>
+                  <Users />
+                </IconButton>
+              )}
               <IconButton variant="outline" label={t.replaceButton()} onClick={() => setReplacing(true)}>
                 <Replace />
               </IconButton>
@@ -206,6 +213,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
           </Tabs>
         )}
       </div>
+      <SpeakersDialog id={meta.id} transcript={rec.transcript} open={naming} onOpenChange={setNaming} onChanged={onChanged} />
       <ReplaceDialog id={meta.id} open={replacing} onOpenChange={setReplacing} onChanged={onChanged} />
       <ExportDialog key={meta.id} id={meta.id} summaries={rec.summaries} template={name} open={exporting} onOpenChange={setExporting} />
       {recording ? (

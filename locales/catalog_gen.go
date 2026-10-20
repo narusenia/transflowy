@@ -1741,3 +1741,63 @@ func ThemeDark() string { return In(i18n.Locale()).ThemeDark() }
 func (msgs Messages) ThemeDark() string {
 	return Catalog.Format(msgs.locale, "themeDark", nil)
 }
+
+// SpeakerLabel says "話者{n}"
+// in the language the app shows.
+func SpeakerLabel(n int) string { return In(i18n.Locale()).SpeakerLabel(n) }
+
+// SpeakerLabel says "話者{n}"
+// in the language of msgs.
+func (msgs Messages) SpeakerLabel(n int) string {
+	return Catalog.Format(msgs.locale, "speakerLabel", map[string]any{"n": n})
+}
+
+// SpeakersButton says "話者名"
+// in the language the app shows.
+func SpeakersButton() string { return In(i18n.Locale()).SpeakersButton() }
+
+// SpeakersButton says "話者名"
+// in the language of msgs.
+func (msgs Messages) SpeakersButton() string {
+	return Catalog.Format(msgs.locale, "speakersButton", nil)
+}
+
+// SpeakersTitle says "話者名を付ける"
+// in the language the app shows.
+func SpeakersTitle() string { return In(i18n.Locale()).SpeakersTitle() }
+
+// SpeakersTitle says "話者名を付ける"
+// in the language of msgs.
+func (msgs Messages) SpeakersTitle() string {
+	return Catalog.Format(msgs.locale, "speakersTitle", nil)
+}
+
+// SpeakersHint says "名前は文字起こし・要約・書き出しに使われます。空欄は「話者N」に戻ります"
+// in the language the app shows.
+func SpeakersHint() string { return In(i18n.Locale()).SpeakersHint() }
+
+// SpeakersHint says "名前は文字起こし・要約・書き出しに使われます。空欄は「話者N」に戻ります"
+// in the language of msgs.
+func (msgs Messages) SpeakersHint() string {
+	return Catalog.Format(msgs.locale, "speakersHint", nil)
+}
+
+// SpeakersSave says "保存"
+// in the language the app shows.
+func SpeakersSave() string { return In(i18n.Locale()).SpeakersSave() }
+
+// SpeakersSave says "保存"
+// in the language of msgs.
+func (msgs Messages) SpeakersSave() string {
+	return Catalog.Format(msgs.locale, "speakersSave", nil)
+}
+
+// SpeakerLines says "{count}行"
+// in the language the app shows.
+func SpeakerLines(count int) string { return In(i18n.Locale()).SpeakerLines(count) }
+
+// SpeakerLines says "{count}行"
+// in the language of msgs.
+func (msgs Messages) SpeakerLines(count int) string {
+	return Catalog.Format(msgs.locale, "speakerLines", map[string]any{"count": count})
+}
