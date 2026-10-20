@@ -196,3 +196,18 @@ func (r *Recorder) Recording() bool {
 	defer r.mu.Unlock()
 	return r.dev != nil
 }
+
+// Record captures d of audio from the device into the WAV file at path and
+// returns the loudest level heard (0..1). It opens the device like Start, so
+// it is also how the app makes macOS ask for microphone permission.
+func (r *Recorder) Record(path, device string, d time.Duration) (float32, error) {
+	if err := r.Start(path, device); err != nil {
+		return 0, err
+	}
+	var peak float32
+	for end := time.Now().Add(d); time.Now().Before(end); time.Sleep(50 * time.Millisecond) {
+		peak = max(peak, r.Level())
+	}
+	_, err := r.Stop()
+	return peak, err
+}
