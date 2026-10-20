@@ -40,7 +40,17 @@ Point it at an Obsidian vault and the notes are already there.
 
 ## Install
 
-There is no prebuilt download yet (no Developer ID signing), so you build the app yourself. Apple Silicon and macOS 14.2+ only.
+Apple Silicon and macOS 14.2+ only.
+
+### Download
+
+Get `transflowy <version> arm64.dmg` from [Releases](https://github.com/narusenia/transflowy/releases), open it and drag the app to `/Applications`. The app is not signed with a Developer ID, so macOS blocks the first launch. Run this once, then open it:
+
+```sh
+xattr -dr com.apple.quarantine /Applications/transflowy.app
+```
+
+### Build it yourself
 
 Requirements: Xcode command line tools, Go, [bun](https://bun.sh), cmake, git.
 
@@ -53,7 +63,7 @@ bun run cert          # once: a local signing identity, so macOS keeps the micro
 bun run build:signed  # makes build/darwin-arm64/transflowy.app
 ```
 
-`bun run build:dmg` also makes `build/darwin-arm64/transflowy 0.1.0 arm64.dmg`, a disk image to hand to another Mac. Copy `transflowy.app` to `/Applications` (or drag it from the image). It is signed with your own local identity, so it opens on the Mac that built it. To use it on another Mac, build there, or copy the app and run `xattr -dr com.apple.quarantine /Applications/transflowy.app` once.
+`bun run build:dmg` also makes `build/darwin-arm64/transflowy 0.1.0 arm64.dmg`, a disk image to hand to another Mac. Copy `transflowy.app` to `/Applications` (or drag it from the image). It is signed with your own local identity, so it opens on the Mac that built it. On another Mac, run the `xattr` command above once.
 
 On first launch:
 
@@ -76,7 +86,7 @@ In development, `OPENROUTER_API_KEY` in `.env` is also read. Messages live in `l
 ## Status
 
 - Builds and runs on Apple Silicon. `whisper-server` and the sherpa-onnx dylibs are bundled in the `.app`.
-- Not done yet: Developer ID signing and notarization (so no prebuilt download), auto update, Windows.
+- Not done yet: Developer ID signing and notarization (the download needs the `xattr` step), auto update, Windows.
 - Planned: meeting detection, automatic template choice, chat about a recording, a warning for cloud-synced folders.
 
 Details: [docs/requirements.md](docs/requirements.md), [docs/implementation-plan.md](docs/implementation-plan.md) (Japanese).

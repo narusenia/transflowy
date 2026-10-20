@@ -40,7 +40,17 @@ dictionary.txt
 
 ## インストール
 
-署名つきの配布物はまだない（Developer ID 署名をしていない）ので、自分でビルドする。Apple Silicon、macOS 14.2 以上のみ。
+Apple Silicon、macOS 14.2 以上のみ。
+
+### ダウンロード
+
+[Releases](https://github.com/narusenia/transflowy/releases) から `transflowy <バージョン> arm64.dmg` を取り、開いてアプリを `/Applications` にドラッグする。Developer ID で署名していないので、macOS が初回の起動を止める。次のコマンドを 1 回実行してから開く。
+
+```sh
+xattr -dr com.apple.quarantine /Applications/transflowy.app
+```
+
+### 自分でビルドする
 
 必要なもの: Xcode のコマンドラインツール、Go、[bun](https://bun.sh)、cmake、git。
 
@@ -53,7 +63,7 @@ bun run cert          # 初回のみ。ローカルの署名用証明書。再�
 bun run build:signed  # build/darwin-arm64/transflowy.app ができる
 ```
 
-`bun run build:dmg` なら `build/darwin-arm64/transflowy 0.1.0 arm64.dmg` も作る。ほかの Mac へ渡すためのディスクイメージ。`transflowy.app` を `/Applications` にコピーする（イメージからドラッグでもよい）。署名は自分のローカル証明書なので、ビルドした Mac ではそのまま開ける。ほかの Mac で使うなら、そこでビルドするか、アプリをコピーして `xattr -dr com.apple.quarantine /Applications/transflowy.app` を 1 回実行する。
+`bun run build:dmg` なら `build/darwin-arm64/transflowy 0.1.0 arm64.dmg` も作る。ほかの Mac へ渡すためのディスクイメージ。`transflowy.app` を `/Applications` にコピーする（イメージからドラッグでもよい）。署名は自分のローカル証明書なので、ビルドした Mac ではそのまま開ける。ほかの Mac では、上の `xattr` コマンドを 1 回実行する。
 
 初回起動の流れ:
 
@@ -76,7 +86,7 @@ go test ./...
 ## 状況
 
 - Apple Silicon でビルドして動作する。`whisper-server` と sherpa-onnx の dylib は .app に同梱している。
-- 未対応: Developer ID 署名と公証（そのため配布物はない）、自動更新、Windows。
+- 未対応: Developer ID 署名と公証（ダウンロード版は `xattr` の手順が要る）、自動更新、Windows。
 - 予定: 会議の自動検出、テンプレートの自動選択、録音内容への質問チャット、クラウド同期フォルダの警告。
 
 詳細: [docs/requirements.md](docs/requirements.md)、[docs/implementation-plan.md](docs/implementation-plan.md)。
