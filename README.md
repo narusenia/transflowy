@@ -52,7 +52,7 @@ bun run cert          # once: a local signing identity, so macOS keeps the micro
 bun run build:signed  # makes build/darwin-arm64/transflowy.app
 ```
 
-Copy `transflowy.app` to `/Applications`. It is signed with your own local identity, so it opens on the Mac that built it. To use it on another Mac, build there, or copy the app and run `xattr -dr com.apple.quarantine /Applications/transflowy.app` once.
+`bun run build:dmg` also makes `build/darwin-arm64/transflowy 0.1.0 arm64.dmg`, a disk image to hand to another Mac. Copy `transflowy.app` to `/Applications` (or drag it from the image). It is signed with your own local identity, so it opens on the Mac that built it. To use it on another Mac, build there, or copy the app and run `xattr -dr com.apple.quarantine /Applications/transflowy.app` once.
 
 On first launch:
 

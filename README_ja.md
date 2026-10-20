@@ -52,7 +52,7 @@ bun run cert          # 初回のみ。ローカルの署名用証明書。再�
 bun run build:signed  # build/darwin-arm64/transflowy.app ができる
 ```
 
-`transflowy.app` を `/Applications` にコピーする。署名は自分のローカル証明書なので、ビルドした Mac ではそのまま開ける。ほかの Mac で使うなら、そこでビルドするか、アプリをコピーして `xattr -dr com.apple.quarantine /Applications/transflowy.app` を 1 回実行する。
+`bun run build:dmg` なら `build/darwin-arm64/transflowy 0.1.0 arm64.dmg` も作る。ほかの Mac へ渡すためのディスクイメージ。`transflowy.app` を `/Applications` にコピーする（イメージからドラッグでもよい）。署名は自分のローカル証明書なので、ビルドした Mac ではそのまま開ける。ほかの Mac で使うなら、そこでビルドするか、アプリをコピーして `xattr -dr com.apple.quarantine /Applications/transflowy.app` を 1 回実行する。
 
 初回起動の流れ:
 
