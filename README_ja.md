@@ -79,3 +79,7 @@ go test ./...
 - 予定: 会議の自動検出、テンプレートの自動選択、録音内容への質問チャット、クラウド同期フォルダの警告。
 
 詳細: [docs/requirements.md](docs/requirements.md)、[docs/implementation-plan.md](docs/implementation-plan.md)。
+
+## ライセンス
+
+[MIT](LICENSE)

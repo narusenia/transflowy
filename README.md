@@ -79,3 +79,7 @@ In development, `OPENROUTER_API_KEY` in `.env` is also read. Messages live in `l
 - Planned: meeting detection, automatic template choice, chat about a recording, a warning for cloud-synced folders.
 
 Details: [docs/requirements.md](docs/requirements.md), [docs/implementation-plan.md](docs/implementation-plan.md) (Japanese).
+
+## License
+
+[MIT](LICENSE)
