@@ -2,63 +2,46 @@ package main
 
 import (
 	"log"
-	"runtime"
-	"time"
+	"os"
+	"path/filepath"
 
 	"github.com/egoist/mygo"
+
+	"transflowy/internal/settings"
 )
 
-// Greeter is callable from the frontend: `mygo generate` turns its methods
-// into typed TypeScript functions in src/mygo.ts.
-type Greeter struct{}
-
-// Greet returns a greeting for name.
-func (Greeter) Greet(name string) string {
-	if name == "" {
-		name = "stranger"
-	}
-	return "Hello, " + name + "! This message comes from Go."
-}
-
-// SystemInfo describes the machine the app runs on.
-type SystemInfo struct {
-	OS        string `json:"os"`
-	Arch      string `json:"arch"`
-	GoVersion string `json:"goVersion"`
-}
-
-// Info returns information about the system.
-func (Greeter) Info() SystemInfo {
-	return SystemInfo{OS: runtime.GOOS, Arch: runtime.GOARCH, GoVersion: runtime.Version()}
-}
-
-// Tick is sent to the page every second.
-var Tick = mygo.NewEvent[time.Time]("tick")
-
 func main() {
-	mygo.Bind(Greeter{})
+	home, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cfgDir, err := os.UserConfigDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	cfg := &settings.Service{
+		Path:           filepath.Join(cfgDir, "transflowy", "settings.json"),
+		Home:           home,
+		Keys:           mygo.Secrets,
+		ErrKeyNotFound: mygo.ErrSecretNotFound,
+	}
+	mygo.BindAs("Settings", cfg)
+	mygo.BindAs("Library", &Library{cfg: cfg})
 
 	mygo.App.WhenReady(func() {
-		win := mygo.NewWindow(mygo.WindowOptions{
+		mygo.NewWindow(mygo.WindowOptions{
 			Title:           "transflowy",
-			Width:           960,
-			Height:          640,
-			MinWidth:        480,
-			MinHeight:       360,
-			BackgroundColor: "light-dark(#f6f7f9, #0f1115)", // the page's --bg in src/style.css
+			Width:           1200,
+			Height:          760,
+			MinWidth:        720,
+			MinHeight:       480,
+			BackgroundColor: "light-dark(#ffffff, #0a0a0a)", // shadcn neutral --background
 			// Opens where the user left it last time.
 			StateKey: "main",
 			// The frontend: devUrl during `mygo dev`, frontendDist
-			// embedded by `mygo build` otherwise (see mygo.json).
+			// embedded by `mygo build` otherwise (see mygo.config.ts).
 			URL: "/",
 		})
-		go func() {
-			for t := range time.Tick(time.Second) {
-				if Tick.Emit(win, t) != nil {
-					return // the window was closed
-				}
-			}
-		}()
 	})
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)
