@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-//go:embed templates/*.md
+//go:embed templates/*.md templates/en/*.md
 var builtin embed.FS
 
 // Template is a summary recipe: a Markdown file with a frontmatter header.
@@ -18,6 +18,7 @@ type Template struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Builtin     bool   `json:"builtin"`
+	Key         string `json:"-"` // a built-in's file name, the same in every language
 	Prompt      string `json:"-"`
 }
 
@@ -51,16 +52,28 @@ func parse(src, fallbackName string) Template {
 	return t
 }
 
-// Templates returns the built-in templates followed by the user's, which are
-// the *.md files in <libraryDir>/templates. A user template with a built-in
-// name replaces it.
-func Templates(libraryDir string) []Template {
+// MemoKey is the built-in template for any kind of recording: the fallback
+// when the chosen template does not exist in the app's language.
+const MemoKey = "06-memo"
+
+// Templates returns the built-in templates of the language (Japanese, else
+// English) followed by the user's, which are the *.md files in
+// <libraryDir>/templates. A user template with a built-in name replaces it.
+func Templates(libraryDir, lang string) []Template {
 	var out []Template
-	entries, _ := builtin.ReadDir("templates")
+	dir := "templates/en"
+	if strings.HasPrefix(lang, "ja") {
+		dir = "templates"
+	}
+	entries, _ := builtin.ReadDir(dir)
 	for _, e := range entries {
-		b, _ := builtin.ReadFile("templates/" + e.Name())
+		if e.IsDir() {
+			continue
+		}
+		b, _ := builtin.ReadFile(dir + "/" + e.Name())
 		t := parse(string(b), strings.TrimSuffix(e.Name(), ".md"))
 		t.Builtin = true
+		t.Key = strings.TrimSuffix(e.Name(), ".md")
 		out = append(out, t)
 	}
 	users, _ := filepath.Glob(filepath.Join(libraryDir, "templates", "*.md"))

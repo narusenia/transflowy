@@ -41,14 +41,14 @@ func TestSplitTitle(t *testing.T) {
 
 func TestTemplates(t *testing.T) {
 	dir := t.TempDir()
-	if n := len(Templates(dir)); n != 6 {
+	if n := len(Templates(dir, "ja")); n != 6 {
 		t.Fatalf("built-in templates: %d", n)
 	}
 	os.MkdirAll(filepath.Join(dir, "templates"), 0o755)
 	os.WriteFile(filepath.Join(dir, "templates", "mine.md"), []byte("---\nname: 週報/まとめ\ndescription: d\n---\n週報にする\n"), 0o644)
 	os.WriteFile(filepath.Join(dir, "templates", "x.md"), []byte("---\nname: 議事録\n---\n上書き\n"), 0o644)
 	var mine, minutes *Template
-	all := Templates(dir)
+	all := Templates(dir, "ja")
 	for i := range all {
 		switch all[i].Name {
 		case "週報-まとめ":
@@ -85,7 +85,7 @@ func TestQueueSummarizes(t *testing.T) {
 	ready := false
 	q := New(Config{
 		Store:     func() (library.Store, error) { return st, nil },
-		Templates: func() []Template { return Templates(st.Root) },
+		Templates: func() []Template { return Templates(st.Root, "ja") },
 		Default:   func() string { return "議事録" },
 		Chat: func() (Chat, error) {
 			if !ready {
@@ -126,5 +126,12 @@ func TestQueueSummarizes(t *testing.T) {
 	msgs := sent["messages"].([]any)
 	if user := msgs[1].(map[string]any)["content"]; user != "[00:05] 予算を決める\n" {
 		t.Fatalf("sent %q", user)
+	}
+}
+
+func TestTemplatesEnglish(t *testing.T) {
+	all := Templates(t.TempDir(), "en-US")
+	if len(all) != 6 || all[0].Name != "Minutes" || all[5].Key != MemoKey || all[5].Name != "Memo" {
+		t.Fatalf("english built-ins: %+v", all)
 	}
 }

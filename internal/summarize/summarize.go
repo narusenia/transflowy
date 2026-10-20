@@ -154,12 +154,10 @@ func (q *Queue) process(ctx context.Context, req request) {
 	if name == "" {
 		name = q.cfg.Default()
 	}
-	var tpl *Template
-	for _, t := range q.cfg.Templates() {
-		if t.Name == name {
-			tpl = &t
-			break
-		}
+	all := q.cfg.Templates()
+	tpl := find(all, func(t Template) bool { return t.Name == name })
+	if tpl == nil && req.template == "" { // the chosen default is from another language
+		tpl = find(all, func(t Template) bool { return t.Key == MemoKey })
 	}
 	if tpl == nil {
 		q.status(st, req.id, library.StatusDone, locales.ErrNoTemplate(name))
@@ -243,4 +241,13 @@ func describe(err error) string {
 		return locales.ErrBadKey()
 	}
 	return locales.ErrSummarize(err.Error())
+}
+
+func find(all []Template, ok func(Template) bool) *Template {
+	for i := range all {
+		if ok(all[i]) {
+			return &all[i]
+		}
+	}
+	return nil
 }
