@@ -9,7 +9,7 @@
 - **録音**: マイク、またはシステム音声も（Core Audio Tap、macOS 14.2 以上。別トラックで保存）。グローバルショートカット（既定 `⌥⌘R`）、メニューバーのアイコン、窓のボタンで開始・停止できる。停止後 5 秒は取り消せる。
 - **取り込み**: 音声・動画ファイル（m4a / mp3 / wav / aac / caf / mp4 / mov）。窓や Dock アイコンへのドロップに対応。
 - **文字起こし**: 録音中に先行して処理するので、停止後の待ちがほとんどない。ライブ字幕は最新の行に追従する。
-  - ローカル: whisper.cpp の `whisper-server`（large-v3-turbo）。チャンクごとに言語を判定するので、日本語と英語が混ざってもよい。
+  - ローカル: 同梱の whisper.cpp `whisper-server`（モデルは large-v3-turbo、初回に取得）。チャンクごとに言語を判定するので、日本語と英語が混ざってもよい。
   - クラウド: OpenRouter の `microsoft/mai-transcribe-2`、または OpenAI 互換の URL。
 - **話者分離**: クラウドのエンジン、またはローカル（sherpa-onnx）。話者名は付け替えられる。システム音声のトラックがあるときは、マイク側を「自分」にする。
 - **要約**: テンプレート（議事録 / 1on1 / 商談 / 面接 / 講義 / 汎用メモ）か、自作の Markdown テンプレート。1 件に複数の要約を持てる。手書きして編集することもできる。`[12:34]` をクリックすると文字起こしの該当行へ飛ぶ。
@@ -35,30 +35,45 @@ dictionary.txt
 
 保存先を Obsidian の Vault にすれば、そのままノートとして読める。
 
-## ソースから動かす
+## インストール
 
-必要なもの: macOS 14.2 以上、Go、[bun](https://bun.sh)、ローカル文字起こし用の `whisper-server`（`PATH` に置く。たとえば Homebrew の `whisper-cpp`。まだ同梱していない）。API キーはアプリの設定で入れ、macOS のキーチェーンに保存する。開発中は `.env` の `OPENROUTER_API_KEY` も読む。
+署名つきの配布物はまだない（Developer ID 署名をしていない）ので、自分でビルドする。Apple Silicon、macOS 14.2 以上のみ。
+
+必要なもの: Xcode のコマンドラインツール、Go、[bun](https://bun.sh)、cmake、git。
 
 ```sh
+git clone git@github.com:narusenia/transflowy.git
+cd transflowy
 bun install
-bun run dev          # アプリを起動
+bun run bundle        # whisper-server のビルドと sherpa-onnx の dylib のコピー（初回と更新後）
+bun run cert          # 初回のみ。ローカルの署名用証明書。再ビルドしてもマイクの許可が消えなくなる
+bun run build:signed  # build/darwin-arm64/transflowy.app ができる
+```
+
+`transflowy.app` を `/Applications` にコピーする。署名は自分のローカル証明書なので、ビルドした Mac ではそのまま開ける。ほかの Mac で使うなら、そこでビルドするか、アプリをコピーして `xattr -dr com.apple.quarantine /Applications/transflowy.app` を 1 回実行する。
+
+初回起動の流れ:
+
+1. マイクを許可する。システム音声の録音は、初めてオンにしたときに別の許可を求められる。
+2. エンジンを選ぶ。OpenRouter の API キーを貼るか、ローカルモデル（large-v3-turbo、約 0.6 GB）をダウンロードする。ダウンロードは裏で進む。どちらが整う前でも録音はでき、整い次第、処理が始まる。
+3. ショートカット（既定 `⌥⌘R`）を確認する。
+
+ローカルの話者分離は、設定からモデルをダウンロードする。API キーは macOS のキーチェーンに保存する。
+
+## 開発
+
+```sh
+bun run dev          # アプリを起動（whisper-server が要る。bun run bundle か、PATH 上のもの）
 bun run typecheck
 go test ./...
 ```
 
-文言は `locales/ja.json` にある。編集したら `bun run generate` を実行する。生成物はコミットに含める。
-
-再ビルドしてもマイクの許可が消えないよう、固定のローカル証明書で署名する。
-
-```sh
-bun run cert          # 初回のみ
-bun run build:signed
-```
+開発中は `.env` の `OPENROUTER_API_KEY` も読む。文言は `locales/ja.json` にある。編集したら `bun run generate` を実行する（生成物はコミットに含める）。
 
 ## 状況
 
-- Apple Silicon でソースから動作する。
-- 未対応: `whisper-server` と sherpa-onnx の dylib の .app 同梱、Developer ID 署名と公証、自動更新、Windows。
+- Apple Silicon でビルドして動作する。`whisper-server` と sherpa-onnx の dylib は .app に同梱している。
+- 未対応: Developer ID 署名と公証（そのため配布物はない）、自動更新、Windows。
 - 予定: 会議の自動検出、テンプレートの自動選択、録音内容への質問チャット、クラウド同期フォルダの警告。
 
 詳細: [docs/requirements.md](docs/requirements.md)、[docs/implementation-plan.md](docs/implementation-plan.md)。
