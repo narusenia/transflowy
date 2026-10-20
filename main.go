@@ -7,6 +7,7 @@ import (
 
 	"github.com/egoist/mygo"
 
+	"transflowy/internal/library"
 	"transflowy/internal/settings"
 )
 
@@ -25,11 +26,19 @@ func main() {
 		Keys:           mygo.Secrets,
 		ErrKeyNotFound: mygo.ErrSecretNotFound,
 	}
+	rec := &Recorder{cfg: cfg}
 	mygo.BindAs("Settings", cfg)
 	mygo.BindAs("Library", &Library{cfg: cfg})
+	mygo.BindAs("Recorder", rec)
 
-	mygo.App.WhenReady(func() {
-		mygo.NewWindow(mygo.WindowOptions{
+	var win *mygo.Window
+	openWindow := func() {
+		if win != nil {
+			win.Show()
+			win.Focus()
+			return
+		}
+		win = mygo.NewWindow(mygo.WindowOptions{
 			Title:           "transflowy",
 			Width:           1200,
 			Height:          760,
@@ -42,6 +51,34 @@ func main() {
 			// embedded by `mygo build` otherwise (see mygo.config.ts).
 			URL: "/",
 		})
+	}
+
+	// Closing the window must not end a recording: the app stays in the menu bar.
+	mygo.App.OnWindowAllClosed(func() { win = nil })
+	mygo.App.OnActivate(func(visible bool) {
+		if !visible {
+			openWindow()
+		}
+	})
+	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { rec.shutdown() })
+
+	mygo.App.WhenReady(func() {
+		s, err := cfg.Get()
+		if err != nil {
+			log.Println("settings:", err)
+		}
+		recoverRecordings(library.Store{Root: s.LibraryDir})
+
+		update, err := newTray(s.Shortcut, rec.toggle, openWindow)
+		if err != nil {
+			log.Println("tray:", err)
+		} else {
+			rec.onState = update
+		}
+		if err := mygo.GlobalShortcut.Register(s.Shortcut, rec.toggle); err != nil {
+			log.Println("shortcut:", err)
+		}
+		openWindow()
 	})
 	if err := mygo.App.Run(); err != nil {
 		log.Fatal(err)
