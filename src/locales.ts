@@ -671,6 +671,22 @@ export interface Messages {
    * `一時停止`
    */
   pause(): string;
+  /**
+   * `外観`
+   */
+  appearance(): string;
+  /**
+   * `システムに合わせる`
+   */
+  themeSystem(): string;
+  /**
+   * `ライト`
+   */
+  themeLight(): string;
+  /**
+   * `ダーク`
+   */
+  themeDark(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -847,6 +863,10 @@ const catalog = createCatalog<Messages>({
     "untitled": [],
     "play": [],
     "pause": [],
+    "appearance": [],
+    "themeSystem": [],
+    "themeLight": [],
+    "themeDark": [],
   },
   messages: {
     "ja": {
@@ -1017,6 +1037,10 @@ const catalog = createCatalog<Messages>({
       "untitled": "無題の録音",
       "play": "再生",
       "pause": "一時停止",
+      "appearance": "外観",
+      "themeSystem": "システムに合わせる",
+      "themeLight": "ライト",
+      "themeDark": "ダーク",
     },
   },
 });

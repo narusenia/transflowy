@@ -257,5 +257,9 @@
   "cancel": "キャンセル",
   "untitled": "無題の録音",
   "play": "再生",
-  "pause": "一時停止"
+  "pause": "一時停止",
+  "appearance": "外観",
+  "themeSystem": "システムに合わせる",
+  "themeLight": "ライト",
+  "themeDark": "ダーク"
 }

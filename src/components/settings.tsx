@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useMessages } from "@/i18n";
+import { getMode, setMode, type Mode } from "@/lib/theme";
 import { Library, Recorder, Settings, Summarizer, type Provider, type Settings as S, type Template } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
@@ -78,6 +79,7 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
   const [templates, setTemplates] = useState<Template[]>([]);
   const [ollama, setOllama] = useState<string[] | null>(null);
   const [devices, setDevices] = useState<string[]>([]);
+  const [mode, setModeState] = useState<Mode>(getMode);
 
   useEffect(() => {
     if (!open) return;
@@ -107,6 +109,13 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
         {s && (
           <div className="divide-y">
             <section className="pb-2">
+              <Row label={t.appearance()}>
+                <select className={select} value={mode} onChange={(e) => { const m = e.target.value as Mode; setModeState(m); setMode(m); }}>
+                  <option value="system">{t.themeSystem()}</option>
+                  <option value="light">{t.themeLight()}</option>
+                  <option value="dark">{t.themeDark()}</option>
+                </select>
+              </Row>
               <Row label={t.localOnly()} hint={t.localOnlyHint()}>
                 <Switch checked={s.localOnly} onCheckedChange={(v) => save({ ...s, localOnly: v })} />
               </Row>

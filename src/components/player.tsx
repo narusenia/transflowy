@@ -4,6 +4,7 @@ import { IconButton } from "@/components/icon-button";
 import { Pause, Play } from "lucide-react";
 import { clock, mediaUrl } from "@/lib/media";
 import { useMessages } from "@/i18n";
+import { useDark } from "@/lib/theme";
 
 export interface PlayerHandle {
   /** Moves the playhead; plays from there when play is set. */
@@ -18,6 +19,7 @@ const flat = Array.from({ length: 300 }, () => 0.25);
 export const Player = forwardRef<PlayerHandle, { id: string; duration: number; onTime(seconds: number): void }>(
   function Player({ id, duration, onTime }, ref) {
     const t = useMessages();
+    const dark = useDark(); // the waveform is drawn with colors read once: draw it again when they change
     const box = useRef<HTMLDivElement>(null);
     const ws = useRef<WaveSurfer | null>(null);
     const onTimeRef = useRef(onTime);
@@ -78,7 +80,7 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; o
         setPlaying(false);
         setTime(0);
       };
-    }, [id, duration]);
+    }, [id, duration, dark]);
 
     // Space plays and pauses, unless it types a space or presses a control of a dialog.
     useEffect(() => {

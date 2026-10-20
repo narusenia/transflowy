@@ -2,6 +2,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import "./style.css";
+import { initTheme } from "./lib/theme";
+
+initTheme();
 
 // The webview's own context menu (Reload, Inspect Element) is not part of the
 // app. Text fields and selected text keep it for Copy and Paste; the recording

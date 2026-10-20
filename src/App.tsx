@@ -9,6 +9,7 @@ import { SettingsDialog } from "@/components/settings";
 import { Sidebar } from "@/components/sidebar";
 import { TitleBar } from "@/components/titlebar";
 import { useMessages } from "@/i18n";
+import { useDark } from "@/lib/theme";
 import type { Messages } from "@/locales";
 import { events, Importer, Library, Models, Recorder, Settings, Summarizer, type Hit, type Meta, type ModelStatus, type Recording, type RecordingState, type Settings as S, type Template } from "@/mygo";
 
@@ -22,6 +23,7 @@ export function App() {
   const [levels, setLevels] = useState<number[]>([]);
   const wasRecording = useRef(false);
   const t = useMessages();
+  const dark = useDark();
   const tRef = useRef(t); // the event handler below outlives a render
   tRef.current = t;
 
@@ -111,12 +113,12 @@ export function App() {
     setJump((j) => ({ n: (j?.n ?? 0) + 1, time: h.kind === "transcript" ? h.time : undefined, template: h.template }));
   };
 
-  if (first) return <><Toaster position="bottom-center" /><Onboarding settings={first} onDone={() => setFirst(null)} /></>;
+  if (first) return <><Toaster position="bottom-center" theme={dark ? "dark" : "light"} /><Onboarding settings={first} onDone={() => setFirst(null)} /></>;
 
   return (
     <TooltipProvider delay={400}>
     <div className="flex h-screen flex-col text-sm">
-      <Toaster position="bottom-center" />
+      <Toaster position="bottom-center" theme={dark ? "dark" : "light"} />
       <TitleBar onToggleSidebar={() => setSidebar((s) => !s)} onSearch={() => setSearching(true)} onSettings={() => setSettingsOpen(true)} />
       <div className="flex min-h-0 flex-1">
       {sidebar && (

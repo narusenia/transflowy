@@ -1701,3 +1701,43 @@ func Pause() string { return In(i18n.Locale()).Pause() }
 func (msgs Messages) Pause() string {
 	return Catalog.Format(msgs.locale, "pause", nil)
 }
+
+// Appearance says "外観"
+// in the language the app shows.
+func Appearance() string { return In(i18n.Locale()).Appearance() }
+
+// Appearance says "外観"
+// in the language of msgs.
+func (msgs Messages) Appearance() string {
+	return Catalog.Format(msgs.locale, "appearance", nil)
+}
+
+// ThemeSystem says "システムに合わせる"
+// in the language the app shows.
+func ThemeSystem() string { return In(i18n.Locale()).ThemeSystem() }
+
+// ThemeSystem says "システムに合わせる"
+// in the language of msgs.
+func (msgs Messages) ThemeSystem() string {
+	return Catalog.Format(msgs.locale, "themeSystem", nil)
+}
+
+// ThemeLight says "ライト"
+// in the language the app shows.
+func ThemeLight() string { return In(i18n.Locale()).ThemeLight() }
+
+// ThemeLight says "ライト"
+// in the language of msgs.
+func (msgs Messages) ThemeLight() string {
+	return Catalog.Format(msgs.locale, "themeLight", nil)
+}
+
+// ThemeDark says "ダーク"
+// in the language the app shows.
+func ThemeDark() string { return In(i18n.Locale()).ThemeDark() }
+
+// ThemeDark says "ダーク"
+// in the language of msgs.
+func (msgs Messages) ThemeDark() string {
+	return Catalog.Format(msgs.locale, "themeDark", nil)
+}
