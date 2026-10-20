@@ -44,7 +44,7 @@ Apple Silicon and macOS 14.2+ only.
 
 ### Download
 
-Get `transflowy <version> arm64.dmg` from [Releases](https://github.com/narusenia/transflowy/releases), open it and drag the app to `/Applications`. The app is not signed with a Developer ID, so macOS blocks the first launch. Run this once, then open it:
+Get `transflowy-<version>-arm64.dmg` from [Releases](https://github.com/narusenia/transflowy/releases), open it and drag the app to `/Applications`. The app is not signed with a Developer ID, so macOS blocks the first launch. Run this once, then open it:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/transflowy.app

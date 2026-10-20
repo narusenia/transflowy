@@ -44,7 +44,7 @@ Apple Silicon、macOS 14.2 以上のみ。
 
 ### ダウンロード
 
-[Releases](https://github.com/narusenia/transflowy/releases) から `transflowy <バージョン> arm64.dmg` を取り、開いてアプリを `/Applications` にドラッグする。Developer ID で署名していないので、macOS が初回の起動を止める。次のコマンドを 1 回実行してから開く。
+[Releases](https://github.com/narusenia/transflowy/releases) から `transflowy-<バージョン>-arm64.dmg` を取り、開いてアプリを `/Applications` にドラッグする。Developer ID で署名していないので、macOS が初回の起動を止める。次のコマンドを 1 回実行してから開く。
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/transflowy.app
