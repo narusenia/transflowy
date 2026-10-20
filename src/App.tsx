@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n";
+import type { Messages } from "@/locales";
 import { events, Library, Recorder, Settings, type Meta, type RecordingState } from "@/mygo";
 
 const idle: RecordingState = { recording: false, id: "", elapsed: 0, level: 0 };
@@ -13,6 +15,9 @@ export function App() {
   const [recordings, setRecordings] = useState<Meta[]>([]);
   const [state, setState] = useState(idle);
   const wasRecording = useRef(false);
+  const t = useMessages();
+  const tRef = useRef(t); // the event handler below outlives a render
+  tRef.current = t;
 
   const reload = () => Library.list().then(setRecordings);
 
@@ -25,7 +30,7 @@ export function App() {
     reload();
     // The menu bar and the shortcut also start and stop recordings.
     return events.recordingChanged.on((s) => {
-      if (wasRecording.current && !s.recording) onStopped(s.id);
+      if (wasRecording.current && !s.recording) onStopped(s.id, tRef.current);
       wasRecording.current = s.recording;
       setState(s);
       if (!s.recording) reload();
@@ -40,27 +45,27 @@ export function App() {
         variant={state.recording ? "destructive" : "default"}
         onClick={() => (state.recording ? Recorder.stop() : Recorder.start()).catch((e) => toast.error(String(e.message ?? e)))}
       >
-        {state.recording ? `停止 ${clock(state.elapsed)}` : "録音を開始"}
+        {state.recording ? t.recordStop(clock(state.elapsed)) : t.recordStart()}
       </Button>
       <div className="h-1.5 w-48 overflow-hidden rounded bg-muted">
         <div className="h-full bg-primary transition-[width] duration-150" style={{ width: `${Math.min(1, state.level * 2) * 100}%` }} />
       </div>
       <p className="text-muted-foreground">
-        {dir} · {recordings.length} 件
+        {dir} · {t.recordingCount(recordings.length)}
       </p>
     </main>
   );
 }
 
 // onStopped offers to undo a recording for five seconds.
-function onStopped(id: string) {
-  toast("録音を保存しました", {
+function onStopped(id: string, t: Messages) {
+  toast(t.recordingSaved(), {
     duration: 5000,
     action: {
-      label: "取り消し",
+      label: t.undo(),
       onClick: () =>
         Recorder.discard(id)
-          .then(() => toast("録音を削除しました"))
+          .then(() => toast(t.recordingDeleted()))
           .catch((e) => toast.error(String(e.message ?? e))),
     },
   });

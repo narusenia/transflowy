@@ -14,6 +14,7 @@ import (
 	"transflowy/internal/library"
 	"transflowy/internal/recorder"
 	"transflowy/internal/settings"
+	"transflowy/locales"
 )
 
 // RecordingState is sent to the page while a recording runs and when it ends.
@@ -224,7 +225,7 @@ func recoverRecordings(st library.Store) {
 		}
 		m.Duration = float64(fi.Size()-44) / 32000
 		m.Status = library.StatusQueued
-		m.Error = "アプリが予期せず終了したため、途中までの録音を復旧しました"
+		m.Error = locales.RecordingRecovered()
 		if st.SaveMeta(m) == nil {
 			go finalizeAudio(st, m.ID)
 		}

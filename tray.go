@@ -8,6 +8,8 @@ import (
 	"image/png"
 
 	"github.com/egoist/mygo"
+
+	"transflowy/locales"
 )
 
 // trayIcon draws the menu bar icon: a ring when idle, a filled dot while
@@ -31,27 +33,33 @@ func trayIcon(recording bool) []byte {
 
 // newTray adds the menu bar item. toggle starts or stops a recording.
 func newTray(shortcutLabel string, toggle, openWindow func()) (update func(RecordingState), err error) {
-	rec := &mygo.MenuItem{ID: "record", Label: "録音を開始", Accelerator: shortcutLabel, Click: func(*mygo.MenuItem, *mygo.Window) { toggle() }}
-	menu := mygo.NewMenu([]*mygo.MenuItem{
-		rec,
-		{Label: "ウィンドウを開く", Click: func(*mygo.MenuItem, *mygo.Window) { openWindow() }},
-		mygo.Separator(),
-		{Label: "transflowy を終了", Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }},
-	})
+	rec := &mygo.MenuItem{ID: "record", Accelerator: shortcutLabel, Click: func(*mygo.MenuItem, *mygo.Window) { toggle() }}
+	open := &mygo.MenuItem{Click: func(*mygo.MenuItem, *mygo.Window) { openWindow() }}
+	quit := &mygo.MenuItem{Click: func(*mygo.MenuItem, *mygo.Window) { mygo.App.Quit() }}
+	menu := mygo.NewMenu([]*mygo.MenuItem{rec, open, mygo.Separator(), quit})
 	tray, err := mygo.NewTray(mygo.TrayOptions{Icon: trayIcon(false), IconIsTemplate: true, ToolTip: "transflowy", Menu: menu})
 	if err != nil {
 		return nil, err
 	}
 	var was bool
+	// labels sets the texts of the menu: custom menus are not translated by
+	// mygo, so this runs again when the language changes.
+	labels := func() {
+		if was {
+			rec.SetLabel(locales.TrayRecordStop())
+		} else {
+			rec.SetLabel(locales.TrayRecordStart())
+		}
+		open.SetLabel(locales.TrayOpenWindow())
+		quit.SetLabel(locales.TrayQuit())
+	}
+	labels()
+	mygo.App.OnLocaleChanged(func(string) { labels() })
 	return func(st RecordingState) {
 		if st.Recording != was { // the icon and the label change only on start and stop
 			was = st.Recording
 			_ = tray.SetIcon(trayIcon(st.Recording), true)
-			if st.Recording {
-				rec.SetLabel("録音を停止")
-			} else {
-				rec.SetLabel("録音を開始")
-			}
+			labels()
 		}
 		if st.Recording {
 			tray.SetTitle(fmt.Sprintf(" %d:%02d", int(st.Elapsed)/60, int(st.Elapsed)%60))
