@@ -5,3 +5,4 @@ node_modules/
 mygo_windows_*.syso
 .env
 .env.*
+/resources/darwin/

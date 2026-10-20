@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "CGO_ENABLED=1 mygo dev",
-    "build": "CGO_ENABLED=1 mygo build",
+    "build": "CGO_ENABLED=1 CGO_LDFLAGS=\"-Wl,-rpath,@executable_path/../Resources/lib\" mygo build",
     "generate": "CGO_ENABLED=1 mygo generate",
     "dev:web": "vite",
     "build:web": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
+    "bundle": "sh scripts/build-whisper-server.sh && sh scripts/copy-sherpa-libs.sh",
     "cert": "sh scripts/create-signing-cert.sh",
-    "build:signed": "CGO_ENABLED=1 mygo build -sign \"transflowy Local Signing\" -skip-dmg"
+    "build:signed": "CGO_ENABLED=1 CGO_LDFLAGS=\"-Wl,-rpath,@executable_path/../Resources/lib\" mygo build -sign \"transflowy Local Signing\" -skip-dmg"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
