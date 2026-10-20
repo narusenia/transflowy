@@ -143,6 +143,20 @@ func (l *Library) ShowMenu(ctx context.Context, id string) {
 	menu.Popup(mygo.CallerWindow(ctx))
 }
 
+// ConfirmDelete asks, then moves a recording to the trash (the list's ✕ button).
+func (l *Library) ConfirmDelete(ctx context.Context, id string) {
+	st, err := l.store()
+	if err != nil {
+		return
+	}
+	rec, err := st.Get(id)
+	if err != nil {
+		return
+	}
+	dir, _ := st.Path(id)
+	go l.confirmDelete(mygo.CallerWindow(ctx), rec.Meta, dir)
+}
+
 // confirmDelete moves a recording's folder to the trash after the user agrees.
 func (l *Library) confirmDelete(win *mygo.Window, m library.Meta, dir string) {
 	title := m.Title
