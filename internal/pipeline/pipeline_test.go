@@ -33,7 +33,8 @@ func (f *fake) Transcribe(_ context.Context, r transcribe.Request) (transcribe.R
 		f.errs = f.errs[1:]
 		return transcribe.Result{}, err
 	}
-	return transcribe.Result{Language: "ja", Segments: []library.Segment{{Start: 0, End: 1, Speaker: -1, Text: "x", Original: "x"}}}, nil
+	dur := float64(len(r.WAV)-44) / 32000 // the text covers the whole chunk
+	return transcribe.Result{Language: "ja", Segments: []library.Segment{{Start: 0, End: dur, Speaker: -1, Text: "x", Original: "x"}}}, nil
 }
 
 // tone: speech-like audio, silence: a pause.
@@ -176,5 +177,48 @@ func TestNotReadyWaitsInsteadOfFailing(t *testing.T) {
 	r, _ := e.st.Get(e.id)
 	if r.Meta.Status != library.StatusQueued || r.Meta.Error != "no key" {
 		t.Fatalf("%v %q", r.Meta.Status, r.Meta.Error)
+	}
+}
+
+// partial covers only the first `cover` seconds of every chunk it gets, like an
+// engine that drops speech in a second language.
+type partial struct {
+	mu    sync.Mutex
+	calls []float64 // each chunk's length in seconds
+	cover float64
+}
+
+func (p *partial) Name() string { return "partial" }
+func (p *partial) Transcribe(_ context.Context, r transcribe.Request) (transcribe.Result, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	dur := float64(len(r.WAV)-44) / 32000
+	p.calls = append(p.calls, dur)
+	end := min(dur, p.cover)
+	return transcribe.Result{Segments: []library.Segment{{Start: 0, End: end, Speaker: -1, Text: "x", Original: "x"}}}, nil
+}
+
+func TestResendsDroppedTail(t *testing.T) {
+	e := setup(t, library.StatusQueued, 10) // one 10 s chunk of speech
+	p := &partial{cover: 3}
+	e.q.cfg.Engine = func(string) (Job, error) {
+		return Job{Engine: p, Params: transcribe.Params{Target: 8, Max: 15, MinSilence: 0.3}}, nil
+	}
+	r := e.run(t)
+	// 10 s -> text to 3 s; tail 7 s -> text to 6 s; tail 4 s -> text to 9 s; tail 1 s is too short to chase.
+	if r.Meta.Status != library.StatusDone || len(p.calls) != 3 {
+		t.Fatalf("%v calls=%v", r.Meta.Status, p.calls)
+	}
+	s := r.Transcript.Segments
+	if s[1].Start < 2.9 || s[1].Start > 3.1 || s[2].Start < 5.9 || s[2].Start > 6.1 {
+		t.Errorf("tails start where the text stopped: %v %v", s[1].Start, s[2].Start)
+	}
+
+	// A result too short to count as progress is not chased: no loop.
+	e = setup(t, library.StatusQueued, 10)
+	p = &partial{cover: 0.5}
+	e.q.cfg.Engine = func(string) (Job, error) { return Job{Engine: p, Params: transcribe.LocalParams}, nil }
+	if r := e.run(t); r.Meta.Status != library.StatusDone || len(p.calls) != 1 {
+		t.Fatalf("%v calls=%v", r.Meta.Status, p.calls)
 	}
 }

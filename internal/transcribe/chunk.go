@@ -24,7 +24,7 @@ type Params struct {
 // numbering per request, so its chunks are long (the request limit is about
 // 25 MB of WAV, 13 minutes).
 var (
-	LocalParams = Params{Target: 8, Max: 25, MinSilence: 0.3}
+	LocalParams = Params{Target: 4, Max: 25, MinSilence: 0.3}
 	CloudParams = Params{Target: 300, Max: 600, MinSilence: 0.5}
 )
 
@@ -120,4 +120,10 @@ func quietest(rms []float64, from, to int) int {
 		}
 	}
 	return best
+}
+
+// HasSpeech reports whether pcm holds speech by the same test Plan uses.
+func HasSpeech(pcm []int16) bool {
+	spans, _ := Plan(pcm, 0, true, Params{Target: 1e6, Max: 1e6, MinSilence: 1})
+	return len(spans) == 1 && spans[0].Speech
 }

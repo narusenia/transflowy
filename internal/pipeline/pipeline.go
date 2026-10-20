@@ -27,6 +27,12 @@ const (
 	readLimit = 20 * 60 * transcribe.SampleRate
 	livePoll  = time.Second
 	maxTries  = 5
+
+	// An engine that finds one language per chunk drops speech in another one:
+	// when a chunk's text stops this long before its audio does and speech
+	// follows, the rest is sent again as a chunk of its own.
+	droppedTail = 3 * transcribe.SampleRate
+	minCovered  = transcribe.SampleRate // a result shorter than this makes no progress worth repeating
 )
 
 // Job is what the engine factory returns for one recording.
@@ -210,21 +216,34 @@ func (q *Queue) process(ctx context.Context, req request) {
 		}
 		final := !live && len(region) < readLimit
 		spans, _ := transcribe.Plan(region, 0, final, job.Params)
+		resend := false // the chunk lost its tail: plan again from where its text ends
 		for _, sp := range spans {
 			if ctx.Err() != nil {
 				return
 			}
+			end := done + sp.End
 			if sp.Speech {
-				if err := q.transcribeSpan(ctx, st, id, job, cur.Meta.Language, region[sp.Start:sp.End], done+sp.Start); err != nil {
+				covered, err := q.transcribeSpan(ctx, st, id, job, cur.Meta.Language, region[sp.Start:sp.End], done+sp.Start)
+				if err != nil {
 					if ctx.Err() == nil {
 						q.fail(st, id, live, err)
 					}
 					return
 				}
+				if tail := sp.End - sp.Start - covered; covered >= minCovered && tail > droppedTail && transcribe.HasSpeech(region[sp.Start+covered:sp.End]) {
+					end, resend = done+sp.Start+covered, true
+				}
 			}
-			end := float64(done+sp.End) / transcribe.SampleRate
-			_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil = end })
+			t := float64(end) / transcribe.SampleRate
+			_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.ProcessedUntil = t })
 			q.changed(id)
+			if resend {
+				done = end
+				break
+			}
+		}
+		if resend {
+			continue
 		}
 		if n := len(spans); n > 0 {
 			done += spans[n-1].End
@@ -242,11 +261,11 @@ func (q *Queue) process(ctx context.Context, req request) {
 }
 
 // transcribeSpan sends one chunk and appends its lines to the transcript.
-func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string, job Job, lang string, pcm []int16, startSample int) error {
+func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string, job Job, lang string, pcm []int16, startSample int) (covered int, err error) {
 	req := transcribe.Request{WAV: audio.WAVBytes(pcm, transcribe.SampleRate), Language: lang, Phrases: q.cfg.Phrases(), Diarize: job.Diarize}
 	res, err := q.send(ctx, st, id, job.Engine, req)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	offset := float64(startSample) / transcribe.SampleRate
 	for i := range res.Segments {
@@ -254,7 +273,10 @@ func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string,
 		res.Segments[i].End += offset
 	}
 	if err := st.UpdateTranscript(id, func(t *library.Transcript) { t.Segments = append(t.Segments, res.Segments...) }); err != nil {
-		return err
+		return 0, err
+	}
+	if n := len(res.Segments); n > 0 {
+		covered = int((res.Segments[n-1].End - offset) * transcribe.SampleRate)
 	}
 	_, err = st.UpdateMeta(id, func(m *library.Meta) {
 		m.Engine, m.Error = job.Engine.Name(), ""
@@ -262,7 +284,7 @@ func (q *Queue) transcribeSpan(ctx context.Context, st library.Store, id string,
 			m.Detected = res.Language
 		}
 	})
-	return err
+	return covered, err
 }
 
 // send retries a chunk. A lost connection is waited out for as long as it
