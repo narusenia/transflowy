@@ -78,5 +78,23 @@
     }
   },
   "modelFailed": "ダウンロードに失敗しました",
-  "reprocess": "再処理"
+  "reprocess": "再処理",
+  "errNoSummaryModel": "要約に使うモデルが選択されていません",
+  "errSummarize": "要約に失敗しました: {detail}",
+  "@errSummarize": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errNoTemplate": "テンプレート「{name}」が見つかりません",
+  "@errNoTemplate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "statusSummarizing": "要約待ち"
 }

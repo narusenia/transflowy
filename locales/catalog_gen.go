@@ -401,3 +401,43 @@ func Reprocess() string { return In(i18n.Locale()).Reprocess() }
 func (msgs Messages) Reprocess() string {
 	return Catalog.Format(msgs.locale, "reprocess", nil)
 }
+
+// ErrNoSummaryModel says "要約に使うモデルが選択されていません"
+// in the language the app shows.
+func ErrNoSummaryModel() string { return In(i18n.Locale()).ErrNoSummaryModel() }
+
+// ErrNoSummaryModel says "要約に使うモデルが選択されていません"
+// in the language of msgs.
+func (msgs Messages) ErrNoSummaryModel() string {
+	return Catalog.Format(msgs.locale, "errNoSummaryModel", nil)
+}
+
+// ErrSummarize says "要約に失敗しました: {detail}"
+// in the language the app shows.
+func ErrSummarize(detail string) string { return In(i18n.Locale()).ErrSummarize(detail) }
+
+// ErrSummarize says "要約に失敗しました: {detail}"
+// in the language of msgs.
+func (msgs Messages) ErrSummarize(detail string) string {
+	return Catalog.Format(msgs.locale, "errSummarize", map[string]any{"detail": detail})
+}
+
+// ErrNoTemplate says "テンプレート「{name}」が見つかりません"
+// in the language the app shows.
+func ErrNoTemplate(name string) string { return In(i18n.Locale()).ErrNoTemplate(name) }
+
+// ErrNoTemplate says "テンプレート「{name}」が見つかりません"
+// in the language of msgs.
+func (msgs Messages) ErrNoTemplate(name string) string {
+	return Catalog.Format(msgs.locale, "errNoTemplate", map[string]any{"name": name})
+}
+
+// StatusSummarizing says "要約待ち"
+// in the language the app shows.
+func StatusSummarizing() string { return In(i18n.Locale()).StatusSummarizing() }
+
+// StatusSummarizing says "要約待ち"
+// in the language of msgs.
+func (msgs Messages) StatusSummarizing() string {
+	return Catalog.Format(msgs.locale, "statusSummarizing", nil)
+}

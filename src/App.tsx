@@ -117,7 +117,7 @@ export function App() {
 function statusLabel(t: Messages, status: string) {
   const labels: Record<string, () => string> = {
     recording: t.statusRecording, importing: t.statusImporting, queued: t.statusQueued,
-    processing: t.statusProcessing, done: t.statusDone, failed: t.statusFailed,
+    processing: t.statusProcessing, summarizing: t.statusSummarizing, done: t.statusDone, failed: t.statusFailed,
   };
   return labels[status]?.() ?? status;
 }

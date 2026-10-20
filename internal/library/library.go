@@ -18,12 +18,13 @@ import (
 type Status string
 
 const (
-	StatusRecording  Status = "recording"
-	StatusImporting  Status = "importing" // an imported file is being converted
-	StatusQueued     Status = "queued"
-	StatusProcessing Status = "processing"
-	StatusDone       Status = "done"
-	StatusFailed     Status = "failed"
+	StatusRecording   Status = "recording"
+	StatusImporting   Status = "importing" // an imported file is being converted
+	StatusQueued      Status = "queued"
+	StatusProcessing  Status = "processing"
+	StatusSummarizing Status = "summarizing" // transcript is done; the summary is waiting or running
+	StatusDone        Status = "done"
+	StatusFailed      Status = "failed"
 )
 
 // UnknownSpeaker marks a segment that has no speaker label.
@@ -136,6 +137,25 @@ func (s Store) UpdateTranscript(id string, fn func(*Transcript)) error {
 	return s.SaveTranscript(id, t)
 }
 
+// SaveSummary writes summary-<template>.md. The name comes from a template
+// file, so it must be a plain file name.
+func (s Store) SaveSummary(id, template, text string) error {
+	if template == "" || template != filepath.Base(template) || strings.HasPrefix(template, ".") {
+		return ErrNotFound
+	}
+	return s.write(id, "summary-"+template+".md", text)
+}
+
+// Summary reads summary-<template>.md.
+func (s Store) Summary(id, template string) (string, error) {
+	d, err := s.dir(id)
+	if err != nil || template == "" || template != filepath.Base(template) {
+		return "", ErrNotFound
+	}
+	b, err := os.ReadFile(filepath.Join(d, "summary-"+template+".md"))
+	return string(b), err
+}
+
 // SaveMeta writes meta.json.
 func (s Store) SaveMeta(m Meta) error { return s.write(m.ID, "meta.json", m) }
 
@@ -150,16 +170,20 @@ func (s Store) write(id, name string, v any) error {
 	if err != nil {
 		return err
 	}
-	b, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return err
+	b, ok := v.(string) // summaries are Markdown, the rest JSON
+	if !ok {
+		j, err := json.MarshalIndent(v, "", "  ")
+		if err != nil {
+			return err
+		}
+		b = string(j)
 	}
 	tmp, err := os.CreateTemp(d, name+".*.tmp")
 	if err != nil {
 		return err
 	}
 	defer os.Remove(tmp.Name())
-	if _, err := tmp.Write(b); err != nil {
+	if _, err := tmp.WriteString(b); err != nil {
 		tmp.Close()
 		return err
 	}
