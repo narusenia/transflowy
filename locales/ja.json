@@ -165,5 +165,44 @@
   },
   "inputDevice": "入力デバイス",
   "inputDeviceDefault": "システムの既定",
-  "exportTranscript": "文字起こし"
+  "exportTranscript": "文字起こし",
+  "titlePlaceholder": "タイトルを入力",
+  "segmentEdit": "編集",
+  "segmentRevert": "元に戻す",
+  "segmentEdited": "編集済み",
+  "replaceButton": "置換",
+  "replaceTitle": "文字起こしを置換",
+  "replaceFind": "置換前",
+  "replaceWith": "置換後",
+  "replaceRun": "置換する",
+  "addDictionary": "辞書に追加",
+  "dictionaryAdded": "辞書に追加しました",
+  "staleSummary": "再生成",
+  "staleHint": "文字起こしが要約より新しくなっています。クリックで要約を作り直します",
+  "exportButton": "コピー・書き出し",
+  "exportInclude": "内容",
+  "includeSummary": "要約のみ",
+  "includeBoth": "要約 + 文字起こし",
+  "includeTranscript": "文字起こしのみ",
+  "exportStamps": "タイムスタンプを付ける",
+  "exportCopy": "クリップボードにコピー",
+  "exportCopied": "コピーしました",
+  "exportSaveAs": "ファイルに書き出し",
+  "exportNote": ".txt と .srt は文字起こしだけを書き出します",
+  "replaceDone": "{count}件を置換しました",
+  "@replaceDone": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exportSaved": "{path} に保存しました",
+  "@exportSaved": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  }
 }

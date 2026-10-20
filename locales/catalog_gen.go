@@ -1061,3 +1061,253 @@ func ExportTranscript() string { return In(i18n.Locale()).ExportTranscript() }
 func (msgs Messages) ExportTranscript() string {
 	return Catalog.Format(msgs.locale, "exportTranscript", nil)
 }
+
+// TitlePlaceholder says "タイトルを入力"
+// in the language the app shows.
+func TitlePlaceholder() string { return In(i18n.Locale()).TitlePlaceholder() }
+
+// TitlePlaceholder says "タイトルを入力"
+// in the language of msgs.
+func (msgs Messages) TitlePlaceholder() string {
+	return Catalog.Format(msgs.locale, "titlePlaceholder", nil)
+}
+
+// SegmentEdit says "編集"
+// in the language the app shows.
+func SegmentEdit() string { return In(i18n.Locale()).SegmentEdit() }
+
+// SegmentEdit says "編集"
+// in the language of msgs.
+func (msgs Messages) SegmentEdit() string {
+	return Catalog.Format(msgs.locale, "segmentEdit", nil)
+}
+
+// SegmentRevert says "元に戻す"
+// in the language the app shows.
+func SegmentRevert() string { return In(i18n.Locale()).SegmentRevert() }
+
+// SegmentRevert says "元に戻す"
+// in the language of msgs.
+func (msgs Messages) SegmentRevert() string {
+	return Catalog.Format(msgs.locale, "segmentRevert", nil)
+}
+
+// SegmentEdited says "編集済み"
+// in the language the app shows.
+func SegmentEdited() string { return In(i18n.Locale()).SegmentEdited() }
+
+// SegmentEdited says "編集済み"
+// in the language of msgs.
+func (msgs Messages) SegmentEdited() string {
+	return Catalog.Format(msgs.locale, "segmentEdited", nil)
+}
+
+// ReplaceButton says "置換"
+// in the language the app shows.
+func ReplaceButton() string { return In(i18n.Locale()).ReplaceButton() }
+
+// ReplaceButton says "置換"
+// in the language of msgs.
+func (msgs Messages) ReplaceButton() string {
+	return Catalog.Format(msgs.locale, "replaceButton", nil)
+}
+
+// ReplaceTitle says "文字起こしを置換"
+// in the language the app shows.
+func ReplaceTitle() string { return In(i18n.Locale()).ReplaceTitle() }
+
+// ReplaceTitle says "文字起こしを置換"
+// in the language of msgs.
+func (msgs Messages) ReplaceTitle() string {
+	return Catalog.Format(msgs.locale, "replaceTitle", nil)
+}
+
+// ReplaceFind says "置換前"
+// in the language the app shows.
+func ReplaceFind() string { return In(i18n.Locale()).ReplaceFind() }
+
+// ReplaceFind says "置換前"
+// in the language of msgs.
+func (msgs Messages) ReplaceFind() string {
+	return Catalog.Format(msgs.locale, "replaceFind", nil)
+}
+
+// ReplaceWith says "置換後"
+// in the language the app shows.
+func ReplaceWith() string { return In(i18n.Locale()).ReplaceWith() }
+
+// ReplaceWith says "置換後"
+// in the language of msgs.
+func (msgs Messages) ReplaceWith() string {
+	return Catalog.Format(msgs.locale, "replaceWith", nil)
+}
+
+// ReplaceRun says "置換する"
+// in the language the app shows.
+func ReplaceRun() string { return In(i18n.Locale()).ReplaceRun() }
+
+// ReplaceRun says "置換する"
+// in the language of msgs.
+func (msgs Messages) ReplaceRun() string {
+	return Catalog.Format(msgs.locale, "replaceRun", nil)
+}
+
+// AddDictionary says "辞書に追加"
+// in the language the app shows.
+func AddDictionary() string { return In(i18n.Locale()).AddDictionary() }
+
+// AddDictionary says "辞書に追加"
+// in the language of msgs.
+func (msgs Messages) AddDictionary() string {
+	return Catalog.Format(msgs.locale, "addDictionary", nil)
+}
+
+// DictionaryAdded says "辞書に追加しました"
+// in the language the app shows.
+func DictionaryAdded() string { return In(i18n.Locale()).DictionaryAdded() }
+
+// DictionaryAdded says "辞書に追加しました"
+// in the language of msgs.
+func (msgs Messages) DictionaryAdded() string {
+	return Catalog.Format(msgs.locale, "dictionaryAdded", nil)
+}
+
+// StaleSummary says "再生成"
+// in the language the app shows.
+func StaleSummary() string { return In(i18n.Locale()).StaleSummary() }
+
+// StaleSummary says "再生成"
+// in the language of msgs.
+func (msgs Messages) StaleSummary() string {
+	return Catalog.Format(msgs.locale, "staleSummary", nil)
+}
+
+// StaleHint says "文字起こしが要約より新しくなっています。クリックで要約を作り直します"
+// in the language the app shows.
+func StaleHint() string { return In(i18n.Locale()).StaleHint() }
+
+// StaleHint says "文字起こしが要約より新しくなっています。クリックで要約を作り直します"
+// in the language of msgs.
+func (msgs Messages) StaleHint() string {
+	return Catalog.Format(msgs.locale, "staleHint", nil)
+}
+
+// ExportButton says "コピー・書き出し"
+// in the language the app shows.
+func ExportButton() string { return In(i18n.Locale()).ExportButton() }
+
+// ExportButton says "コピー・書き出し"
+// in the language of msgs.
+func (msgs Messages) ExportButton() string {
+	return Catalog.Format(msgs.locale, "exportButton", nil)
+}
+
+// ExportInclude says "内容"
+// in the language the app shows.
+func ExportInclude() string { return In(i18n.Locale()).ExportInclude() }
+
+// ExportInclude says "内容"
+// in the language of msgs.
+func (msgs Messages) ExportInclude() string {
+	return Catalog.Format(msgs.locale, "exportInclude", nil)
+}
+
+// IncludeSummary says "要約のみ"
+// in the language the app shows.
+func IncludeSummary() string { return In(i18n.Locale()).IncludeSummary() }
+
+// IncludeSummary says "要約のみ"
+// in the language of msgs.
+func (msgs Messages) IncludeSummary() string {
+	return Catalog.Format(msgs.locale, "includeSummary", nil)
+}
+
+// IncludeBoth says "要約 + 文字起こし"
+// in the language the app shows.
+func IncludeBoth() string { return In(i18n.Locale()).IncludeBoth() }
+
+// IncludeBoth says "要約 + 文字起こし"
+// in the language of msgs.
+func (msgs Messages) IncludeBoth() string {
+	return Catalog.Format(msgs.locale, "includeBoth", nil)
+}
+
+// IncludeTranscript says "文字起こしのみ"
+// in the language the app shows.
+func IncludeTranscript() string { return In(i18n.Locale()).IncludeTranscript() }
+
+// IncludeTranscript says "文字起こしのみ"
+// in the language of msgs.
+func (msgs Messages) IncludeTranscript() string {
+	return Catalog.Format(msgs.locale, "includeTranscript", nil)
+}
+
+// ExportStamps says "タイムスタンプを付ける"
+// in the language the app shows.
+func ExportStamps() string { return In(i18n.Locale()).ExportStamps() }
+
+// ExportStamps says "タイムスタンプを付ける"
+// in the language of msgs.
+func (msgs Messages) ExportStamps() string {
+	return Catalog.Format(msgs.locale, "exportStamps", nil)
+}
+
+// ExportCopy says "クリップボードにコピー"
+// in the language the app shows.
+func ExportCopy() string { return In(i18n.Locale()).ExportCopy() }
+
+// ExportCopy says "クリップボードにコピー"
+// in the language of msgs.
+func (msgs Messages) ExportCopy() string {
+	return Catalog.Format(msgs.locale, "exportCopy", nil)
+}
+
+// ExportCopied says "コピーしました"
+// in the language the app shows.
+func ExportCopied() string { return In(i18n.Locale()).ExportCopied() }
+
+// ExportCopied says "コピーしました"
+// in the language of msgs.
+func (msgs Messages) ExportCopied() string {
+	return Catalog.Format(msgs.locale, "exportCopied", nil)
+}
+
+// ExportSaveAs says "ファイルに書き出し"
+// in the language the app shows.
+func ExportSaveAs() string { return In(i18n.Locale()).ExportSaveAs() }
+
+// ExportSaveAs says "ファイルに書き出し"
+// in the language of msgs.
+func (msgs Messages) ExportSaveAs() string {
+	return Catalog.Format(msgs.locale, "exportSaveAs", nil)
+}
+
+// ExportNote says ".txt と .srt は文字起こしだけを書き出します"
+// in the language the app shows.
+func ExportNote() string { return In(i18n.Locale()).ExportNote() }
+
+// ExportNote says ".txt と .srt は文字起こしだけを書き出します"
+// in the language of msgs.
+func (msgs Messages) ExportNote() string {
+	return Catalog.Format(msgs.locale, "exportNote", nil)
+}
+
+// ReplaceDone says "{count}件を置換しました"
+// in the language the app shows.
+func ReplaceDone(count int) string { return In(i18n.Locale()).ReplaceDone(count) }
+
+// ReplaceDone says "{count}件を置換しました"
+// in the language of msgs.
+func (msgs Messages) ReplaceDone(count int) string {
+	return Catalog.Format(msgs.locale, "replaceDone", map[string]any{"count": count})
+}
+
+// ExportSaved says "{path} に保存しました"
+// in the language the app shows.
+func ExportSaved(path string) string { return In(i18n.Locale()).ExportSaved(path) }
+
+// ExportSaved says "{path} に保存しました"
+// in the language of msgs.
+func (msgs Messages) ExportSaved(path string) string {
+	return Catalog.Format(msgs.locale, "exportSaved", map[string]any{"path": path})
+}
