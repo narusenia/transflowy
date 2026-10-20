@@ -12,6 +12,8 @@ import { Markdown } from "@/components/summary";
 import { DiarizeDialog, ExportDialog, ReplaceDialog, SpeakersDialog, speakersOf } from "@/components/tools";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Shimmer } from "@/components/ui/shimmer";
+import { progressText } from "@/lib/status";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import { Library, Summarizer, Transcriber, type Recording, type Template } from "@/mygo";
@@ -56,6 +58,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
   const wide = useWide();
   const { meta } = rec;
   const recording = meta.status === "recording";
+  const progress = progressText(t, meta);
   const player = useRef<PlayerHandle>(null);
   const [time, setTime] = useState(0);
   const [follow, setFollow] = useState(true);
@@ -169,7 +172,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
         />
       ) : (
       <div className="min-h-0 flex-1 overflow-auto px-4 py-2">
-        {meta.status === "summarizing" && <p className="text-sm text-muted-foreground">{meta.error || t.summaryWaiting()}</p>}
+        {meta.status === "summarizing" && <p className="text-sm"><Shimmer>{meta.error || t.summaryWaiting()}</Shimmer></p>}
         {text ? (
           <Markdown text={text} onSeek={seek} />
         ) : (
@@ -207,9 +210,12 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       <header className="space-y-2 border-b px-4 py-3">
         <Title key={meta.id} id={meta.id} title={meta.title} renaming={renaming} onRenameHandled={onRenameHandled} fallback={new Date(meta.createdAt).toLocaleString()} onChanged={onChanged} />
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <p className="text-xs text-muted-foreground">
-            {[new Date(meta.createdAt).toLocaleString(), meta.duration > 0 && clock(meta.duration), meta.engine].filter(Boolean).join(" · ")}
-          </p>
+          <div className="flex items-center gap-3 text-xs">
+            <p className="text-muted-foreground">
+              {[new Date(meta.createdAt).toLocaleString(), meta.duration > 0 && clock(meta.duration), meta.engine].filter(Boolean).join(" · ")}
+            </p>
+            {progress && <Shimmer>{progress}</Shimmer>}
+          </div>
           <div className="flex items-center gap-1.5">
           {!recording && rec.transcript.segments.length > 0 && (
             <>

@@ -3,20 +3,13 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
+import { progressText } from "@/lib/status";
 import type { Messages } from "@/locales";
 import { Library, type Meta } from "@/mygo";
 import { Mic, Square, Upload, X } from "lucide-react";
 
 function statusBadge(t: Messages, m: Meta) {
-  const label: Record<string, string> = {
-    recording: t.statusRecording(), importing: t.statusImporting(), queued: t.statusQueued(),
-    summarizing: t.statusSummarizing(), diarizing: t.statusDiarizing(), failed: t.statusFailed(),
-  };
-  if (m.status === "processing") {
-    const pct = m.duration > 0 ? Math.min(99, Math.floor(((m.processedUntil ?? 0) / m.duration) * 100)) : 0;
-    return { text: t.statusProcessingPercent(pct), variant: "secondary" as const };
-  }
-  const text = label[m.status];
+  const text = progressText(t, m) ?? (m.status === "recording" ? t.statusRecording() : m.status === "failed" ? t.statusFailed() : null);
   if (!text) return null; // done: no badge
   return { text, variant: m.status === "failed" ? ("destructive" as const) : m.status === "recording" ? ("default" as const) : ("secondary" as const) };
 }
