@@ -3,14 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "mygo dev",
-    "build": "mygo build",
-    "generate": "mygo generate",
+    "dev": "CGO_ENABLED=1 mygo dev",
+    "build": "CGO_ENABLED=1 mygo build",
+    "generate": "CGO_ENABLED=1 mygo generate",
     "dev:web": "vite",
     "build:web": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "cert": "sh scripts/create-signing-cert.sh",
-    "build:signed": "mygo build -sign \"transflowy Local Signing\" -skip-dmg"
+    "build:signed": "CGO_ENABLED=1 mygo build -sign \"transflowy Local Signing\" -skip-dmg"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
