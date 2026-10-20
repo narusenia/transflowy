@@ -1951,3 +1951,63 @@ func DiarizeAgain() string { return In(i18n.Locale()).DiarizeAgain() }
 func (msgs Messages) DiarizeAgain() string {
 	return Catalog.Format(msgs.locale, "diarizeAgain", nil)
 }
+
+// SummaryEdit says "要約を編集"
+// in the language the app shows.
+func SummaryEdit() string { return In(i18n.Locale()).SummaryEdit() }
+
+// SummaryEdit says "要約を編集"
+// in the language of msgs.
+func (msgs Messages) SummaryEdit() string {
+	return Catalog.Format(msgs.locale, "summaryEdit", nil)
+}
+
+// SummaryWrite says "手入力で書く"
+// in the language the app shows.
+func SummaryWrite() string { return In(i18n.Locale()).SummaryWrite() }
+
+// SummaryWrite says "手入力で書く"
+// in the language of msgs.
+func (msgs Messages) SummaryWrite() string {
+	return Catalog.Format(msgs.locale, "summaryWrite", nil)
+}
+
+// SummarySave says "保存"
+// in the language the app shows.
+func SummarySave() string { return In(i18n.Locale()).SummarySave() }
+
+// SummarySave says "保存"
+// in the language of msgs.
+func (msgs Messages) SummarySave() string {
+	return Catalog.Format(msgs.locale, "summarySave", nil)
+}
+
+// SummaryEditHint says "⌘Enter で保存、Esc で取り消し。空にして保存すると、この要約を削除します"
+// in the language the app shows.
+func SummaryEditHint() string { return In(i18n.Locale()).SummaryEditHint() }
+
+// SummaryEditHint says "⌘Enter で保存、Esc で取り消し。空にして保存すると、この要約を削除します"
+// in the language of msgs.
+func (msgs Messages) SummaryEditHint() string {
+	return Catalog.Format(msgs.locale, "summaryEditHint", nil)
+}
+
+// ManualSummaryName says "メモ"
+// in the language the app shows.
+func ManualSummaryName() string { return In(i18n.Locale()).ManualSummaryName() }
+
+// ManualSummaryName says "メモ"
+// in the language of msgs.
+func (msgs Messages) ManualSummaryName() string {
+	return Catalog.Format(msgs.locale, "manualSummaryName", nil)
+}
+
+// SummaryRegenerateKeepsEdits says "手で直した内容は、再生成で置き換わります"
+// in the language the app shows.
+func SummaryRegenerateKeepsEdits() string { return In(i18n.Locale()).SummaryRegenerateKeepsEdits() }
+
+// SummaryRegenerateKeepsEdits says "手で直した内容は、再生成で置き換わります"
+// in the language of msgs.
+func (msgs Messages) SummaryRegenerateKeepsEdits() string {
+	return Catalog.Format(msgs.locale, "summaryRegenerateKeepsEdits", nil)
+}

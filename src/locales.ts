@@ -771,6 +771,30 @@ export interface Messages {
    * `話者分離をやり直す`
    */
   diarizeAgain(): string;
+  /**
+   * `要約を編集`
+   */
+  summaryEdit(): string;
+  /**
+   * `手入力で書く`
+   */
+  summaryWrite(): string;
+  /**
+   * `保存`
+   */
+  summarySave(): string;
+  /**
+   * `⌘Enter で保存、Esc で取り消し。空にして保存すると、この要約を削除します`
+   */
+  summaryEditHint(): string;
+  /**
+   * `メモ`
+   */
+  manualSummaryName(): string;
+  /**
+   * `手で直した内容は、再生成で置き換わります`
+   */
+  summaryRegenerateKeepsEdits(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -972,6 +996,12 @@ const catalog = createCatalog<Messages>({
     "speakerModelReady": [],
     "speakerModelProgress": ["pct"],
     "diarizeAgain": [],
+    "summaryEdit": [],
+    "summaryWrite": [],
+    "summarySave": [],
+    "summaryEditHint": [],
+    "manualSummaryName": [],
+    "summaryRegenerateKeepsEdits": [],
   },
   messages: {
     "ja": {
@@ -1167,6 +1197,12 @@ const catalog = createCatalog<Messages>({
       "speakerModelReady": "モデルは準備できています",
       "speakerModelProgress": "ダウンロード中 {pct}%",
       "diarizeAgain": "話者分離をやり直す",
+      "summaryEdit": "要約を編集",
+      "summaryWrite": "手入力で書く",
+      "summarySave": "保存",
+      "summaryEditHint": "⌘Enter で保存、Esc で取り消し。空にして保存すると、この要約を削除します",
+      "manualSummaryName": "メモ",
+      "summaryRegenerateKeepsEdits": "手で直した内容は、再生成で置き換わります",
     },
   },
 });

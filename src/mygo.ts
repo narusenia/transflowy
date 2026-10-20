@@ -205,6 +205,13 @@ export const Library = {
   resetSegment(id: string, index: number, start: number): Promise<void> {
     return call("Library.ResetSegment", id, index, start);
   },
+  /**
+   * SaveSummary stores a summary the user wrote or edited, under the name of a
+   * template or any other plain name. An empty text deletes it.
+   */
+  saveSummary(id: string, name: string, text: string): Promise<void> {
+    return call("Library.SaveSummary", id, name, text);
+  },
   /** Search finds recordings by title, transcript and summary text. */
   search(query: string): Promise<Hit[]> {
     return call("Library.Search", query);

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AudioLines, Download, Replace, RotateCw, Users } from "lucide-react";
+import { AudioLines, Download, Pencil, Replace, RotateCw, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/icon-button";
@@ -63,6 +63,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
   const [text, setText] = useState("");
   const [replacing, setReplacing] = useState(false);
   const [naming, setNaming] = useState(false);
+  const [draft, setDraft] = useState<{ name: string; text: string } | null>(null); // a summary being written by hand
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
@@ -71,7 +72,15 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
   }, [meta.id]);
 
   // Keep the shown summary valid as summaries appear.
+  const wanted = useRef(""); // a summary just saved: show it once the reloaded list has it
   useEffect(() => {
+    if (wanted.current) {
+      if (rec.summaries.includes(wanted.current)) {
+        setName(wanted.current);
+        wanted.current = "";
+      }
+      return;
+    }
     if (!rec.summaries.includes(name)) setName(rec.summaries[0] ?? "");
   }, [rec.summaries, name]);
   useEffect(() => {
@@ -119,6 +128,11 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
           </button>
         )}
         <span className="flex-1" />
+        {name && !draft && (
+          <IconButton variant="ghost" label={t.summaryEdit()} onClick={() => setDraft({ name, text })}>
+            <Pencil />
+          </IconButton>
+        )}
         <select aria-label={t.summaryTemplate()} className={select} value={tpl} onChange={(e) => setTpl(e.target.value)}>
           {templates.map((x) => (
             <option key={x.name} value={x.name} title={x.description}>
@@ -129,16 +143,46 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
         <Button
           size="sm"
           variant="outline"
-          disabled={!tpl || meta.status === "summarizing" || meta.status === "recording" || rec.transcript.segments.length === 0}
+          title={rec.summaries.includes(tpl) ? t.summaryRegenerateKeepsEdits() : undefined}
+          disabled={!!draft || !tpl || meta.status === "summarizing" || meta.status === "recording" || rec.transcript.segments.length === 0}
           onClick={() => Summarizer.summarize(meta.id, tpl).then(onChanged).catch(fail)}
         >
           {rec.summaries.includes(tpl) ? t.summaryRemake() : t.summaryMake()}
         </Button>
       </div>
+      {draft ? (
+        <SummaryEditor
+          draft={draft}
+          onCancel={() => setDraft(null)}
+          onSave={(d) =>
+            Library.saveSummary(meta.id, d.name, d.text)
+              .then(() => {
+                setDraft(null);
+                wanted.current = d.text.trim() ? d.name : "";
+                onChanged();
+              })
+              .catch(fail)
+          }
+        />
+      ) : (
       <div className="min-h-0 flex-1 overflow-auto px-4 py-2">
         {meta.status === "summarizing" && <p className="text-sm text-muted-foreground">{meta.error || t.summaryWaiting()}</p>}
-        {text ? <Markdown text={text} onSeek={seek} /> : meta.status !== "summarizing" && <p className="text-sm text-muted-foreground">{t.summaryEmpty()}</p>}
+        {text ? (
+          <Markdown text={text} onSeek={seek} />
+        ) : (
+          meta.status !== "summarizing" && (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">{t.summaryEmpty()}</p>
+              {meta.status === "done" && (
+                <Button size="sm" variant="outline" onClick={() => setDraft({ name: t.manualSummaryName(), text: "" })}>
+                  {t.summaryWrite()}
+                </Button>
+              )}
+            </div>
+          )
+        )}
       </div>
+      )}
     </div>
   );
   const transcriptPane = <Transcript
@@ -310,5 +354,31 @@ function Title({ id, title, fallback, onChanged, renaming, onRenameHandled }: { 
         else if (e.key === "Enter" && !e.nativeEvent.isComposing) save();
       }}
     />
+  );
+}
+
+/** Write or fix a summary by hand: Markdown, with [12:34] stamps that stay links. */
+function SummaryEditor({ draft, onSave, onCancel }: { draft: { name: string; text: string }; onSave(d: { name: string; text: string }): void; onCancel(): void }) {
+  const t = useMessages();
+  const [text, setText] = useState(draft.text);
+  const save = () => onSave({ name: draft.name, text });
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 py-2">
+      <textarea
+        autoFocus
+        className="min-h-0 flex-1 resize-none rounded-md border bg-background p-3 font-mono text-sm leading-relaxed"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") onCancel();
+          else if (e.key === "Enter" && (e.metaKey || e.ctrlKey) && !e.nativeEvent.isComposing) save();
+        }}
+      />
+      <p className="text-xs text-muted-foreground">{t.summaryEditHint()}</p>
+      <div className="flex gap-2">
+        <Button size="sm" onClick={save}>{t.summarySave()}</Button>
+        <Button size="sm" variant="ghost" onClick={onCancel}>{t.cancel()}</Button>
+      </div>
+    </div>
   );
 }
