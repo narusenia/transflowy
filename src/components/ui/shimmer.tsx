@@ -1,11 +1,6 @@
-import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
-/** Text with a light sweeping across it, for work in progress. The sweep stops with reduced motion. */
+/** Text with a light sweeping across it, for work in progress: shadcn's `shimmer` utility (shadcn/tailwind.css). */
 export function Shimmer({ children, className }: { children: string; className?: string }) {
-  return (
-    <span className={cn("shimmer inline-block", className)} style={{ "--spread": `${children.length * 2}px` } as CSSProperties}>
-      {children}
-    </span>
-  );
+  return <span className={cn("shimmer inline-block text-muted-foreground", className)}>{children}</span>;
 }
