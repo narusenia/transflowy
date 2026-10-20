@@ -16,8 +16,8 @@ const speeds = [0.75, 1, 1.25, 1.5, 2];
 const flat = Array.from({ length: 300 }, () => 0.25);
 
 /** The bottom player: wavesurfer.js draws the saved peaks and never decodes the audio. */
-export const Player = forwardRef<PlayerHandle, { id: string; duration: number; onTime(seconds: number): void }>(
-  function Player({ id, duration, onTime }, ref) {
+export const Player = forwardRef<PlayerHandle, { id: string; duration: number; done: boolean; onTime(seconds: number): void }>(
+  function Player({ id, duration, done, onTime }, ref) {
     const t = useMessages();
     const dark = useDark(); // the waveform is drawn with colors read once: draw it again when they change
     const box = useRef<HTMLDivElement>(null);
@@ -80,7 +80,7 @@ export const Player = forwardRef<PlayerHandle, { id: string; duration: number; o
         setPlaying(false);
         setTime(0);
       };
-    }, [id, duration, dark]);
+    }, [id, duration, dark, done]); // peaks.json and the m4a appear when processing ends
 
     // Space plays and pauses, unless it types a space or presses a control of a dialog.
     useEffect(() => {

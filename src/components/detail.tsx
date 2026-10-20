@@ -275,7 +275,7 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
       ) : meta.duration > 0 ? (
         <>
         <PlaybackCaption transcript={rec.transcript} time={time} />
-        <Player ref={player} id={meta.id} duration={meta.duration} onTime={setTime} />
+        <Player ref={player} id={meta.id} duration={meta.duration} done={meta.status === "done"} onTime={setTime} />
         </>
       ) : null}
     </div>
