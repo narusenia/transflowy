@@ -7,9 +7,19 @@
 結果は各項目の下に 1〜2 行で追記する。決定が変わる場合は requirements.md も直す。
 
 - [ ] P1 OpenRouter 文字起こし: 1 分 / 5 分 / 30 分の音声で制約確認、MAI-Transcribe-2 の diarization・phraseList の渡し方確認
-- [ ] P2 whisper-server: large-v3-turbo の日本語 + 英語混在精度と処理速度（実時間比）
-- [ ] P3 sherpa-onnx Go: silero VAD と話者分離が mac で動くか（Windows はビルドのみ）
-- [ ] P4 malgo: 16kHz モノラル録音、固定署名でマイク権限ダイアログ
+- [x] P2 whisper-server: large-v3-turbo の日本語 + 英語混在精度と処理速度（実時間比）
+  - `ggml-large-v3-turbo-q5_0.bin`（574MB）+ `whisper-server`（Homebrew 導入済み）。起動 9 秒、22.8 秒の音声を約 1.7 秒で処理（約 13 倍速、M 系 Metal）
+  - 日本語は正確。文中の英単語（API、スプリント）も問題なし。`prompt` に辞書語を渡す方式も動いた（読点の入り方が変わる程度）
+  - **問題**: 言語は処理窓（約 30 秒）ごとに 1 つしか判定されない。日本語 15 秒 + 英語 8 秒を 1 チャンクで渡すと英語が丸ごと落ちた。英語だけのチャンクは正常 → VAD で短く切り、チャンクごとに `language=auto` で処理する（上限 15 秒の設計と一致）。要件のモデルは q5_0 に変更し、初回 DL を約 0.6GB に修正
+- 未確認: 実際の会議音声（雑音・早口・重なり）での精度
+- [x] P3 sherpa-onnx Go: silero VAD と話者分離が mac で動くか（Windows はビルドのみ）
+  - `github.com/k2-fsa/sherpa-onnx-go-macos`（cgo、dylib 同梱）で動作。Windows は別モジュール `sherpa-onnx-go-windows`（未検証）
+  - VAD（silero、最大 15 秒で強制分割）: 4 ターンの会話を正解どおりに 4 区間へ分割、30 秒の音声で 65ms
+  - 話者分離（pyannote-3.0 + 3dspeaker / wespeaker）: 30 秒の音声で約 3 秒（約 10 倍速、1 時間で約 6 分）。**macOS TTS の 2 声（Kyoko / Reed）は分離できなかった**（人工音声は話者特徴が薄く、モデルの優劣は判定不能）
+  - 残課題: 実際の 2 人音声で分離精度を確認する（2 段目の着手前）。ローカル分離の所要時間は録音時間の約 1/10 になるので、バックグラウンド処理前提
+- [x] P4 malgo: 16kHz モノラル録音、固定署名でマイク権限ダイアログ
+  - `github.com/gen2brain/malgo` v0.11.26。S16 / 16kHz / モノラルで 5.01 秒を録音、音量あり（無音ではない）。デバイス列挙も可
+  - ターミナル経由の実行では権限が通った。**アプリ本体（固定署名の .app）でのマイク権限ダイアログは未確認** → Phase 2 の冒頭で確認（`Info.plist` の `NSMicrophoneUsageDescription` が mygo の設定で出せるかも含む）
 - [x] P5 afconvert: 各形式 → 16kHz WAV、動画の可否
   - m4a / mp3 / aac / wav / caf / mp4 / mov すべて `afconvert in -f WAVE -d LEI16@16000 -c 1 out.wav` で変換できた。動画（mp4 / mov）も音声が取れる → 動画取り込みを MVP に前倒しできる
   - WAV → m4a は `afconvert in.wav -f m4af -d aac -b 32000 out.m4a`。`-c 1` を付けると失敗し、16kHz モノラルで 64kbps も失敗する。32kbps なら 1 時間約 14MB

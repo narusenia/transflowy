@@ -33,7 +33,7 @@
 | 録音 | Go 側で malgo（miniaudio）。窓が閉じていても録音できる |
 | VAD | sherpa-onnx（silero VAD） |
 | 文字起こし（クラウド） | OpenRouter `microsoft/mai-transcribe-2` |
-| 文字起こし（ローカル） | whisper.cpp `whisper-server` を同梱しサイドカー起動。モデル large-v3-turbo を初回 DL |
+| 文字起こし（ローカル） | whisper.cpp `whisper-server` を同梱しサイドカー起動。モデル large-v3-turbo（q5_0 量子化、約 0.6GB）を初回 DL |
 | 文字起こし（その他） | 任意の OpenAI 互換 URL（`/audio/transcriptions`） |
 | 話者分離 | クラウド: MAI-Transcribe-2 の diarization。ローカル: sherpa-onnx |
 | 要約 | OpenRouter、または OpenAI 互換 URL（Ollama / LM Studio 等。Ollama は自動検出） |
@@ -72,7 +72,7 @@
 
 | 段 | 要件 |
 |---|---|
-| MVP | 録音後一括方式。ただし録音中に VAD で無音区間ごとにチャンク化し、裏で先行処理して停止後の待ちをほぼゼロにする |
+| MVP | 録音後一括方式。ただし録音中に VAD で無音区間ごとにチャンク化（最大 15 秒）し、チャンクごとに言語を自動判定しながら裏で先行処理して、停止後の待ちをほぼゼロにする。1 チャンクに複数言語を混ぜると片方が落ちるため（P2） |
 | MVP | 固有名詞辞書。MAI → phraseList、Whisper → initial prompt に渡す |
 | MVP | データは最初から `speaker` フィールドを持つ（MVP では未使用） |
 | 2 | 話者分離と話者名の付け替え（「話者 1 → 田中」）。別トラック録音時はマイク側を「自分」に確定 |
