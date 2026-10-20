@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useMessages } from "@/i18n";
-import { Library, Settings, Summarizer, type Provider, type Settings as S, type Template } from "@/mygo";
+import { Library, Recorder, Settings, Summarizer, type Provider, type Settings as S, type Template } from "@/mygo";
 
 const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
 const select = "h-8 rounded-md border bg-transparent px-2 text-sm";
@@ -77,11 +77,13 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
   const [s, setS] = useState<S | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [ollama, setOllama] = useState<string[] | null>(null);
+  const [devices, setDevices] = useState<string[]>([]);
 
   useEffect(() => {
     if (!open) return;
     Settings.get().then(setS).catch(fail);
     Summarizer.templates().then(setTemplates).catch(() => setTemplates([]));
+    Recorder.devices().then(setDevices).catch(() => setDevices([]));
     setOllama(null);
   }, [open]);
 
@@ -107,6 +109,13 @@ export function SettingsDialog({ open, onOpenChange, onChanged }: { open: boolea
             <section className="pb-2">
               <Row label={t.localOnly()} hint={t.localOnlyHint()}>
                 <Switch checked={s.localOnly} onCheckedChange={(v) => save({ ...s, localOnly: v })} />
+              </Row>
+              <Row label={t.inputDevice()}>
+                <select className={select} value={s.inputDevice} onChange={(e) => save({ ...s, inputDevice: e.target.value })}>
+                  <option value="">{t.inputDeviceDefault()}</option>
+                  {/* A saved device that is unplugged stays listed, so the choice is not lost. */}
+                  {(s.inputDevice && !devices.includes(s.inputDevice) ? [s.inputDevice, ...devices] : devices).map((d) => <option key={d}>{d}</option>)}
+                </select>
               </Row>
               <Row label={t.libraryDir()}>
                 <div className="flex gap-2">

@@ -162,5 +162,7 @@
         "type": "int"
       }
     }
-  }
+  },
+  "inputDevice": "入力デバイス",
+  "inputDeviceDefault": "システムの既定"
 }

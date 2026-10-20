@@ -1031,3 +1031,23 @@ func StatusProcessingPercent(pct int) string { return In(i18n.Locale()).StatusPr
 func (msgs Messages) StatusProcessingPercent(pct int) string {
 	return Catalog.Format(msgs.locale, "statusProcessingPercent", map[string]any{"pct": pct})
 }
+
+// InputDevice says "入力デバイス"
+// in the language the app shows.
+func InputDevice() string { return In(i18n.Locale()).InputDevice() }
+
+// InputDevice says "入力デバイス"
+// in the language of msgs.
+func (msgs Messages) InputDevice() string {
+	return Catalog.Format(msgs.locale, "inputDevice", nil)
+}
+
+// InputDeviceDefault says "システムの既定"
+// in the language the app shows.
+func InputDeviceDefault() string { return In(i18n.Locale()).InputDeviceDefault() }
+
+// InputDeviceDefault says "システムの既定"
+// in the language of msgs.
+func (msgs Messages) InputDeviceDefault() string {
+	return Catalog.Format(msgs.locale, "inputDeviceDefault", nil)
+}

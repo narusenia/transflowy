@@ -403,6 +403,14 @@ export interface Messages {
    * `処理中 {pct}%`
    */
   statusProcessingPercent(pct: number): string;
+  /**
+   * `入力デバイス`
+   */
+  inputDevice(): string;
+  /**
+   * `システムの既定`
+   */
+  inputDeviceDefault(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -512,6 +520,8 @@ const catalog = createCatalog<Messages>({
     "engine": [],
     "copy": [],
     "statusProcessingPercent": ["pct"],
+    "inputDevice": [],
+    "inputDeviceDefault": [],
   },
   messages: {
     "ja": {
@@ -615,6 +625,8 @@ const catalog = createCatalog<Messages>({
       "engine": "エンジン",
       "copy": "コピー",
       "statusProcessingPercent": "処理中 {pct}%",
+      "inputDevice": "入力デバイス",
+      "inputDeviceDefault": "システムの既定",
     },
   },
 });

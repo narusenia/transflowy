@@ -88,6 +88,8 @@ export interface Settings {
   template: string;
   /** LocalOnly forbids every request to a cloud provider. */
   localOnly: boolean;
+  /** InputDevice is the microphone's name; "" is the system default. */
+  inputDevice: string;
   shortcut: string;
   onboarded: boolean;
 }
@@ -163,6 +165,10 @@ export const Library = {
  * same methods on the Go side.
  */
 export const Recorder = {
+  /** Devices lists the input devices for the settings screen. */
+  devices(): Promise<string[]> {
+    return call("Recorder.Devices");
+  },
   /**
    * Discard deletes the recording that was just stopped (the undo toast).
    * Any other id is refused.
@@ -170,7 +176,7 @@ export const Recorder = {
   discard(id: string): Promise<void> {
     return call("Recorder.Discard", id);
   },
-  /** Start begins a recording from the default microphone. */
+  /** Start begins a recording from the input device in the settings (the default one when none). */
   start(): Promise<Meta> {
     return call("Recorder.Start");
   },
