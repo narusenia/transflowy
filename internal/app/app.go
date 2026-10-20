@@ -31,10 +31,11 @@ func Run() {
 		log.Fatal(err)
 	}
 	cfg := &settings.Service{
-		Path:           filepath.Join(cfgDir, "transflowy", "settings.json"),
-		Home:           home,
-		Keys:           mygo.Secrets,
-		ErrKeyNotFound: mygo.ErrSecretNotFound,
+		Path:            filepath.Join(cfgDir, "transflowy", "settings.json"),
+		Home:            home,
+		DefaultTemplate: locales.DefaultTemplateName(),
+		Keys:            mygo.Secrets,
+		ErrKeyNotFound:  mygo.ErrSecretNotFound,
 	}
 	modelDir := filepath.Join(cfgDir, "transflowy", "models")
 	server := &transcribe.Server{Model: models.Whisper.Path(modelDir)}
@@ -53,12 +54,15 @@ func Run() {
 		_ = mygo.NewNotification(mygo.NotificationOptions{ID: "done-" + id, Title: locales.NotifyDone(), Body: r.Meta.Title}).Show()
 	}
 	sumQueue := summarize.New(summarize.Config{
-		Store:     store,
-		Templates: func() []summarize.Template { s, _ := cfg.Get(); return summarize.Templates(s.LibraryDir) },
-		Default:   func() string { s, _ := cfg.Get(); return s.Template },
-		Chat:      engines.Chat,
-		Changed:   changed,
-		Finished:  notify,
+		Store: store,
+		Templates: func() []summarize.Template {
+			s, _ := cfg.Get()
+			return summarize.Templates(s.LibraryDir, mygo.App.Locale())
+		},
+		Default:  func() string { s, _ := cfg.Get(); return s.Template },
+		Chat:     engines.Chat,
+		Changed:  changed,
+		Finished: notify,
 	})
 	queue := pipeline.New(pipeline.Config{
 		Store:       store,

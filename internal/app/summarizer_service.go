@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/egoist/mygo"
+
 	"context"
 	"errors"
 	"fmt"
@@ -20,7 +22,7 @@ type Summarizer struct {
 // Templates lists the built-in and the user's summary templates.
 func (s *Summarizer) Templates() ([]summarize.Template, error) {
 	cur, err := s.cfg.Get()
-	return summarize.Templates(cur.LibraryDir), err
+	return summarize.Templates(cur.LibraryDir, mygo.App.Locale()), err
 }
 
 // Summarize writes a summary of a finished transcript with a template, keeping
@@ -39,7 +41,7 @@ func (s *Summarizer) Summarize(id, template string) error {
 		return errors.New("the transcript is not finished")
 	}
 	found := false
-	for _, t := range summarize.Templates(cur.LibraryDir) {
+	for _, t := range summarize.Templates(cur.LibraryDir, mygo.App.Locale()) {
 		found = found || t.Name == template
 	}
 	if !found {

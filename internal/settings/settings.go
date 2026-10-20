@@ -67,7 +67,10 @@ type KeyStore interface {
 type Service struct {
 	Path string // settings.json
 	Home string
-	Keys KeyStore
+	// DefaultTemplate is the template a fresh install summarizes with, by the
+	// app's language; empty keeps Defaults'.
+	DefaultTemplate string
+	Keys            KeyStore
 	// ErrKeyNotFound is the KeyStore's "no such key" error.
 	ErrKeyNotFound error
 	// OnChange is called after settings or a key changed.
@@ -85,6 +88,9 @@ func (s *Service) Get() (Settings, error) {
 
 func (s *Service) load() (Settings, error) {
 	cur := Defaults(s.Home)
+	if s.DefaultTemplate != "" {
+		cur.Template = s.DefaultTemplate
+	}
 	b, err := os.ReadFile(s.Path)
 	if errors.Is(err, os.ErrNotExist) {
 		return cur, nil
