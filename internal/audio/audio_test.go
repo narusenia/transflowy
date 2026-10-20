@@ -71,3 +71,20 @@ func TestWAVAndConvert(t *testing.T) {
 		t.Fatalf("decoded wav: %v %v", st, err)
 	}
 }
+
+func TestPeaks(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "a.wav")
+	w, _ := CreateWAV(path, 16000)
+	pcm := make([]int16, 1000) // quiet, then one loud sample in the last tenth
+	pcm[950] = -16384
+	b := make([]byte, 0, 2000)
+	for _, s := range pcm {
+		b = append(b, byte(s), byte(uint16(s)>>8))
+	}
+	w.Write(b)
+	w.Close()
+	p, err := Peaks(path, 10)
+	if err != nil || len(p) != 10 || p[9] != 0.5 || p[0] != 0 {
+		t.Fatalf("%v %v", p, err)
+	}
+}

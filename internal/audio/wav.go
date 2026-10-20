@@ -143,3 +143,32 @@ func ReadPCM(path string, from, limit int) ([]int16, error) {
 	}
 	return out, nil
 }
+
+// Peaks returns n values in 0..1: the loudest sample of each of n equal
+// slices of a 16-bit mono WAV. It reads in windows, so a long recording is
+// never held whole.
+func Peaks(path string, n int) ([]float32, error) {
+	total, err := PCMSamples(path)
+	if err != nil || total == 0 || n <= 0 {
+		return nil, err
+	}
+	n = min(n, total)
+	out := make([]float32, n)
+	const window = 60 * 16000
+	for from := 0; from < total; from += window {
+		pcm, err := ReadPCM(path, from, window)
+		if err != nil {
+			return nil, err
+		}
+		for i, s := range pcm {
+			v := float32(s) / 32768
+			if v < 0 {
+				v = -v
+			}
+			if k := int(int64(from+i) * int64(n) / int64(total)); v > out[k] {
+				out[k] = v
+			}
+		}
+	}
+	return out, nil
+}

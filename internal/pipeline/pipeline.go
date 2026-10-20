@@ -6,8 +6,10 @@ package pipeline
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"sync"
@@ -350,10 +352,31 @@ func describe(err error) string {
 
 func (q *Queue) finish(st library.Store, id, dir string) {
 	_, _ = st.UpdateMeta(id, func(m *library.Meta) { m.Status, m.Error = library.StatusDone, "" })
+	savePeaks(dir)
 	CleanupWAV(dir)
 	q.changed(id)
 	if q.cfg.Transcribed != nil {
 		q.cfg.Transcribed(id)
+	}
+}
+
+// peakCount is how many bars the player's waveform has.
+const peakCount = 2000
+
+// savePeaks writes peaks.json from recording.wav, so the page draws the
+// waveform without decoding a long audio file. Call it before CleanupWAV.
+func savePeaks(dir string) {
+	peaks, err := audio.Peaks(filepath.Join(dir, wavName), peakCount)
+	if err != nil || len(peaks) == 0 {
+		return
+	}
+	for i, p := range peaks { // 3 decimals are plenty for a picture
+		peaks[i] = float32(math.Round(float64(p)*1000) / 1000)
+	}
+	b, _ := json.Marshal(peaks)
+	tmp := filepath.Join(dir, "peaks.json.tmp")
+	if os.WriteFile(tmp, b, 0o644) == nil {
+		_ = os.Rename(tmp, filepath.Join(dir, "peaks.json"))
 	}
 }
 
