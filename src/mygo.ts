@@ -19,6 +19,12 @@ export interface ImportProblem {
   message: string;
 }
 
+/** MenuAction names the recording and the item chosen. */
+export interface MenuAction {
+  id: string;
+  action: string;
+}
+
 export interface Meta {
   id: string;
   title: string;
@@ -190,6 +196,10 @@ export const Library = {
   setTitle(id: string, title: string): Promise<void> {
     return call("Library.SetTitle", id, title);
   },
+  /** ShowMenu shows the context menu of a recording at the mouse. */
+  showMenu(id: string): Promise<void> {
+    return call("Library.ShowMenu", id);
+  },
   /** Summary returns the Markdown of a recording's summary made with a template. */
   summary(id: string, template: string): Promise<string> {
     return call("Library.Summary", id, template);
@@ -334,6 +344,8 @@ export const events = {
   libraryChanged: event<string>("libraryChanged"),
   /** ImportFailed fires for an unsupported or unreadable file. */
   importFailed: event<ImportProblem>("importFailed"),
+  /** LibraryMenu fires when a context-menu item needs the page: "rename". */
+  libraryMenu: event<MenuAction>("libraryMenu"),
   /** ModelChanged fires during a download. */
   modelChanged: event<ModelProgress>("modelChanged"),
   /** RecordingChanged fires on start, stop and about five times a second while recording. */

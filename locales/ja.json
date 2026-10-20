@@ -240,5 +240,20 @@
         "type": "int"
       }
     }
-  }
+  },
+  "menuRename": "名前を変更",
+  "menuReveal": "Finder で表示",
+  "menuDelete": "削除…",
+  "deleteTitle": "「{title}」を削除しますか？",
+  "@deleteTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteDetail": "録音のフォルダ（音声・文字起こし・要約）をゴミ箱に移動します",
+  "deleteConfirm": "ゴミ箱に移動",
+  "cancel": "キャンセル",
+  "untitled": "無題の録音"
 }

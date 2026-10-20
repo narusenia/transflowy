@@ -1601,3 +1601,83 @@ func ObModelProgress(pct int) string { return In(i18n.Locale()).ObModelProgress(
 func (msgs Messages) ObModelProgress(pct int) string {
 	return Catalog.Format(msgs.locale, "obModelProgress", map[string]any{"pct": pct})
 }
+
+// MenuRename says "名前を変更"
+// in the language the app shows.
+func MenuRename() string { return In(i18n.Locale()).MenuRename() }
+
+// MenuRename says "名前を変更"
+// in the language of msgs.
+func (msgs Messages) MenuRename() string {
+	return Catalog.Format(msgs.locale, "menuRename", nil)
+}
+
+// MenuReveal says "Finder で表示"
+// in the language the app shows.
+func MenuReveal() string { return In(i18n.Locale()).MenuReveal() }
+
+// MenuReveal says "Finder で表示"
+// in the language of msgs.
+func (msgs Messages) MenuReveal() string {
+	return Catalog.Format(msgs.locale, "menuReveal", nil)
+}
+
+// MenuDelete says "削除…"
+// in the language the app shows.
+func MenuDelete() string { return In(i18n.Locale()).MenuDelete() }
+
+// MenuDelete says "削除…"
+// in the language of msgs.
+func (msgs Messages) MenuDelete() string {
+	return Catalog.Format(msgs.locale, "menuDelete", nil)
+}
+
+// DeleteTitle says "「{title}」を削除しますか？"
+// in the language the app shows.
+func DeleteTitle(title string) string { return In(i18n.Locale()).DeleteTitle(title) }
+
+// DeleteTitle says "「{title}」を削除しますか？"
+// in the language of msgs.
+func (msgs Messages) DeleteTitle(title string) string {
+	return Catalog.Format(msgs.locale, "deleteTitle", map[string]any{"title": title})
+}
+
+// DeleteDetail says "録音のフォルダ（音声・文字起こし・要約）をゴミ箱に移動します"
+// in the language the app shows.
+func DeleteDetail() string { return In(i18n.Locale()).DeleteDetail() }
+
+// DeleteDetail says "録音のフォルダ（音声・文字起こし・要約）をゴミ箱に移動します"
+// in the language of msgs.
+func (msgs Messages) DeleteDetail() string {
+	return Catalog.Format(msgs.locale, "deleteDetail", nil)
+}
+
+// DeleteConfirm says "ゴミ箱に移動"
+// in the language the app shows.
+func DeleteConfirm() string { return In(i18n.Locale()).DeleteConfirm() }
+
+// DeleteConfirm says "ゴミ箱に移動"
+// in the language of msgs.
+func (msgs Messages) DeleteConfirm() string {
+	return Catalog.Format(msgs.locale, "deleteConfirm", nil)
+}
+
+// Cancel says "キャンセル"
+// in the language the app shows.
+func Cancel() string { return In(i18n.Locale()).Cancel() }
+
+// Cancel says "キャンセル"
+// in the language of msgs.
+func (msgs Messages) Cancel() string {
+	return Catalog.Format(msgs.locale, "cancel", nil)
+}
+
+// Untitled says "無題の録音"
+// in the language the app shows.
+func Untitled() string { return In(i18n.Locale()).Untitled() }
+
+// Untitled says "無題の録音"
+// in the language of msgs.
+func (msgs Messages) Untitled() string {
+	return Catalog.Format(msgs.locale, "untitled", nil)
+}

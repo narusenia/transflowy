@@ -32,6 +32,7 @@ export function App() {
   const [sidebar, setSidebar] = useState(true);
   const [searching, setSearching] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [renameId, setRenameId] = useState("");
   const [jump, setJump] = useState<Jump | null>(null);
   const [first, setFirst] = useState<S | null>(null); // settings, while the first-run screen is up
   const selectedRef = useRef("");
@@ -73,6 +74,12 @@ export function App() {
         if (!s.recording) reload();
       }),
       events.libraryChanged.on(reload),
+      events.libraryMenu.on((a) => {
+        if (a.action === "rename") {
+          select(a.id);
+          setRenameId(a.id);
+        }
+      }),
       events.importFailed.on((p) => toast.error(p.message)),
       events.modelChanged.on((p) => {
         if (p.state === "downloading") setPercent(p.total ? Math.floor((p.done / p.total) * 100) : 0);
@@ -133,7 +140,7 @@ export function App() {
         )}
         <div className="min-h-0 flex-1">
           {detail && detail.meta.id === selected ? (
-            <Detail rec={detail} templates={templates} jump={jump} live={state.recording && state.id === selected ? { levels, elapsed: state.elapsed } : null} onChanged={reload} />
+            <Detail rec={detail} templates={templates} jump={jump} renaming={renameId === detail.meta.id} onRenameHandled={() => setRenameId("")} live={state.recording && state.id === selected ? { levels, elapsed: state.elapsed } : null} onChanged={reload} />
           ) : (
             <p className="flex h-full items-center justify-center text-muted-foreground">{t.selectPrompt()}</p>
           )}

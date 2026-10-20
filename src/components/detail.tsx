@@ -40,12 +40,14 @@ function useWide() {
   return wide;
 }
 
-export function Detail({ rec, templates, jump, live, onChanged }: {
+export function Detail({ rec, templates, jump, live, onChanged, renaming, onRenameHandled }: {
   rec: Recording;
   templates: Template[];
   jump: Jump | null;
   live: Live | null;
   onChanged(): void;
+  renaming: boolean; // the context menu asked to rename this recording
+  onRenameHandled(): void;
 }) {
   const t = useMessages();
   const wide = useWide();
@@ -150,7 +152,7 @@ export function Detail({ rec, templates, jump, live, onChanged }: {
   return (
     <div className="flex h-full flex-col">
       <header className="space-y-2 border-b px-4 py-3">
-        <Title key={meta.id} id={meta.id} title={meta.title} fallback={new Date(meta.createdAt).toLocaleString()} onChanged={onChanged} />
+        <Title key={meta.id} id={meta.id} title={meta.title} renaming={renaming} onRenameHandled={onRenameHandled} fallback={new Date(meta.createdAt).toLocaleString()} onChanged={onChanged} />
         <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <span>{new Date(meta.createdAt).toLocaleString()}</span>
           {meta.duration > 0 && <span>· {clock(meta.duration)}</span>}
@@ -259,10 +261,17 @@ function LiveWave({ live }: { live: Live | null }) {
 }
 
 /** The title: click to rename; an empty title goes back to the date. */
-function Title({ id, title, fallback, onChanged }: { id: string; title: string; fallback: string; onChanged(): void }) {
+function Title({ id, title, fallback, onChanged, renaming, onRenameHandled }: { id: string; title: string; fallback: string; onChanged(): void; renaming: boolean; onRenameHandled(): void }) {
   const t = useMessages();
   const [editing, setEditing] = useState(false);
   const [v, setV] = useState(title);
+  useEffect(() => {
+    if (renaming) {
+      setV(title);
+      setEditing(true);
+      onRenameHandled();
+    }
+  }, [renaming]); // eslint-disable-line react-hooks/exhaustive-deps
   const save = () => {
     setEditing(false);
     if (v.trim() !== title) Library.setTitle(id, v).then(onChanged).catch(fail);

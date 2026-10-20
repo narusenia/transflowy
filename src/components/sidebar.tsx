@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { clock } from "@/lib/media";
 import { useMessages } from "@/i18n";
 import type { Messages } from "@/locales";
-import type { Meta } from "@/mygo";
+import { Library, type Meta } from "@/mygo";
 import { Mic, Square, Upload } from "lucide-react";
 
 function statusBadge(t: Messages, m: Meta) {
@@ -75,6 +75,11 @@ export function Sidebar({ recordings, selected, onSelect, recording, elapsed, le
                 <button
                   key={m.id}
                   onClick={() => onSelect(m.id)}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    onSelect(m.id);
+                    void Library.showMenu(m.id);
+                  }}
                   title={m.error}
                   className={`flex w-full cursor-pointer flex-col gap-0.5 rounded-md px-2 py-1.5 text-left text-sm hover:bg-sidebar-accent ${m.id === selected ? "bg-sidebar-accent" : ""}`}
                 >

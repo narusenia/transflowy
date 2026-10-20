@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"github.com/egoist/mygo"
 
 	"transflowy/internal/library"
 	"transflowy/internal/settings"
+	"transflowy/locales"
 )
 
 // Library is callable from the page: it reads recordings from the folder the
@@ -106,4 +108,56 @@ func (l *Library) AddToDictionary(word string) error {
 		return err
 	}
 	return st.AddToDictionary(word)
+}
+
+// LibraryMenu fires when a context-menu item needs the page: "rename".
+var LibraryMenu = mygo.NewEvent[MenuAction]("libraryMenu")
+
+// MenuAction names the recording and the item chosen.
+type MenuAction struct {
+	ID     string `json:"id"`
+	Action string `json:"action"`
+}
+
+// ShowMenu shows the context menu of a recording at the mouse.
+func (l *Library) ShowMenu(ctx context.Context, id string) {
+	st, err := l.store()
+	if err != nil {
+		return
+	}
+	rec, err := st.Get(id)
+	if err != nil {
+		return
+	}
+	busy := rec.Meta.Status == library.StatusRecording || rec.Meta.Status == library.StatusImporting
+	dir, _ := st.Path(id)
+	menu := mygo.NewMenu([]*mygo.MenuItem{
+		{Label: locales.MenuRename(), Click: func(*mygo.MenuItem, *mygo.Window) { _ = LibraryMenu.Broadcast(MenuAction{id, "rename"}) }},
+		{Label: locales.MenuReveal(), Click: func(*mygo.MenuItem, *mygo.Window) { mygo.Shell.ShowItemInFolder(dir) }},
+		mygo.Separator(),
+		{Label: locales.MenuDelete(), Disabled: busy, Click: func(_ *mygo.MenuItem, win *mygo.Window) {
+			go l.confirmDelete(win, rec.Meta, dir) // a dialog blocks: not on the menu's thread
+		}},
+	})
+	menu.Popup(mygo.CallerWindow(ctx))
+}
+
+// confirmDelete moves a recording's folder to the trash after the user agrees.
+func (l *Library) confirmDelete(win *mygo.Window, m library.Meta, dir string) {
+	title := m.Title
+	if title == "" {
+		title = locales.Untitled()
+	}
+	res, err := mygo.Dialog.Message(mygo.MessageOptions{
+		Parent: win, Type: mygo.MessageWarning, Message: locales.DeleteTitle(title), Detail: locales.DeleteDetail(),
+		Buttons: []string{locales.DeleteConfirm(), locales.Cancel()}, DefaultButton: 1, CancelButton: 1,
+	})
+	if err != nil || res.Button != 0 {
+		return
+	}
+	if err := mygo.Shell.TrashItem(dir); err != nil {
+		mygo.Dialog.Error(title, err.Error())
+		return
+	}
+	_ = LibraryChanged.Broadcast(m.ID)
 }

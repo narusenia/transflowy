@@ -631,6 +631,38 @@ export interface Messages {
    * `ダウンロード中 {pct}%`
    */
   obModelProgress(pct: number): string;
+  /**
+   * `名前を変更`
+   */
+  menuRename(): string;
+  /**
+   * `Finder で表示`
+   */
+  menuReveal(): string;
+  /**
+   * `削除…`
+   */
+  menuDelete(): string;
+  /**
+   * `「{title}」を削除しますか？`
+   */
+  deleteTitle(title: string): string;
+  /**
+   * `録音のフォルダ（音声・文字起こし・要約）をゴミ箱に移動します`
+   */
+  deleteDetail(): string;
+  /**
+   * `ゴミ箱に移動`
+   */
+  deleteConfirm(): string;
+  /**
+   * `キャンセル`
+   */
+  cancel(): string;
+  /**
+   * `無題の録音`
+   */
+  untitled(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -797,6 +829,14 @@ const catalog = createCatalog<Messages>({
     "obStep3Title": [],
     "obStep3Body": [],
     "obModelProgress": ["pct"],
+    "menuRename": [],
+    "menuReveal": [],
+    "menuDelete": [],
+    "deleteTitle": ["title"],
+    "deleteDetail": [],
+    "deleteConfirm": [],
+    "cancel": [],
+    "untitled": [],
   },
   messages: {
     "ja": {
@@ -957,6 +997,14 @@ const catalog = createCatalog<Messages>({
       "obStep3Title": "ショートカット",
       "obStep3Body": "どのアプリを使っていても、このキーで録音を開始・停止できます。メニューバーのアイコンからも操作できます。",
       "obModelProgress": "ダウンロード中 {pct}%",
+      "menuRename": "名前を変更",
+      "menuReveal": "Finder で表示",
+      "menuDelete": "削除…",
+      "deleteTitle": "「{title}」を削除しますか？",
+      "deleteDetail": "録音のフォルダ（音声・文字起こし・要約）をゴミ箱に移動します",
+      "deleteConfirm": "ゴミ箱に移動",
+      "cancel": "キャンセル",
+      "untitled": "無題の録音",
     },
   },
 });
