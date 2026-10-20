@@ -22,6 +22,10 @@ export default defineConfig({
     // Core Audio Tap (system audio, a later stage) needs 14.2.
     minimumSystemVersion: "14.2",
     // Without this key macOS refuses microphone access without asking.
-    infoPlist: { NSMicrophoneUsageDescription: "会議やメモを録音して文字起こしするために、マイクを使います。" },
+    infoPlist: {
+      NSMicrophoneUsageDescription: "会議やメモを録音して文字起こしするために、マイクを使います。",
+      // Without this key macOS refuses system audio capture without asking.
+      NSAudioCaptureUsageDescription: "会議の相手の声など、Mac から出る音を録音して文字起こしするために、システム音声を使います。",
+    },
   },
 });

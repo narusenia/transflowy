@@ -5,6 +5,7 @@ package systemaudio
 import (
 	"errors"
 	"math"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -53,6 +54,7 @@ func (r *Recorder) Start(path string) error {
 	stop, rate, _, err := startTap(r.onData)
 	if err != nil {
 		_ = w.Close()
+		_ = os.Remove(path) // an empty system track must not make the recording a two-track one
 		r.wav = nil
 		return err
 	}

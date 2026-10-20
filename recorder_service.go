@@ -15,6 +15,7 @@ import (
 	"transflowy/internal/pipeline"
 	"transflowy/internal/recorder"
 	"transflowy/internal/settings"
+	"transflowy/internal/systemaudio"
 	"transflowy/locales"
 )
 
@@ -29,9 +30,15 @@ type RecordingState struct {
 // RecordingChanged fires on start, stop and about five times a second while recording.
 var RecordingChanged = mygo.NewEvent[RecordingState]("recordingChanged")
 
+// RecorderWarning fires when a recording went on with less than was asked for.
+var RecorderWarning = mygo.NewEvent[string]("recorderWarning")
+
 const (
-	wavName = "recording.wav" // removed by the pipeline once transcribed and the m4a exists
-	m4aName = "audio.m4a"
+	systemWAVName = "system.wav"
+	micM4AName    = "mic.m4a"
+	systemM4AName = "system.m4a"
+	wavName       = "recording.wav" // removed by the pipeline once transcribed and the m4a exists
+	m4aName       = "audio.m4a"
 )
 
 // Recorder is callable from the page. The shortcut and the menu bar call the
@@ -40,6 +47,7 @@ type Recorder struct {
 	cfg   *settings.Service
 	queue *pipeline.Queue // nil in tests
 	rec   recorder.Recorder
+	sys   systemaudio.Recorder // the second track, when the settings ask for it
 
 	// onState is called with every state change, for the menu bar.
 	onState func(RecordingState)
@@ -76,6 +84,12 @@ func (r *Recorder) Start() (library.Meta, error) {
 		_ = os.RemoveAll(dir) // nothing was recorded: leave no empty folder
 		return library.Meta{}, err
 	}
+	if cur.CaptureSystem && systemaudio.Supported {
+		if err := r.sys.Start(filepath.Join(dir, systemWAVName)); err != nil {
+			log.Println("system audio:", err)
+			_ = RecorderWarning.Broadcast(locales.WarnSystemAudio(err.Error()))
+		}
+	}
 	r.id = m.ID
 	r.quit = make(chan struct{})
 	go r.publish(r.quit, m.ID)
@@ -87,9 +101,12 @@ func (r *Recorder) Start() (library.Meta, error) {
 func (r *Recorder) publish(quit chan struct{}, id string) {
 	t := time.NewTicker(200 * time.Millisecond)
 	defer t.Stop()
-	for {
+	for n := 1; ; n++ {
 		select {
 		case <-t.C:
+			if n%10 == 0 { // a crash loses at most this much of the system track
+				r.sys.Flush()
+			}
 			r.emit(true, id)
 		case <-quit:
 			return
@@ -98,7 +115,7 @@ func (r *Recorder) publish(quit chan struct{}, id string) {
 }
 
 func (r *Recorder) emit(recording bool, id string) {
-	st := RecordingState{Recording: recording, ID: id, Elapsed: r.rec.Elapsed(), Level: r.rec.Level()}
+	st := RecordingState{Recording: recording, ID: id, Elapsed: r.rec.Elapsed(), Level: max(r.rec.Level(), r.sys.Level())}
 	_ = RecordingChanged.Broadcast(st)
 	if r.onState != nil {
 		r.onState(st)
@@ -115,6 +132,13 @@ func (r *Recorder) Stop() (library.Meta, error) {
 	id := r.id
 	close(r.quit)
 	secs, stopErr := r.rec.Stop()
+	if r.sys.Recording() {
+		sysSecs, sysErr := r.sys.Stop()
+		secs = max(secs, sysSecs)
+		if stopErr == nil {
+			stopErr = sysErr
+		}
+	}
 	r.id, r.last = "", id
 	r.emit(false, id)
 
@@ -205,13 +229,31 @@ func (r *Recorder) Discard(id string) error {
 	return nil
 }
 
-// finalizeAudio encodes recording.wav as audio.m4a.
+// finalizeAudio encodes the recording's WAVs as m4a. One track becomes
+// audio.m4a. With system audio there are three: mic.m4a and system.m4a, which
+// are transcribed and rebuilt from, and audio.m4a, their mix, which is played.
 func finalizeAudio(st library.Store, id string) {
 	dir, err := st.Path(id)
 	if err != nil {
 		return
 	}
-	if err := audio.ToM4A(filepath.Join(dir, wavName), filepath.Join(dir, m4aName)); err != nil {
+	mic, sys := filepath.Join(dir, wavName), filepath.Join(dir, systemWAVName)
+	if _, err := os.Stat(sys); err == nil {
+		mix := filepath.Join(dir, "mix.wav")
+		defer os.Remove(mix)
+		for _, c := range []struct{ wav, m4a string }{{mic, micM4AName}, {sys, systemM4AName}} {
+			if err := audio.ToM4A(c.wav, filepath.Join(dir, c.m4a)); err != nil {
+				log.Println("m4a:", err)
+				return
+			}
+		}
+		if err := audio.MixWAV(mix, mic, sys); err != nil {
+			log.Println("mix:", err)
+			return
+		}
+		mic = mix // audio.m4a is encoded from the mix below
+	}
+	if err := audio.ToM4A(mic, filepath.Join(dir, m4aName)); err != nil {
 		log.Println("m4a:", err)
 		return
 	}
@@ -256,3 +298,6 @@ func recoverRecordings(st library.Store) {
 		}
 	}
 }
+
+// CanCaptureSystem reports whether this build can record system audio.
+func (r *Recorder) CanCaptureSystem() bool { return systemaudio.Supported }

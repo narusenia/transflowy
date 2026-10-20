@@ -224,6 +224,10 @@ export const Library = {
  * same methods on the Go side.
  */
 export const Recorder = {
+  /** CanCaptureSystem reports whether this build can record system audio. */
+  canCaptureSystem(): Promise<boolean> {
+    return call("Recorder.CanCaptureSystem");
+  },
   /** Devices lists the input devices for the settings screen. */
   devices(): Promise<string[]> {
     return call("Recorder.Devices");
@@ -363,4 +367,6 @@ export const events = {
   modelChanged: event<ModelProgress>("modelChanged"),
   /** RecordingChanged fires on start, stop and about five times a second while recording. */
   recordingChanged: event<RecordingState>("recordingChanged"),
+  /** RecorderWarning fires when a recording went on with less than was asked for. */
+  recorderWarning: event<string>("recorderWarning"),
 } as const;
