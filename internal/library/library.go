@@ -34,10 +34,16 @@ type Meta struct {
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"createdAt"`
 	Duration  float64   `json:"duration"` // seconds
-	Language  string    `json:"language,omitempty"`
-	Engine    string    `json:"engine,omitempty"`
-	Status    Status    `json:"status"`
-	Error     string    `json:"error,omitempty"`
+	// Language is the user's choice for this recording; "" means detect.
+	Language string `json:"language,omitempty"`
+	// Detected is the language the engine reported, for display.
+	Detected string `json:"detected,omitempty"`
+	Engine   string `json:"engine,omitempty"`
+	// ProcessedUntil is how many seconds of audio have a transcript, so a
+	// restart continues where the pipeline stopped.
+	ProcessedUntil float64 `json:"processedUntil,omitempty"`
+	Status         Status  `json:"status"`
+	Error          string  `json:"error,omitempty"`
 }
 
 // Segment is one line of a transcript. Original keeps the engine's text so an
