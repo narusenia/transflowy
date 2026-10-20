@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Download, Replace, RotateCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/icon-button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Player, type PlayerHandle } from "@/components/player";
 import { Transcript } from "@/components/transcript";
@@ -153,22 +154,28 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
     <div className="flex h-full flex-col">
       <header className="space-y-2 border-b px-4 py-3">
         <Title key={meta.id} id={meta.id} title={meta.title} renaming={renaming} onRenameHandled={onRenameHandled} fallback={new Date(meta.createdAt).toLocaleString()} onChanged={onChanged} />
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <span>{new Date(meta.createdAt).toLocaleString()}</span>
-          {meta.duration > 0 && <span>· {clock(meta.duration)}</span>}
-          {meta.engine && <span>· {meta.engine}</span>}
-          <span className="flex-1" />
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <p className="text-xs text-muted-foreground">
+            {[new Date(meta.createdAt).toLocaleString(), meta.duration > 0 && clock(meta.duration), meta.engine].filter(Boolean).join(" · ")}
+          </p>
+          <div className="flex items-center gap-1.5">
           {!recording && rec.transcript.segments.length > 0 && (
             <>
-              <Button size="icon-sm" variant="outline" title={t.replaceButton()} aria-label={t.replaceButton()} onClick={() => setReplacing(true)}>
+              <IconButton variant="outline" label={t.replaceButton()} onClick={() => setReplacing(true)}>
                 <Replace />
-              </Button>
-              <Button size="icon-sm" variant="outline" title={t.exportButton()} aria-label={t.exportButton()} onClick={() => setExporting(true)}>
+              </IconButton>
+              <IconButton variant="outline" label={t.exportButton()} onClick={() => setExporting(true)}>
                 <Download />
-              </Button>
+              </IconButton>
             </>
           )}
-          {!recording && meta.status !== "importing" && <Reprocess id={meta.id} language={meta.language ?? ""} detected={meta.detected} onChanged={onChanged} />}
+          {!recording && meta.status !== "importing" && (
+            <>
+              <span className="mx-1 h-4 w-px bg-border" />
+              <Reprocess id={meta.id} language={meta.language ?? ""} detected={meta.detected} onChanged={onChanged} />
+            </>
+          )}
+          </div>
         </div>
         {(meta.status === "failed" || (meta.status === "done" && meta.error)) && (
           <div className="flex flex-wrap items-center gap-2 rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -214,32 +221,29 @@ export function Detail({ rec, templates, jump, live, onChanged, renaming, onRena
 function Reprocess({ id, language, detected, onChanged }: { id: string; language: string; detected?: string; onChanged(): void }) {
   const t = useMessages();
   const [kind, setKind] = useState("");
+  const small = "h-7 rounded-md border bg-transparent px-2 text-xs";
   return (
     <>
-      <label className="flex items-center gap-1">
-        {t.language()}
-        <select
-          className={select}
-          value={language}
-          onChange={(e) => Transcriber.setLanguage(id, e.target.value).then(onChanged).catch(fail)}
-        >
-          <option value="">{t.languageAuto()}{detected ? ` (${detected})` : ""}</option>
-          <option value="ja">{t.languageJa()}</option>
-          <option value="en">{t.languageEn()}</option>
-        </select>
-      </label>
-      <label className="flex items-center gap-1">
-        {t.processWith()}
-        <select className={select} value={kind} onChange={(e) => setKind(e.target.value)}>
-          <option value="">{t.languageAuto()}</option>
-          <option value="local">{t.engineLocal()}</option>
-          <option value="openrouter">{t.engineOpenRouter()}</option>
-          <option value="openai-compat">{t.engineCompat()}</option>
-        </select>
-      </label>
-      <Button size="icon-sm" variant="outline" title={t.reprocess()} aria-label={t.reprocess()} onClick={() => Transcriber.reprocess(id, kind).then(onChanged).catch(fail)}>
+      <select
+        title={t.language()}
+        aria-label={t.language()}
+        className={small}
+        value={language}
+        onChange={(e) => Transcriber.setLanguage(id, e.target.value).then(onChanged).catch(fail)}
+      >
+        <option value="">{t.language()}: {t.languageAuto()}{detected ? ` (${detected})` : ""}</option>
+        <option value="ja">{t.languageJa()}</option>
+        <option value="en">{t.languageEn()}</option>
+      </select>
+      <select title={t.processWith()} aria-label={t.processWith()} className={small} value={kind} onChange={(e) => setKind(e.target.value)}>
+        <option value="">{t.processWith()}: {t.languageAuto()}</option>
+        <option value="local">{t.engineLocal()}</option>
+        <option value="openrouter">{t.engineOpenRouter()}</option>
+        <option value="openai-compat">{t.engineCompat()}</option>
+      </select>
+      <IconButton variant="outline" label={t.reprocess()} onClick={() => Transcriber.reprocess(id, kind).then(onChanged).catch(fail)}>
         <RotateCw />
-      </Button>
+      </IconButton>
     </>
   );
 }
