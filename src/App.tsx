@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Detail, type Jump } from "@/components/detail";
+import { Search } from "@/components/search";
+import { SettingsDialog } from "@/components/settings";
+import { Sidebar } from "@/components/sidebar";
 import { useMessages } from "@/i18n";
 import type { Messages } from "@/locales";
-import { events, Importer, Library, Models, Recorder, Settings, Transcriber, type Meta, type ModelStatus, type Recording, type RecordingState } from "@/mygo";
+import { events, Importer, Library, Models, Recorder, Summarizer, type Hit, type Meta, type ModelStatus, type Recording, type RecordingState, type Template } from "@/mygo";
 
 const idle: RecordingState = { recording: false, id: "", elapsed: 0, level: 0 };
-
-const clock = (s: number) =>
-  `${Math.floor(s / 60)}:${String(Math.floor(s) % 60).padStart(2, "0")}`;
+const LEVELS = 150; // bars of the live waveform
+const fail = (e: unknown) => toast.error(String((e as Error)?.message ?? e));
 
 export function App() {
-  const [dir, setDir] = useState("");
   const [recordings, setRecordings] = useState<Meta[]>([]);
   const [state, setState] = useState(idle);
+  const [levels, setLevels] = useState<number[]>([]);
   const wasRecording = useRef(false);
   const t = useMessages();
   const tRef = useRef(t); // the event handler below outlives a render
@@ -21,20 +24,32 @@ export function App() {
 
   const [selected, setSelected] = useState("");
   const [detail, setDetail] = useState<Recording | null>(null);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [model, setModel] = useState<ModelStatus>({ present: true, downloading: false });
   const [percent, setPercent] = useState(0);
+  const [sidebar, setSidebar] = useState(true);
+  const [searching, setSearching] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [jump, setJump] = useState<Jump | null>(null);
   const selectedRef = useRef("");
   selectedRef.current = selected;
 
-  const loadDetail = (id: string) => (id ? Library.get(id).then(setDetail).catch(() => setDetail(null)) : setDetail(null));
+  const loadDetail = (id: string) =>
+    id ? Library.get(id).then((r) => selectedRef.current === id && setDetail(r)).catch(() => setDetail(null)) : setDetail(null);
   const reload = () => {
     Library.list().then(setRecordings);
     loadDetail(selectedRef.current);
   };
+  const select = (id: string) => {
+    selectedRef.current = id;
+    setSelected(id);
+    setDetail((d) => (d?.meta.id === id ? d : null));
+    loadDetail(id);
+  };
 
   useEffect(() => {
-    Settings.get().then((s) => setDir(s.libraryDir));
     Models.status().then(setModel);
+    Summarizer.templates().then(setTemplates).catch(() => {});
     Recorder.state().then((s) => {
       wasRecording.current = s.recording;
       setState(s);
@@ -44,6 +59,11 @@ export function App() {
     const offs = [
       events.recordingChanged.on((s) => {
         if (wasRecording.current && !s.recording) onStopped(s.id, tRef.current);
+        if (!wasRecording.current && s.recording) {
+          setLevels([]);
+          select(s.id);
+        }
+        if (s.recording) setLevels((l) => [...l.slice(-(LEVELS - 1)), s.level]);
         wasRecording.current = s.recording;
         setState(s);
         if (!s.recording) reload();
@@ -59,67 +79,64 @@ export function App() {
     return () => offs.forEach((off) => off());
   }, []);
 
-  return (
-    <main className="flex h-screen flex-col items-center justify-center gap-4 text-sm">
-      <Toaster position="bottom-center" />
-      <Button
-        size="lg"
-        variant={state.recording ? "destructive" : "default"}
-        onClick={() => (state.recording ? Recorder.stop() : Recorder.start()).catch((e) => toast.error(String(e.message ?? e)))}
-      >
-        {state.recording ? t.recordStop(clock(state.elapsed)) : t.recordStart()}
-      </Button>
-      <div className="h-1.5 w-48 overflow-hidden rounded bg-muted">
-        <div className="h-full bg-primary transition-[width] duration-150" style={{ width: `${Math.min(1, state.level * 2) * 100}%` }} />
-      </div>
-      <Button variant="outline" onClick={() => Importer.importDialog().catch((e) => toast.error(String(e.message ?? e)))}>
-        {t.importButton()}
-      </Button>
-      {!model.present && (
-        <Button variant="outline" disabled={model.downloading} onClick={() => Models.download()}>
-          {model.downloading ? t.modelDownloading(percent) : t.modelDownload()}
-        </Button>
-      )}
-      <p className="text-muted-foreground">
-        {dir} · {t.recordingCount(recordings.length)}
-      </p>
-      {/* ponytail: placeholder list, replaced by the real list in the screen phase */}
-      <ul className="max-h-48 w-96 overflow-auto text-xs text-muted-foreground">
-        {recordings.map((r) => (
-          <li key={r.id} className="flex cursor-pointer justify-between gap-2" onClick={() => { setSelected(r.id); loadDetail(r.id); }}>
-            <span className={`truncate ${r.id === selected ? "font-semibold text-foreground" : ""}`}>{r.title || r.id}</span>
-            <span title={r.error}>
-              {statusLabel(t, r.status)}
-              {r.status === "processing" && r.duration > 0 ? ` ${Math.floor(((r.processedUntil ?? 0) / r.duration) * 100)}%` : ""} · {clock(r.duration)}
-            </span>
-          </li>
-        ))}
-      </ul>
-      {detail && (
-        <div className="w-96 text-xs">
-          {detail.meta.error && <p className="text-destructive">{detail.meta.error}</p>}
-          <Button size="sm" variant="ghost" onClick={() => Transcriber.reprocess(detail.meta.id, "").catch((e) => toast.error(String(e.message ?? e)))}>
-            {t.reprocess()}
-          </Button>
-          <ol className="max-h-40 overflow-auto">
-            {detail.transcript.segments.map((g, i) => (
-              <li key={i}>
-                <span className="text-muted-foreground">{clock(g.start)}</span> {g.text}
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-    </main>
-  );
-}
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      if (!e.metaKey && !e.ctrlKey) return;
+      if (e.key === "k") {
+        e.preventDefault();
+        setSearching((s) => !s);
+      } else if (e.key === "\\") {
+        e.preventDefault();
+        setSidebar((s) => !s);
+      }
+    };
+    window.addEventListener("keydown", on);
+    return () => window.removeEventListener("keydown", on);
+  }, []);
 
-function statusLabel(t: Messages, status: string) {
-  const labels: Record<string, () => string> = {
-    recording: t.statusRecording, importing: t.statusImporting, queued: t.statusQueued,
-    processing: t.statusProcessing, summarizing: t.statusSummarizing, done: t.statusDone, failed: t.statusFailed,
+  const pick = (h: Hit) => {
+    select(h.id);
+    setJump((j) => ({ n: (j?.n ?? 0) + 1, time: h.kind === "transcript" ? h.time : undefined, template: h.template }));
   };
-  return labels[status]?.() ?? status;
+
+  return (
+    <div className="flex h-screen text-sm">
+      <Toaster position="bottom-center" />
+      {sidebar && (
+        <Sidebar
+          recordings={recordings}
+          selected={selected}
+          onSelect={select}
+          recording={state.recording}
+          elapsed={state.elapsed}
+          level={state.level}
+          onRecord={() => (state.recording ? Recorder.stop() : Recorder.start()).catch(fail)}
+          onImport={() => Importer.importDialog().catch(fail)}
+          onSearch={() => setSearching(true)}
+          onSettings={() => setSettingsOpen(true)}
+        />
+      )}
+      <main className="flex min-w-0 flex-1 flex-col">
+        {!model.present && (
+          <div className="flex items-center gap-3 border-b bg-muted px-4 py-2">
+            <span className="flex-1">{t.errNoModel()}</span>
+            <Button size="sm" disabled={model.downloading} onClick={() => Models.download().catch(fail)}>
+              {model.downloading ? t.modelDownloading(percent) : t.modelDownload()}
+            </Button>
+          </div>
+        )}
+        <div className="min-h-0 flex-1">
+          {detail && detail.meta.id === selected ? (
+            <Detail rec={detail} templates={templates} jump={jump} live={state.recording && state.id === selected ? { levels, elapsed: state.elapsed } : null} onChanged={reload} />
+          ) : (
+            <p className="flex h-full items-center justify-center text-muted-foreground">{t.selectPrompt()}</p>
+          )}
+        </div>
+      </main>
+      <Search open={searching} onOpenChange={setSearching} onPick={pick} />
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} onChanged={() => Summarizer.templates().then(setTemplates).catch(() => {})} />
+    </div>
+  );
 }
 
 // onStopped offers to undo a recording for five seconds.
@@ -131,7 +148,7 @@ function onStopped(id: string, t: Messages) {
       onClick: () =>
         Recorder.discard(id)
           .then(() => toast(t.recordingDeleted()))
-          .catch((e) => toast.error(String(e.message ?? e))),
+          .catch(fail),
     },
   });
 }

@@ -451,3 +451,583 @@ func NotifyDone() string { return In(i18n.Locale()).NotifyDone() }
 func (msgs Messages) NotifyDone() string {
 	return Catalog.Format(msgs.locale, "notifyDone", nil)
 }
+
+// SearchPlaceholder says "タイトル・文字起こし・要約を検索…"
+// in the language the app shows.
+func SearchPlaceholder() string { return In(i18n.Locale()).SearchPlaceholder() }
+
+// SearchPlaceholder says "タイトル・文字起こし・要約を検索…"
+// in the language of msgs.
+func (msgs Messages) SearchPlaceholder() string {
+	return Catalog.Format(msgs.locale, "searchPlaceholder", nil)
+}
+
+// SearchEmpty says "見つかりません"
+// in the language the app shows.
+func SearchEmpty() string { return In(i18n.Locale()).SearchEmpty() }
+
+// SearchEmpty says "見つかりません"
+// in the language of msgs.
+func (msgs Messages) SearchEmpty() string {
+	return Catalog.Format(msgs.locale, "searchEmpty", nil)
+}
+
+// SearchTitle says "検索"
+// in the language the app shows.
+func SearchTitle() string { return In(i18n.Locale()).SearchTitle() }
+
+// SearchTitle says "検索"
+// in the language of msgs.
+func (msgs Messages) SearchTitle() string {
+	return Catalog.Format(msgs.locale, "searchTitle", nil)
+}
+
+// HitTitle says "タイトル"
+// in the language the app shows.
+func HitTitle() string { return In(i18n.Locale()).HitTitle() }
+
+// HitTitle says "タイトル"
+// in the language of msgs.
+func (msgs Messages) HitTitle() string {
+	return Catalog.Format(msgs.locale, "hitTitle", nil)
+}
+
+// HitTranscript says "文字起こし"
+// in the language the app shows.
+func HitTranscript() string { return In(i18n.Locale()).HitTranscript() }
+
+// HitTranscript says "文字起こし"
+// in the language of msgs.
+func (msgs Messages) HitTranscript() string {
+	return Catalog.Format(msgs.locale, "hitTranscript", nil)
+}
+
+// HitSummary says "要約"
+// in the language the app shows.
+func HitSummary() string { return In(i18n.Locale()).HitSummary() }
+
+// HitSummary says "要約"
+// in the language of msgs.
+func (msgs Messages) HitSummary() string {
+	return Catalog.Format(msgs.locale, "hitSummary", nil)
+}
+
+// ListEmpty says "録音がありません。録音を開始するか、音声ファイルを取り込んでください"
+// in the language the app shows.
+func ListEmpty() string { return In(i18n.Locale()).ListEmpty() }
+
+// ListEmpty says "録音がありません。録音を開始するか、音声ファイルを取り込んでください"
+// in the language of msgs.
+func (msgs Messages) ListEmpty() string {
+	return Catalog.Format(msgs.locale, "listEmpty", nil)
+}
+
+// SelectPrompt says "録音を選択してください"
+// in the language the app shows.
+func SelectPrompt() string { return In(i18n.Locale()).SelectPrompt() }
+
+// SelectPrompt says "録音を選択してください"
+// in the language of msgs.
+func (msgs Messages) SelectPrompt() string {
+	return Catalog.Format(msgs.locale, "selectPrompt", nil)
+}
+
+// DateToday says "今日"
+// in the language the app shows.
+func DateToday() string { return In(i18n.Locale()).DateToday() }
+
+// DateToday says "今日"
+// in the language of msgs.
+func (msgs Messages) DateToday() string {
+	return Catalog.Format(msgs.locale, "dateToday", nil)
+}
+
+// DateYesterday says "昨日"
+// in the language the app shows.
+func DateYesterday() string { return In(i18n.Locale()).DateYesterday() }
+
+// DateYesterday says "昨日"
+// in the language of msgs.
+func (msgs Messages) DateYesterday() string {
+	return Catalog.Format(msgs.locale, "dateYesterday", nil)
+}
+
+// TabSummary says "要約"
+// in the language the app shows.
+func TabSummary() string { return In(i18n.Locale()).TabSummary() }
+
+// TabSummary says "要約"
+// in the language of msgs.
+func (msgs Messages) TabSummary() string {
+	return Catalog.Format(msgs.locale, "tabSummary", nil)
+}
+
+// TabTranscript says "文字起こし"
+// in the language the app shows.
+func TabTranscript() string { return In(i18n.Locale()).TabTranscript() }
+
+// TabTranscript says "文字起こし"
+// in the language of msgs.
+func (msgs Messages) TabTranscript() string {
+	return Catalog.Format(msgs.locale, "tabTranscript", nil)
+}
+
+// SummaryEmpty says "まだ要約がありません"
+// in the language the app shows.
+func SummaryEmpty() string { return In(i18n.Locale()).SummaryEmpty() }
+
+// SummaryEmpty says "まだ要約がありません"
+// in the language of msgs.
+func (msgs Messages) SummaryEmpty() string {
+	return Catalog.Format(msgs.locale, "summaryEmpty", nil)
+}
+
+// SummaryWaiting says "要約待ちです"
+// in the language the app shows.
+func SummaryWaiting() string { return In(i18n.Locale()).SummaryWaiting() }
+
+// SummaryWaiting says "要約待ちです"
+// in the language of msgs.
+func (msgs Messages) SummaryWaiting() string {
+	return Catalog.Format(msgs.locale, "summaryWaiting", nil)
+}
+
+// SummaryMake says "この形式で要約"
+// in the language the app shows.
+func SummaryMake() string { return In(i18n.Locale()).SummaryMake() }
+
+// SummaryMake says "この形式で要約"
+// in the language of msgs.
+func (msgs Messages) SummaryMake() string {
+	return Catalog.Format(msgs.locale, "summaryMake", nil)
+}
+
+// SummaryRemake says "この形式で再生成"
+// in the language the app shows.
+func SummaryRemake() string { return In(i18n.Locale()).SummaryRemake() }
+
+// SummaryRemake says "この形式で再生成"
+// in the language of msgs.
+func (msgs Messages) SummaryRemake() string {
+	return Catalog.Format(msgs.locale, "summaryRemake", nil)
+}
+
+// SummaryTemplate says "テンプレート"
+// in the language the app shows.
+func SummaryTemplate() string { return In(i18n.Locale()).SummaryTemplate() }
+
+// SummaryTemplate says "テンプレート"
+// in the language of msgs.
+func (msgs Messages) SummaryTemplate() string {
+	return Catalog.Format(msgs.locale, "summaryTemplate", nil)
+}
+
+// TranscriptEmpty says "文字起こしはまだありません"
+// in the language the app shows.
+func TranscriptEmpty() string { return In(i18n.Locale()).TranscriptEmpty() }
+
+// TranscriptEmpty says "文字起こしはまだありません"
+// in the language of msgs.
+func (msgs Messages) TranscriptEmpty() string {
+	return Catalog.Format(msgs.locale, "transcriptEmpty", nil)
+}
+
+// FollowPlayback says "再生位置へ戻る"
+// in the language the app shows.
+func FollowPlayback() string { return In(i18n.Locale()).FollowPlayback() }
+
+// FollowPlayback says "再生位置へ戻る"
+// in the language of msgs.
+func (msgs Messages) FollowPlayback() string {
+	return Catalog.Format(msgs.locale, "followPlayback", nil)
+}
+
+// Retry says "再試行"
+// in the language the app shows.
+func Retry() string { return In(i18n.Locale()).Retry() }
+
+// Retry says "再試行"
+// in the language of msgs.
+func (msgs Messages) Retry() string {
+	return Catalog.Format(msgs.locale, "retry", nil)
+}
+
+// ProcessLocal says "ローカルで処理"
+// in the language the app shows.
+func ProcessLocal() string { return In(i18n.Locale()).ProcessLocal() }
+
+// ProcessLocal says "ローカルで処理"
+// in the language of msgs.
+func (msgs Messages) ProcessLocal() string {
+	return Catalog.Format(msgs.locale, "processLocal", nil)
+}
+
+// ProcessWith says "エンジン"
+// in the language the app shows.
+func ProcessWith() string { return In(i18n.Locale()).ProcessWith() }
+
+// ProcessWith says "エンジン"
+// in the language of msgs.
+func (msgs Messages) ProcessWith() string {
+	return Catalog.Format(msgs.locale, "processWith", nil)
+}
+
+// Language says "言語"
+// in the language the app shows.
+func Language() string { return In(i18n.Locale()).Language() }
+
+// Language says "言語"
+// in the language of msgs.
+func (msgs Messages) Language() string {
+	return Catalog.Format(msgs.locale, "language", nil)
+}
+
+// LanguageAuto says "自動判定"
+// in the language the app shows.
+func LanguageAuto() string { return In(i18n.Locale()).LanguageAuto() }
+
+// LanguageAuto says "自動判定"
+// in the language of msgs.
+func (msgs Messages) LanguageAuto() string {
+	return Catalog.Format(msgs.locale, "languageAuto", nil)
+}
+
+// LanguageJa says "日本語"
+// in the language the app shows.
+func LanguageJa() string { return In(i18n.Locale()).LanguageJa() }
+
+// LanguageJa says "日本語"
+// in the language of msgs.
+func (msgs Messages) LanguageJa() string {
+	return Catalog.Format(msgs.locale, "languageJa", nil)
+}
+
+// LanguageEn says "英語"
+// in the language the app shows.
+func LanguageEn() string { return In(i18n.Locale()).LanguageEn() }
+
+// LanguageEn says "英語"
+// in the language of msgs.
+func (msgs Messages) LanguageEn() string {
+	return Catalog.Format(msgs.locale, "languageEn", nil)
+}
+
+// PlaybackSpeed says "再生速度"
+// in the language the app shows.
+func PlaybackSpeed() string { return In(i18n.Locale()).PlaybackSpeed() }
+
+// PlaybackSpeed says "再生速度"
+// in the language of msgs.
+func (msgs Messages) PlaybackSpeed() string {
+	return Catalog.Format(msgs.locale, "playbackSpeed", nil)
+}
+
+// NoAudio says "音声がまだありません"
+// in the language the app shows.
+func NoAudio() string { return In(i18n.Locale()).NoAudio() }
+
+// NoAudio says "音声がまだありません"
+// in the language of msgs.
+func (msgs Messages) NoAudio() string {
+	return Catalog.Format(msgs.locale, "noAudio", nil)
+}
+
+// Settings says "設定"
+// in the language the app shows.
+func Settings() string { return In(i18n.Locale()).Settings() }
+
+// Settings says "設定"
+// in the language of msgs.
+func (msgs Messages) Settings() string {
+	return Catalog.Format(msgs.locale, "settings", nil)
+}
+
+// SettingsTranscribe says "文字起こし"
+// in the language the app shows.
+func SettingsTranscribe() string { return In(i18n.Locale()).SettingsTranscribe() }
+
+// SettingsTranscribe says "文字起こし"
+// in the language of msgs.
+func (msgs Messages) SettingsTranscribe() string {
+	return Catalog.Format(msgs.locale, "settingsTranscribe", nil)
+}
+
+// SettingsSummarize says "要約"
+// in the language the app shows.
+func SettingsSummarize() string { return In(i18n.Locale()).SettingsSummarize() }
+
+// SettingsSummarize says "要約"
+// in the language of msgs.
+func (msgs Messages) SettingsSummarize() string {
+	return Catalog.Format(msgs.locale, "settingsSummarize", nil)
+}
+
+// SettingsKeys says "API キー"
+// in the language the app shows.
+func SettingsKeys() string { return In(i18n.Locale()).SettingsKeys() }
+
+// SettingsKeys says "API キー"
+// in the language of msgs.
+func (msgs Messages) SettingsKeys() string {
+	return Catalog.Format(msgs.locale, "settingsKeys", nil)
+}
+
+// EngineLocal says "ローカル（Whisper）"
+// in the language the app shows.
+func EngineLocal() string { return In(i18n.Locale()).EngineLocal() }
+
+// EngineLocal says "ローカル（Whisper）"
+// in the language of msgs.
+func (msgs Messages) EngineLocal() string {
+	return Catalog.Format(msgs.locale, "engineLocal", nil)
+}
+
+// EngineOpenRouter says "OpenRouter"
+// in the language the app shows.
+func EngineOpenRouter() string { return In(i18n.Locale()).EngineOpenRouter() }
+
+// EngineOpenRouter says "OpenRouter"
+// in the language of msgs.
+func (msgs Messages) EngineOpenRouter() string {
+	return Catalog.Format(msgs.locale, "engineOpenRouter", nil)
+}
+
+// EngineCompat says "OpenAI 互換 URL"
+// in the language the app shows.
+func EngineCompat() string { return In(i18n.Locale()).EngineCompat() }
+
+// EngineCompat says "OpenAI 互換 URL"
+// in the language of msgs.
+func (msgs Messages) EngineCompat() string {
+	return Catalog.Format(msgs.locale, "engineCompat", nil)
+}
+
+// Model says "モデル"
+// in the language the app shows.
+func Model() string { return In(i18n.Locale()).Model() }
+
+// Model says "モデル"
+// in the language of msgs.
+func (msgs Messages) Model() string {
+	return Catalog.Format(msgs.locale, "model", nil)
+}
+
+// ModelDefault says "既定"
+// in the language the app shows.
+func ModelDefault() string { return In(i18n.Locale()).ModelDefault() }
+
+// ModelDefault says "既定"
+// in the language of msgs.
+func (msgs Messages) ModelDefault() string {
+	return Catalog.Format(msgs.locale, "modelDefault", nil)
+}
+
+// BaseUrl says "サーバー URL"
+// in the language the app shows.
+func BaseUrl() string { return In(i18n.Locale()).BaseUrl() }
+
+// BaseUrl says "サーバー URL"
+// in the language of msgs.
+func (msgs Messages) BaseUrl() string {
+	return Catalog.Format(msgs.locale, "baseUrl", nil)
+}
+
+// ApiKeyOpenRouter says "OpenRouter の API キー"
+// in the language the app shows.
+func ApiKeyOpenRouter() string { return In(i18n.Locale()).ApiKeyOpenRouter() }
+
+// ApiKeyOpenRouter says "OpenRouter の API キー"
+// in the language of msgs.
+func (msgs Messages) ApiKeyOpenRouter() string {
+	return Catalog.Format(msgs.locale, "apiKeyOpenRouter", nil)
+}
+
+// ApiKeyCompat says "OpenAI 互換サーバーの API キー（任意）"
+// in the language the app shows.
+func ApiKeyCompat() string { return In(i18n.Locale()).ApiKeyCompat() }
+
+// ApiKeyCompat says "OpenAI 互換サーバーの API キー（任意）"
+// in the language of msgs.
+func (msgs Messages) ApiKeyCompat() string {
+	return Catalog.Format(msgs.locale, "apiKeyCompat", nil)
+}
+
+// KeySaved says "保存済み"
+// in the language the app shows.
+func KeySaved() string { return In(i18n.Locale()).KeySaved() }
+
+// KeySaved says "保存済み"
+// in the language of msgs.
+func (msgs Messages) KeySaved() string {
+	return Catalog.Format(msgs.locale, "keySaved", nil)
+}
+
+// KeyNotSet says "未設定"
+// in the language the app shows.
+func KeyNotSet() string { return In(i18n.Locale()).KeyNotSet() }
+
+// KeyNotSet says "未設定"
+// in the language of msgs.
+func (msgs Messages) KeyNotSet() string {
+	return Catalog.Format(msgs.locale, "keyNotSet", nil)
+}
+
+// KeySave says "保存"
+// in the language the app shows.
+func KeySave() string { return In(i18n.Locale()).KeySave() }
+
+// KeySave says "保存"
+// in the language of msgs.
+func (msgs Messages) KeySave() string {
+	return Catalog.Format(msgs.locale, "keySave", nil)
+}
+
+// KeyDelete says "削除"
+// in the language the app shows.
+func KeyDelete() string { return In(i18n.Locale()).KeyDelete() }
+
+// KeyDelete says "削除"
+// in the language of msgs.
+func (msgs Messages) KeyDelete() string {
+	return Catalog.Format(msgs.locale, "keyDelete", nil)
+}
+
+// LibraryDir says "保存先"
+// in the language the app shows.
+func LibraryDir() string { return In(i18n.Locale()).LibraryDir() }
+
+// LibraryDir says "保存先"
+// in the language of msgs.
+func (msgs Messages) LibraryDir() string {
+	return Catalog.Format(msgs.locale, "libraryDir", nil)
+}
+
+// ChooseFolder says "変更…"
+// in the language the app shows.
+func ChooseFolder() string { return In(i18n.Locale()).ChooseFolder() }
+
+// ChooseFolder says "変更…"
+// in the language of msgs.
+func (msgs Messages) ChooseFolder() string {
+	return Catalog.Format(msgs.locale, "chooseFolder", nil)
+}
+
+// LocalOnly says "ローカル限定"
+// in the language the app shows.
+func LocalOnly() string { return In(i18n.Locale()).LocalOnly() }
+
+// LocalOnly says "ローカル限定"
+// in the language of msgs.
+func (msgs Messages) LocalOnly() string {
+	return Catalog.Format(msgs.locale, "localOnly", nil)
+}
+
+// LocalOnlyHint says "オンの間は、録音・文字起こし・要約をクラウドへ送りません"
+// in the language the app shows.
+func LocalOnlyHint() string { return In(i18n.Locale()).LocalOnlyHint() }
+
+// LocalOnlyHint says "オンの間は、録音・文字起こし・要約をクラウドへ送りません"
+// in the language of msgs.
+func (msgs Messages) LocalOnlyHint() string {
+	return Catalog.Format(msgs.locale, "localOnlyHint", nil)
+}
+
+// DefaultTemplate says "自動要約のテンプレート"
+// in the language the app shows.
+func DefaultTemplate() string { return In(i18n.Locale()).DefaultTemplate() }
+
+// DefaultTemplate says "自動要約のテンプレート"
+// in the language of msgs.
+func (msgs Messages) DefaultTemplate() string {
+	return Catalog.Format(msgs.locale, "defaultTemplate", nil)
+}
+
+// DetectOllama says "Ollama を検出"
+// in the language the app shows.
+func DetectOllama() string { return In(i18n.Locale()).DetectOllama() }
+
+// DetectOllama says "Ollama を検出"
+// in the language of msgs.
+func (msgs Messages) DetectOllama() string {
+	return Catalog.Format(msgs.locale, "detectOllama", nil)
+}
+
+// OllamaNone says "Ollama が見つかりません"
+// in the language the app shows.
+func OllamaNone() string { return In(i18n.Locale()).OllamaNone() }
+
+// OllamaNone says "Ollama が見つかりません"
+// in the language of msgs.
+func (msgs Messages) OllamaNone() string {
+	return Catalog.Format(msgs.locale, "ollamaNone", nil)
+}
+
+// OllamaPick says "Ollama のモデルを選ぶ"
+// in the language the app shows.
+func OllamaPick() string { return In(i18n.Locale()).OllamaPick() }
+
+// OllamaPick says "Ollama のモデルを選ぶ"
+// in the language of msgs.
+func (msgs Messages) OllamaPick() string {
+	return Catalog.Format(msgs.locale, "ollamaPick", nil)
+}
+
+// Close says "閉じる"
+// in the language the app shows.
+func Close() string { return In(i18n.Locale()).Close() }
+
+// Close says "閉じる"
+// in the language of msgs.
+func (msgs Messages) Close() string {
+	return Catalog.Format(msgs.locale, "close", nil)
+}
+
+// ToggleSidebar says "サイドバーの表示切り替え"
+// in the language the app shows.
+func ToggleSidebar() string { return In(i18n.Locale()).ToggleSidebar() }
+
+// ToggleSidebar says "サイドバーの表示切り替え"
+// in the language of msgs.
+func (msgs Messages) ToggleSidebar() string {
+	return Catalog.Format(msgs.locale, "toggleSidebar", nil)
+}
+
+// LiveRecording says "録音中…"
+// in the language the app shows.
+func LiveRecording() string { return In(i18n.Locale()).LiveRecording() }
+
+// LiveRecording says "録音中…"
+// in the language of msgs.
+func (msgs Messages) LiveRecording() string {
+	return Catalog.Format(msgs.locale, "liveRecording", nil)
+}
+
+// Engine says "エンジン"
+// in the language the app shows.
+func Engine() string { return In(i18n.Locale()).Engine() }
+
+// Engine says "エンジン"
+// in the language of msgs.
+func (msgs Messages) Engine() string {
+	return Catalog.Format(msgs.locale, "engine", nil)
+}
+
+// Copy says "コピー"
+// in the language the app shows.
+func Copy() string { return In(i18n.Locale()).Copy() }
+
+// Copy says "コピー"
+// in the language of msgs.
+func (msgs Messages) Copy() string {
+	return Catalog.Format(msgs.locale, "copy", nil)
+}
+
+// StatusProcessingPercent says "処理中 {pct}%"
+// in the language the app shows.
+func StatusProcessingPercent(pct int) string { return In(i18n.Locale()).StatusProcessingPercent(pct) }
+
+// StatusProcessingPercent says "処理中 {pct}%"
+// in the language of msgs.
+func (msgs Messages) StatusProcessingPercent(pct int) string {
+	return Catalog.Format(msgs.locale, "statusProcessingPercent", map[string]any{"pct": pct})
+}

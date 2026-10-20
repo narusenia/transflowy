@@ -171,6 +171,238 @@ export interface Messages {
    * `要約が完成しました`
    */
   notifyDone(): string;
+  /**
+   * `タイトル・文字起こし・要約を検索…`
+   */
+  searchPlaceholder(): string;
+  /**
+   * `見つかりません`
+   */
+  searchEmpty(): string;
+  /**
+   * `検索`
+   */
+  searchTitle(): string;
+  /**
+   * `タイトル`
+   */
+  hitTitle(): string;
+  /**
+   * `文字起こし`
+   */
+  hitTranscript(): string;
+  /**
+   * `要約`
+   */
+  hitSummary(): string;
+  /**
+   * `録音がありません。録音を開始するか、音声ファイルを取り込んでください`
+   */
+  listEmpty(): string;
+  /**
+   * `録音を選択してください`
+   */
+  selectPrompt(): string;
+  /**
+   * `今日`
+   */
+  dateToday(): string;
+  /**
+   * `昨日`
+   */
+  dateYesterday(): string;
+  /**
+   * `要約`
+   */
+  tabSummary(): string;
+  /**
+   * `文字起こし`
+   */
+  tabTranscript(): string;
+  /**
+   * `まだ要約がありません`
+   */
+  summaryEmpty(): string;
+  /**
+   * `要約待ちです`
+   */
+  summaryWaiting(): string;
+  /**
+   * `この形式で要約`
+   */
+  summaryMake(): string;
+  /**
+   * `この形式で再生成`
+   */
+  summaryRemake(): string;
+  /**
+   * `テンプレート`
+   */
+  summaryTemplate(): string;
+  /**
+   * `文字起こしはまだありません`
+   */
+  transcriptEmpty(): string;
+  /**
+   * `再生位置へ戻る`
+   */
+  followPlayback(): string;
+  /**
+   * `再試行`
+   */
+  retry(): string;
+  /**
+   * `ローカルで処理`
+   */
+  processLocal(): string;
+  /**
+   * `エンジン`
+   */
+  processWith(): string;
+  /**
+   * `言語`
+   */
+  language(): string;
+  /**
+   * `自動判定`
+   */
+  languageAuto(): string;
+  /**
+   * `日本語`
+   */
+  languageJa(): string;
+  /**
+   * `英語`
+   */
+  languageEn(): string;
+  /**
+   * `再生速度`
+   */
+  playbackSpeed(): string;
+  /**
+   * `音声がまだありません`
+   */
+  noAudio(): string;
+  /**
+   * `設定`
+   */
+  settings(): string;
+  /**
+   * `文字起こし`
+   */
+  settingsTranscribe(): string;
+  /**
+   * `要約`
+   */
+  settingsSummarize(): string;
+  /**
+   * `API キー`
+   */
+  settingsKeys(): string;
+  /**
+   * `ローカル（Whisper）`
+   */
+  engineLocal(): string;
+  /**
+   * `OpenRouter`
+   */
+  engineOpenRouter(): string;
+  /**
+   * `OpenAI 互換 URL`
+   */
+  engineCompat(): string;
+  /**
+   * `モデル`
+   */
+  model(): string;
+  /**
+   * `既定`
+   */
+  modelDefault(): string;
+  /**
+   * `サーバー URL`
+   */
+  baseUrl(): string;
+  /**
+   * `OpenRouter の API キー`
+   */
+  apiKeyOpenRouter(): string;
+  /**
+   * `OpenAI 互換サーバーの API キー（任意）`
+   */
+  apiKeyCompat(): string;
+  /**
+   * `保存済み`
+   */
+  keySaved(): string;
+  /**
+   * `未設定`
+   */
+  keyNotSet(): string;
+  /**
+   * `保存`
+   */
+  keySave(): string;
+  /**
+   * `削除`
+   */
+  keyDelete(): string;
+  /**
+   * `保存先`
+   */
+  libraryDir(): string;
+  /**
+   * `変更…`
+   */
+  chooseFolder(): string;
+  /**
+   * `ローカル限定`
+   */
+  localOnly(): string;
+  /**
+   * `オンの間は、録音・文字起こし・要約をクラウドへ送りません`
+   */
+  localOnlyHint(): string;
+  /**
+   * `自動要約のテンプレート`
+   */
+  defaultTemplate(): string;
+  /**
+   * `Ollama を検出`
+   */
+  detectOllama(): string;
+  /**
+   * `Ollama が見つかりません`
+   */
+  ollamaNone(): string;
+  /**
+   * `Ollama のモデルを選ぶ`
+   */
+  ollamaPick(): string;
+  /**
+   * `閉じる`
+   */
+  close(): string;
+  /**
+   * `サイドバーの表示切り替え`
+   */
+  toggleSidebar(): string;
+  /**
+   * `録音中…`
+   */
+  liveRecording(): string;
+  /**
+   * `エンジン`
+   */
+  engine(): string;
+  /**
+   * `コピー`
+   */
+  copy(): string;
+  /**
+   * `処理中 {pct}%`
+   */
+  statusProcessingPercent(pct: number): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -222,6 +454,64 @@ const catalog = createCatalog<Messages>({
     "errNoTemplate": ["name"],
     "statusSummarizing": [],
     "notifyDone": [],
+    "searchPlaceholder": [],
+    "searchEmpty": [],
+    "searchTitle": [],
+    "hitTitle": [],
+    "hitTranscript": [],
+    "hitSummary": [],
+    "listEmpty": [],
+    "selectPrompt": [],
+    "dateToday": [],
+    "dateYesterday": [],
+    "tabSummary": [],
+    "tabTranscript": [],
+    "summaryEmpty": [],
+    "summaryWaiting": [],
+    "summaryMake": [],
+    "summaryRemake": [],
+    "summaryTemplate": [],
+    "transcriptEmpty": [],
+    "followPlayback": [],
+    "retry": [],
+    "processLocal": [],
+    "processWith": [],
+    "language": [],
+    "languageAuto": [],
+    "languageJa": [],
+    "languageEn": [],
+    "playbackSpeed": [],
+    "noAudio": [],
+    "settings": [],
+    "settingsTranscribe": [],
+    "settingsSummarize": [],
+    "settingsKeys": [],
+    "engineLocal": [],
+    "engineOpenRouter": [],
+    "engineCompat": [],
+    "model": [],
+    "modelDefault": [],
+    "baseUrl": [],
+    "apiKeyOpenRouter": [],
+    "apiKeyCompat": [],
+    "keySaved": [],
+    "keyNotSet": [],
+    "keySave": [],
+    "keyDelete": [],
+    "libraryDir": [],
+    "chooseFolder": [],
+    "localOnly": [],
+    "localOnlyHint": [],
+    "defaultTemplate": [],
+    "detectOllama": [],
+    "ollamaNone": [],
+    "ollamaPick": [],
+    "close": [],
+    "toggleSidebar": [],
+    "liveRecording": [],
+    "engine": [],
+    "copy": [],
+    "statusProcessingPercent": ["pct"],
   },
   messages: {
     "ja": {
@@ -267,6 +557,64 @@ const catalog = createCatalog<Messages>({
       "errNoTemplate": "テンプレート「{name}」が見つかりません",
       "statusSummarizing": "要約待ち",
       "notifyDone": "要約が完成しました",
+      "searchPlaceholder": "タイトル・文字起こし・要約を検索…",
+      "searchEmpty": "見つかりません",
+      "searchTitle": "検索",
+      "hitTitle": "タイトル",
+      "hitTranscript": "文字起こし",
+      "hitSummary": "要約",
+      "listEmpty": "録音がありません。録音を開始するか、音声ファイルを取り込んでください",
+      "selectPrompt": "録音を選択してください",
+      "dateToday": "今日",
+      "dateYesterday": "昨日",
+      "tabSummary": "要約",
+      "tabTranscript": "文字起こし",
+      "summaryEmpty": "まだ要約がありません",
+      "summaryWaiting": "要約待ちです",
+      "summaryMake": "この形式で要約",
+      "summaryRemake": "この形式で再生成",
+      "summaryTemplate": "テンプレート",
+      "transcriptEmpty": "文字起こしはまだありません",
+      "followPlayback": "再生位置へ戻る",
+      "retry": "再試行",
+      "processLocal": "ローカルで処理",
+      "processWith": "エンジン",
+      "language": "言語",
+      "languageAuto": "自動判定",
+      "languageJa": "日本語",
+      "languageEn": "英語",
+      "playbackSpeed": "再生速度",
+      "noAudio": "音声がまだありません",
+      "settings": "設定",
+      "settingsTranscribe": "文字起こし",
+      "settingsSummarize": "要約",
+      "settingsKeys": "API キー",
+      "engineLocal": "ローカル（Whisper）",
+      "engineOpenRouter": "OpenRouter",
+      "engineCompat": "OpenAI 互換 URL",
+      "model": "モデル",
+      "modelDefault": "既定",
+      "baseUrl": "サーバー URL",
+      "apiKeyOpenRouter": "OpenRouter の API キー",
+      "apiKeyCompat": "OpenAI 互換サーバーの API キー（任意）",
+      "keySaved": "保存済み",
+      "keyNotSet": "未設定",
+      "keySave": "保存",
+      "keyDelete": "削除",
+      "libraryDir": "保存先",
+      "chooseFolder": "変更…",
+      "localOnly": "ローカル限定",
+      "localOnlyHint": "オンの間は、録音・文字起こし・要約をクラウドへ送りません",
+      "defaultTemplate": "自動要約のテンプレート",
+      "detectOllama": "Ollama を検出",
+      "ollamaNone": "Ollama が見つかりません",
+      "ollamaPick": "Ollama のモデルを選ぶ",
+      "close": "閉じる",
+      "toggleSidebar": "サイドバーの表示切り替え",
+      "liveRecording": "録音中…",
+      "engine": "エンジン",
+      "copy": "コピー",
+      "statusProcessingPercent": "処理中 {pct}%",
     },
   },
 });
