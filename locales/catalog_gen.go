@@ -1851,3 +1851,103 @@ func WarnSystemAudio(detail string) string { return In(i18n.Locale()).WarnSystem
 func (msgs Messages) WarnSystemAudio(detail string) string {
 	return Catalog.Format(msgs.locale, "warnSystemAudio", map[string]any{"detail": detail})
 }
+
+// ErrNoSpeakerModel says "話者分離のモデルがまだダウンロードされていません（設定でダウンロードできます）"
+// in the language the app shows.
+func ErrNoSpeakerModel() string { return In(i18n.Locale()).ErrNoSpeakerModel() }
+
+// ErrNoSpeakerModel says "話者分離のモデルがまだダウンロードされていません（設定でダウンロードできます）"
+// in the language of msgs.
+func (msgs Messages) ErrNoSpeakerModel() string {
+	return Catalog.Format(msgs.locale, "errNoSpeakerModel", nil)
+}
+
+// ErrDiarizeUnsupported says "この OS ではローカルの話者分離を使えません"
+// in the language the app shows.
+func ErrDiarizeUnsupported() string { return In(i18n.Locale()).ErrDiarizeUnsupported() }
+
+// ErrDiarizeUnsupported says "この OS ではローカルの話者分離を使えません"
+// in the language of msgs.
+func (msgs Messages) ErrDiarizeUnsupported() string {
+	return Catalog.Format(msgs.locale, "errDiarizeUnsupported", nil)
+}
+
+// StatusDiarizing says "話者分離中"
+// in the language the app shows.
+func StatusDiarizing() string { return In(i18n.Locale()).StatusDiarizing() }
+
+// StatusDiarizing says "話者分離中"
+// in the language of msgs.
+func (msgs Messages) StatusDiarizing() string {
+	return Catalog.Format(msgs.locale, "statusDiarizing", nil)
+}
+
+// SettingsDiarization says "話者分離"
+// in the language the app shows.
+func SettingsDiarization() string { return In(i18n.Locale()).SettingsDiarization() }
+
+// SettingsDiarization says "話者分離"
+// in the language of msgs.
+func (msgs Messages) SettingsDiarization() string {
+	return Catalog.Format(msgs.locale, "settingsDiarization", nil)
+}
+
+// LocalDiarization says "ローカルで話者分離"
+// in the language the app shows.
+func LocalDiarization() string { return In(i18n.Locale()).LocalDiarization() }
+
+// LocalDiarization says "ローカルで話者分離"
+// in the language of msgs.
+func (msgs Messages) LocalDiarization() string {
+	return Catalog.Format(msgs.locale, "localDiarization", nil)
+}
+
+// LocalDiarizationHint says "ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 …"
+// in the language the app shows.
+func LocalDiarizationHint() string { return In(i18n.Locale()).LocalDiarizationHint() }
+
+// LocalDiarizationHint says "ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 …"
+// in the language of msgs.
+func (msgs Messages) LocalDiarizationHint() string {
+	return Catalog.Format(msgs.locale, "localDiarizationHint", nil)
+}
+
+// SpeakerModelDownload says "モデルをダウンロード（約 45MB）"
+// in the language the app shows.
+func SpeakerModelDownload() string { return In(i18n.Locale()).SpeakerModelDownload() }
+
+// SpeakerModelDownload says "モデルをダウンロード（約 45MB）"
+// in the language of msgs.
+func (msgs Messages) SpeakerModelDownload() string {
+	return Catalog.Format(msgs.locale, "speakerModelDownload", nil)
+}
+
+// SpeakerModelReady says "モデルは準備できています"
+// in the language the app shows.
+func SpeakerModelReady() string { return In(i18n.Locale()).SpeakerModelReady() }
+
+// SpeakerModelReady says "モデルは準備できています"
+// in the language of msgs.
+func (msgs Messages) SpeakerModelReady() string {
+	return Catalog.Format(msgs.locale, "speakerModelReady", nil)
+}
+
+// SpeakerModelProgress says "ダウンロード中 {pct}%"
+// in the language the app shows.
+func SpeakerModelProgress(pct int) string { return In(i18n.Locale()).SpeakerModelProgress(pct) }
+
+// SpeakerModelProgress says "ダウンロード中 {pct}%"
+// in the language of msgs.
+func (msgs Messages) SpeakerModelProgress(pct int) string {
+	return Catalog.Format(msgs.locale, "speakerModelProgress", map[string]any{"pct": pct})
+}
+
+// DiarizeAgain says "話者分離をやり直す"
+// in the language the app shows.
+func DiarizeAgain() string { return In(i18n.Locale()).DiarizeAgain() }
+
+// DiarizeAgain says "話者分離をやり直す"
+// in the language of msgs.
+func (msgs Messages) DiarizeAgain() string {
+	return Catalog.Format(msgs.locale, "diarizeAgain", nil)
+}

@@ -61,6 +61,7 @@ func main() {
 		Store:       store,
 		Engine:      engines.Build,
 		Phrases:     phrases(cfg),
+		Diarizer:    engines.Diarizer,
 		Changed:     changed,
 		Transcribed: func(id string) { sumQueue.Enqueue(id, "") },
 	})

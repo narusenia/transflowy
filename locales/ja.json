@@ -293,5 +293,22 @@
         "type": "String"
       }
     }
-  }
+  },
+  "errNoSpeakerModel": "話者分離のモデルがまだダウンロードされていません（設定でダウンロードできます）",
+  "errDiarizeUnsupported": "この OS ではローカルの話者分離を使えません",
+  "statusDiarizing": "話者分離中",
+  "settingsDiarization": "話者分離",
+  "localDiarization": "ローカルで話者分離",
+  "localDiarizationHint": "ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 分かかります。クラウドの文字起こしは、自分で話者を分けます",
+  "speakerModelDownload": "モデルをダウンロード（約 45MB）",
+  "speakerModelReady": "モデルは準備できています",
+  "speakerModelProgress": "ダウンロード中 {pct}%",
+  "@speakerModelProgress": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "diarizeAgain": "話者分離をやり直す"
 }

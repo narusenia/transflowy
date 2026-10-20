@@ -33,6 +33,9 @@ type Settings struct {
 	Template string `json:"template"`
 	// LocalOnly forbids every request to a cloud provider.
 	LocalOnly bool `json:"localOnly"`
+	// LocalDiarization tells the voices apart on this machine after a local
+	// transcription (the cloud engine does it itself). Needs the speaker models.
+	LocalDiarization bool `json:"localDiarization"`
 	// CaptureSystem also records what the computer plays (macOS 14.2+): the
 	// other side of a call, as a second track.
 	CaptureSystem bool `json:"captureSystem"`

@@ -731,6 +731,46 @@ export interface Messages {
    * `システム音声を録音できませんでした（マイクだけ録音します）: {detail}`
    */
   warnSystemAudio(detail: string): string;
+  /**
+   * `話者分離のモデルがまだダウンロードされていません（設定でダウンロードできます）`
+   */
+  errNoSpeakerModel(): string;
+  /**
+   * `この OS ではローカルの話者分離を使えません`
+   */
+  errDiarizeUnsupported(): string;
+  /**
+   * `話者分離中`
+   */
+  statusDiarizing(): string;
+  /**
+   * `話者分離`
+   */
+  settingsDiarization(): string;
+  /**
+   * `ローカルで話者分離`
+   */
+  localDiarization(): string;
+  /**
+   * `ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 分かかります。クラウドの文字起こしは、自分で話者を分けます`
+   */
+  localDiarizationHint(): string;
+  /**
+   * `モデルをダウンロード（約 45MB）`
+   */
+  speakerModelDownload(): string;
+  /**
+   * `モデルは準備できています`
+   */
+  speakerModelReady(): string;
+  /**
+   * `ダウンロード中 {pct}%`
+   */
+  speakerModelProgress(pct: number): string;
+  /**
+   * `話者分離をやり直す`
+   */
+  diarizeAgain(): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -922,6 +962,16 @@ const catalog = createCatalog<Messages>({
     "captureSystem": [],
     "captureSystemHint": [],
     "warnSystemAudio": ["detail"],
+    "errNoSpeakerModel": [],
+    "errDiarizeUnsupported": [],
+    "statusDiarizing": [],
+    "settingsDiarization": [],
+    "localDiarization": [],
+    "localDiarizationHint": [],
+    "speakerModelDownload": [],
+    "speakerModelReady": [],
+    "speakerModelProgress": ["pct"],
+    "diarizeAgain": [],
   },
   messages: {
     "ja": {
@@ -1107,6 +1157,16 @@ const catalog = createCatalog<Messages>({
       "captureSystem": "システム音声も録音",
       "captureSystemHint": "Zoom や Meet の相手の声など、Mac から出る音を別トラックで録音します",
       "warnSystemAudio": "システム音声を録音できませんでした（マイクだけ録音します）: {detail}",
+      "errNoSpeakerModel": "話者分離のモデルがまだダウンロードされていません（設定でダウンロードできます）",
+      "errDiarizeUnsupported": "この OS ではローカルの話者分離を使えません",
+      "statusDiarizing": "話者分離中",
+      "settingsDiarization": "話者分離",
+      "localDiarization": "ローカルで話者分離",
+      "localDiarizationHint": "ローカルの文字起こしで話者を分けます。録音 1 時間につき約 6 分かかります。クラウドの文字起こしは、自分で話者を分けます",
+      "speakerModelDownload": "モデルをダウンロード（約 45MB）",
+      "speakerModelReady": "モデルは準備できています",
+      "speakerModelProgress": "ダウンロード中 {pct}%",
+      "diarizeAgain": "話者分離をやり直す",
     },
   },
 });

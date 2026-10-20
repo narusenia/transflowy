@@ -51,3 +51,21 @@ func (t *Transcriber) SetLanguage(id, lang string) error {
 	_, err = library.Store{Root: s.LibraryDir}.UpdateMeta(id, func(m *library.Meta) { m.Language = lang })
 	return err
 }
+
+// Diarize tells the voices apart again in a transcribed recording with the
+// local models; the text stays as it is.
+func (t *Transcriber) Diarize(id string) error {
+	s, err := t.cfg.Get()
+	if err != nil {
+		return err
+	}
+	rec, err := (library.Store{Root: s.LibraryDir}).Get(id)
+	if err != nil {
+		return err
+	}
+	if rec.Meta.Status != library.StatusDone {
+		return errors.New("the transcript is not finished")
+	}
+	t.queue.Diarize(id)
+	return nil
+}

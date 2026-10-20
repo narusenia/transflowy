@@ -48,8 +48,12 @@ export interface MicResult {
   heard: boolean;
 }
 
-/** ModelProgress is sent while the local model downloads. */
+/**
+ * ModelProgress is sent while a model downloads. Kind is "whisper" (the
+ * transcription model) or "speaker" (the two speaker diarization models).
+ */
 export interface ModelProgress {
+  kind: string;
   /** downloading, done, failed */
   state: string;
   done: number;
@@ -57,10 +61,12 @@ export interface ModelProgress {
   error?: string;
 }
 
-/** ModelStatus tells the page whether the local model is there. */
+/** ModelStatus tells the page which local models are there. */
 export interface ModelStatus {
   present: boolean;
   downloading: boolean;
+  speakerPresent: boolean;
+  speakerDownloading: boolean;
 }
 
 /** Provider picks the engine for one job (transcribe or summarize). */
@@ -105,6 +111,11 @@ export interface Settings {
   template: string;
   /** LocalOnly forbids every request to a cloud provider. */
   localOnly: boolean;
+  /**
+   * LocalDiarization tells the voices apart on this machine after a local
+   * transcription (the cloud engine does it itself). Needs the speaker models.
+   */
+  localDiarization: boolean;
   /**
    * CaptureSystem also records what the computer plays (macOS 14.2+): the
    * other side of a call, as a second track.
@@ -267,6 +278,13 @@ export const Importer = {
 /** Transcriber is callable from the page. */
 export const Transcriber = {
   /**
+   * Diarize tells the voices apart again in a transcribed recording with the
+   * local models; the text stays as it is.
+   */
+  diarize(id: string): Promise<void> {
+    return call("Transcriber.Diarize", id);
+  },
+  /**
    * Reprocess transcribes a recording again from the start. kind names the
    * engine for this run ("local", "openrouter", "openai-compat"); "" uses the
    * setting. It is also the retry after a failure.
@@ -340,14 +358,18 @@ export const Summarizer = {
 /** Models is callable from the page. */
 export const Models = {
   /**
-   * Download starts the download in the background and returns at once;
-   * progress arrives as modelChanged events. A second call while one runs does
-   * nothing.
+   * Download starts the transcription model's download in the background and
+   * returns at once; progress arrives as modelChanged events. A second call
+   * while one runs does nothing.
    */
   download(): Promise<void> {
     return call("Models.Download");
   },
-  /** Status reports whether the model is downloaded or downloading. */
+  /** DownloadSpeaker does the same for the speaker diarization models (about 45 MB). */
+  downloadSpeaker(): Promise<void> {
+    return call("Models.DownloadSpeaker");
+  },
+  /** Status reports which models are downloaded or downloading. */
   status(): Promise<ModelStatus> {
     return call("Models.Status");
   },

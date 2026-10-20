@@ -235,7 +235,9 @@ func (q *Queue) process(ctx context.Context, req request) {
 			return
 		}
 	}
-	q.diarizeLocal(ctx, st, id, tracks, true)
+	if !job.Diarize { // an engine that told the voices apart itself is not asked again
+		q.diarizeLocal(ctx, st, id, tracks, true)
+	}
 	q.finish(st, id, dir)
 }
 
