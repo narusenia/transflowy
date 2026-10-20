@@ -12,6 +12,10 @@ export default defineConfig({
   frontendDist: "dist",
   bindings: "src/mygo.ts",
   out: "build",
+  // Files dropped on the Dock icon, or opened with the app, are imported.
+  fileAssociations: [
+    { ext: ["m4a", "mp3", "wav", "aac", "caf", "aiff", "aif", "flac", "mp4", "mov", "m4v"], name: "Audio / Video", role: "Viewer" },
+  ],
   // Messages live in locales/<tag>.json; Japanese is the source, others fall back to it.
   i18n: { dir: "locales", source: "ja" },
   macos: {

@@ -29,7 +29,9 @@ func main() {
 	rec := &Recorder{cfg: cfg}
 	mygo.BindAs("Settings", cfg)
 	mygo.BindAs("Library", &Library{cfg: cfg})
+	imp := &Importer{cfg: cfg}
 	mygo.BindAs("Recorder", rec)
+	mygo.BindAs("Importer", imp)
 
 	var win *mygo.Window
 	openWindow := func() {
@@ -51,6 +53,7 @@ func main() {
 			// embedded by `mygo build` otherwise (see mygo.config.ts).
 			URL: "/",
 		})
+		win.OnFileDrop(func(e *mygo.FileDropEvent) { imp.importFiles(e.Paths) })
 	}
 
 	// Closing the window must not end a recording: the app stays in the menu bar.
@@ -60,6 +63,7 @@ func main() {
 			openWindow()
 		}
 	})
+	mygo.App.OnOpenFile(func(path string) { imp.importFiles([]string{path}) }) // Dock icon drop, "Open With"
 	mygo.App.OnWillQuit(func(*mygo.QuitEvent) { rec.shutdown() })
 
 	mygo.App.WhenReady(func() {

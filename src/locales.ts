@@ -47,6 +47,26 @@ export interface Messages {
    * `{count, plural, other{#件}}`
    */
   recordingCount(count: number): string;
+  /**
+   * `ファイルを取り込む…`
+   */
+  importButton(): string;
+  /**
+   * `取り込む音声・動画を選択`
+   */
+  importTitle(): string;
+  /**
+   * `取り込みが中断されました。もう一度取り込んでください`
+   */
+  importInterrupted(): string;
+  /**
+   * `{name} は取り込めない形式です`
+   */
+  importUnsupported(name: string): string;
+  /**
+   * `{name} を取り込めませんでした`
+   */
+  importFailed(name: string): string;
 }
 
 const catalog = createCatalog<Messages>({
@@ -67,6 +87,11 @@ const catalog = createCatalog<Messages>({
     "undo": [],
     "recordingDeleted": [],
     "recordingCount": ["count"],
+    "importButton": [],
+    "importTitle": [],
+    "importInterrupted": [],
+    "importUnsupported": ["name"],
+    "importFailed": ["name"],
   },
   messages: {
     "ja": {
@@ -81,6 +106,11 @@ const catalog = createCatalog<Messages>({
       "undo": "取り消し",
       "recordingDeleted": "録音を削除しました",
       "recordingCount": "{count, plural, other{#件}}",
+      "importButton": "ファイルを取り込む…",
+      "importTitle": "取り込む音声・動画を選択",
+      "importInterrupted": "取り込みが中断されました。もう一度取り込んでください",
+      "importUnsupported": "{name} は取り込めない形式です",
+      "importFailed": "{name} を取り込めませんでした",
     },
   },
 });

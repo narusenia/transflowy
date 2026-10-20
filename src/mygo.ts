@@ -4,6 +4,12 @@ import { call, event } from "mygo-runtime";
 
 // ---- Types ----
 
+/** ImportProblem is sent when a file cannot be imported. */
+export interface ImportProblem {
+  name: string;
+  message: string;
+}
+
 export interface Meta {
   id: string;
   title: string;
@@ -132,10 +138,25 @@ export const Recorder = {
   },
 } as const;
 
+/**
+ * Importer is callable from the page. Files dropped on the window or the Dock
+ * icon reach importFiles on the Go side.
+ */
+export const Importer = {
+  /** ImportDialog asks for files and imports them. */
+  importDialog(): Promise<void> {
+    return call("Importer.ImportDialog");
+  },
+} as const;
+
 // ---- Events ----
 
 /** Events sent by the Go side. Subscribe with `events.name.on(listener)`. */
 export const events = {
+  /** LibraryChanged fires with a recording's id when an import finishes. */
+  libraryChanged: event<string>("libraryChanged"),
+  /** ImportFailed fires for an unsupported or unreadable file. */
+  importFailed: event<ImportProblem>("importFailed"),
   /** RecordingChanged fires on start, stop and about five times a second while recording. */
   recordingChanged: event<RecordingState>("recordingChanged"),
 } as const;

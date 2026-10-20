@@ -210,6 +210,11 @@ func recoverRecordings(st library.Store) {
 	}
 	for _, m := range metas {
 		dir, _ := st.Path(m.ID)
+		if m.Status == library.StatusImporting { // the conversion was cut off
+			m.Status, m.Error = library.StatusFailed, locales.ImportInterrupted()
+			_ = st.SaveMeta(m)
+			continue
+		}
 		if m.Status != library.StatusRecording {
 			// stopped, but the app quit before the m4a was made
 			_, noM4A := os.Stat(filepath.Join(dir, m4aName))

@@ -18,6 +18,7 @@ type Status string
 
 const (
 	StatusRecording  Status = "recording"
+	StatusImporting  Status = "importing" // an imported file is being converted
 	StatusQueued     Status = "queued"
 	StatusProcessing Status = "processing"
 	StatusDone       Status = "done"

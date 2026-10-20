@@ -141,3 +141,53 @@ func RecordingCount(count int) string { return In(i18n.Locale()).RecordingCount(
 func (msgs Messages) RecordingCount(count int) string {
 	return Catalog.Format(msgs.locale, "recordingCount", map[string]any{"count": count})
 }
+
+// ImportButton says "ファイルを取り込む…"
+// in the language the app shows.
+func ImportButton() string { return In(i18n.Locale()).ImportButton() }
+
+// ImportButton says "ファイルを取り込む…"
+// in the language of msgs.
+func (msgs Messages) ImportButton() string {
+	return Catalog.Format(msgs.locale, "importButton", nil)
+}
+
+// ImportTitle says "取り込む音声・動画を選択"
+// in the language the app shows.
+func ImportTitle() string { return In(i18n.Locale()).ImportTitle() }
+
+// ImportTitle says "取り込む音声・動画を選択"
+// in the language of msgs.
+func (msgs Messages) ImportTitle() string {
+	return Catalog.Format(msgs.locale, "importTitle", nil)
+}
+
+// ImportInterrupted says "取り込みが中断されました。もう一度取り込んでください"
+// in the language the app shows.
+func ImportInterrupted() string { return In(i18n.Locale()).ImportInterrupted() }
+
+// ImportInterrupted says "取り込みが中断されました。もう一度取り込んでください"
+// in the language of msgs.
+func (msgs Messages) ImportInterrupted() string {
+	return Catalog.Format(msgs.locale, "importInterrupted", nil)
+}
+
+// ImportUnsupported says "{name} は取り込めない形式です"
+// in the language the app shows.
+func ImportUnsupported(name string) string { return In(i18n.Locale()).ImportUnsupported(name) }
+
+// ImportUnsupported says "{name} は取り込めない形式です"
+// in the language of msgs.
+func (msgs Messages) ImportUnsupported(name string) string {
+	return Catalog.Format(msgs.locale, "importUnsupported", map[string]any{"name": name})
+}
+
+// ImportFailed says "{name} を取り込めませんでした"
+// in the language the app shows.
+func ImportFailed(name string) string { return In(i18n.Locale()).ImportFailed(name) }
+
+// ImportFailed says "{name} を取り込めませんでした"
+// in the language of msgs.
+func (msgs Messages) ImportFailed(name string) string {
+	return Catalog.Format(msgs.locale, "importFailed", map[string]any{"name": name})
+}

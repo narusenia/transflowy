@@ -7,10 +7,41 @@
   "recordingRecovered": "アプリが予期せず終了したため、途中までの録音を復旧しました",
   "recordStart": "録音を開始",
   "recordStop": "停止 {time}",
-  "@recordStop": { "placeholders": { "time": { "type": "String" } } },
+  "@recordStop": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "recordingSaved": "録音を保存しました",
   "undo": "取り消し",
   "recordingDeleted": "録音を削除しました",
   "recordingCount": "{count, plural, other{#件}}",
-  "@recordingCount": { "placeholders": { "count": { "type": "int" } } }
+  "@recordingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importButton": "ファイルを取り込む…",
+  "importTitle": "取り込む音声・動画を選択",
+  "importInterrupted": "取り込みが中断されました。もう一度取り込んでください",
+  "importUnsupported": "{name} は取り込めない形式です",
+  "@importUnsupported": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importFailed": "{name} を取り込めませんでした",
+  "@importFailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }
