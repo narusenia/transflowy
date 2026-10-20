@@ -74,8 +74,10 @@ func setup(t *testing.T, status library.Status, parts ...float64) *env {
 	st.UpdateMeta(m.ID, func(m *library.Meta) { m.Status = status })
 	e := &env{st: st, id: m.ID, eng: &fake{}}
 	e.q = New(Config{
-		Store:   func() (library.Store, error) { return st, nil },
-		Engine:  func(string) (Job, error) { return Job{Engine: e.eng, Params: transcribe.Params{Target: 8, Max: 15, MinSilence: 0.3}}, nil },
+		Store: func() (library.Store, error) { return st, nil },
+		Engine: func(string) (Job, error) {
+			return Job{Engine: e.eng, Params: transcribe.Params{Target: 8, Max: 15, MinSilence: 0.3}}, nil
+		},
 		Phrases: func() []string { return nil },
 		Sleep:   func(ctx context.Context, _ time.Duration) bool { return ctx.Err() == nil },
 	})

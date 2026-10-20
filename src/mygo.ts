@@ -176,6 +176,13 @@ export const Transcriber = {
   reprocess(id: string, kind: string): Promise<void> {
     return call("Transcriber.Reprocess", id, kind);
   },
+  /**
+   * SetLanguage fixes a recording's language (ISO 639-1, "ja", "en"); "" detects.
+   * It applies to the next processing: call Reprocess to redo the transcript.
+   */
+  setLanguage(id: string, lang: string): Promise<void> {
+    return call("Transcriber.SetLanguage", id, lang);
+  },
 } as const;
 
 /** Models is callable from the page. */

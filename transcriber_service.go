@@ -1,6 +1,9 @@
 package main
 
 import (
+	"errors"
+	"regexp"
+
 	"transflowy/internal/library"
 	"transflowy/internal/pipeline"
 	"transflowy/internal/settings"
@@ -31,4 +34,20 @@ func (t *Transcriber) Reprocess(id, kind string) error {
 	}
 	t.queue.Enqueue(id, kind, true)
 	return nil
+}
+
+var langCode = regexp.MustCompile(`^[a-z]{2,3}$`)
+
+// SetLanguage fixes a recording's language (ISO 639-1, "ja", "en"); "" detects.
+// It applies to the next processing: call Reprocess to redo the transcript.
+func (t *Transcriber) SetLanguage(id, lang string) error {
+	if lang != "" && !langCode.MatchString(lang) {
+		return errors.New("language must be a code like ja or en")
+	}
+	s, err := t.cfg.Get()
+	if err != nil {
+		return err
+	}
+	_, err = library.Store{Root: s.LibraryDir}.UpdateMeta(id, func(m *library.Meta) { m.Language = lang })
+	return err
 }

@@ -42,7 +42,13 @@ func main() {
 	ctx, stopQueue := context.WithCancel(context.Background())
 	go queue.Run(ctx)
 	// Settings and keys decide which engine is ready: recordings that waited are tried again.
-	cfg.OnChange = func() { resumeAll(cfg, queue) }
+	var refreshTray func()
+	cfg.OnChange = func() {
+		resumeAll(cfg, queue)
+		if refreshTray != nil {
+			refreshTray()
+		}
+	}
 
 	rec := &Recorder{cfg: cfg, queue: queue}
 	imp := &Importer{cfg: cfg, queue: queue}
@@ -98,11 +104,13 @@ func main() {
 		recoverRecordings(library.Store{Root: s.LibraryDir})
 		resumeAll(cfg, queue)
 
-		update, err := newTray(s.Shortcut, rec.toggle, openWindow)
+		locked := func() bool { s, _ := cfg.Get(); return s.LocalOnly }
+		update, err := newTray(s.Shortcut, locked, rec.toggle, openWindow)
 		if err != nil {
 			log.Println("tray:", err)
 		} else {
 			rec.onState = update
+			refreshTray = func() { update(rec.State()) }
 		}
 		if err := mygo.GlobalShortcut.Register(s.Shortcut, rec.toggle); err != nil {
 			log.Println("shortcut:", err)
