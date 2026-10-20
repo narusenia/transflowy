@@ -38,10 +38,12 @@
 ## Phase 1: 土台
 
 - [x] identifier を `one.nxeu.transflowy` に変更
-- [ ] React + Tailwind + shadcn/ui 導入、Greeter サンプル削除
+- [x] React + Tailwind + shadcn/ui 導入、Greeter サンプル削除
 - [ ] 固定の自己署名証明書でのビルド手順
-- [ ] データモデル（`meta.json` / `transcript.json`、`speaker` / `original` を含む）と録音フォルダの読み書き
-- [ ] 設定の保存（保存先、既定プロバイダ、ローカル限定、ショートカット）と API キーのキーチェーン保存
+  - 用意済み: `bun run cert`（証明書作成。ログインキーチェーンに追加し、ログインパスワードを聞かれる）→ `bun run build:signed`。**未実行**（キーチェーンを変更するため）。実行前の確認: ビルドは ad-hoc 署名で、署名用 ID は 0 件
+  - 済み: Info.plist に `NSMicrophoneUsageDescription`（無いとマイクが黙って拒否される）、最低 macOS 14.2
+- [x] データモデル（`meta.json` / `transcript.json`、`speaker` / `original` を含む）と録音フォルダの読み書き（`internal/library`、原子的書き込み、テストあり）
+- [x] 設定の保存（保存先、既定プロバイダ、ローカル限定、ショートカット）と API キーのキーチェーン保存（`internal/settings`、`mygo.Secrets`。キーの値はページに返さない）
 
 ## Phase 2: 録音と取り込み
 
