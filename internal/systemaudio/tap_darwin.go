@@ -23,14 +23,14 @@ type tap struct {
 }
 
 //export goTapData
-func goTapData(ctx C.uintptr_t, samples *C.float, frames, channels C.int) {
-	fn := cgo.Handle(ctx).Value().(func([]float32, int))
-	fn(unsafe.Slice((*float32)(unsafe.Pointer(samples)), int(frames*channels)), int(channels))
+func goTapData(ctx C.uintptr_t, samples *C.float, frames, channels C.int, rate C.double) {
+	fn := cgo.Handle(ctx).Value().(func([]float32, int, float64))
+	fn(unsafe.Slice((*float32)(unsafe.Pointer(samples)), int(frames*channels)), int(channels), float64(rate))
 }
 
 // startTap calls fn on the audio thread with interleaved float32 frames of
-// everything the Mac plays. fn must copy what it keeps.
-func startTap(fn func(frames []float32, channels int)) (stop func(), rate float64, channels int, err error) {
+// everything the Mac plays, and the rate they run at now. fn must copy what it keeps.
+func startTap(fn func(frames []float32, channels int, rate float64)) (stop func(), rate float64, channels int, err error) {
 	h := cgo.NewHandle(fn)
 	var info C.ta_info
 	state := C.ta_start(C.uintptr_t(h), &info)

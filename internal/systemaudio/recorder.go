@@ -64,11 +64,14 @@ func (r *Recorder) Start(path string) error {
 }
 
 // onData runs on the audio thread: mix to mono, resample, buffer.
-func (r *Recorder) onData(frames []float32, channels int) {
+func (r *Recorder) onData(frames []float32, channels int, rate float64) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if r.stop == nil && r.wav == nil {
 		return
+	}
+	if rate > 0 {
+		r.step = rate / sampleRate // the output device may change its rate while recording
 	}
 	// The tap delivers nothing while the Mac is silent: fill the gap, so this
 	// track stays level with the microphone's.

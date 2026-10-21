@@ -7,22 +7,37 @@
 #include <stdio.h>
 #include "tap_darwin.h"
 
-extern void goTapData(uintptr_t ctx, float *samples, int frames, int channels);
+extern void goTapData(uintptr_t ctx, float *samples, int frames, int channels, double rate);
 
 typedef struct {
 	AudioObjectID tap;
 	AudioObjectID agg;
 	AudioDeviceIOProcID proc;
 	uintptr_t ctx;
+	volatile double rate; // nominal rate of the aggregate device: it follows the output device
 } ta_state;
+
+static AudioObjectPropertyAddress rateAddr = {kAudioDevicePropertyNominalSampleRate, kAudioObjectPropertyScopeGlobal, kAudioObjectPropertyElementMain};
+
+// The delivered audio runs at the clock of the output device, not at the rate
+// the tap reports, and the clock changes when a Bluetooth headset switches to
+// its call profile (as the microphone opens): follow it.
+static OSStatus rateChanged(AudioObjectID obj, UInt32 n, const AudioObjectPropertyAddress *a, void *client) {
+	ta_state *st = client;
+	Float64 r = 0;
+	UInt32 size = sizeof r;
+	if (AudioObjectGetPropertyData(obj, &rateAddr, 0, NULL, &size, &r) == noErr && r > 0) st->rate = r;
+	return noErr;
+}
 
 static OSStatus ioproc(AudioObjectID dev, const AudioTimeStamp *now, const AudioBufferList *in,
                        const AudioTimeStamp *inTime, AudioBufferList *out, const AudioTimeStamp *outTime, void *client) {
 	ta_state *st = client;
 	if (in && in->mNumberBuffers > 0) {
-		const AudioBuffer *b = &in->mBuffers[0];
+		// The tap's streams come after those of the output device (a headset has an input too).
+		const AudioBuffer *b = &in->mBuffers[in->mNumberBuffers - 1];
 		int ch = b->mNumberChannels > 0 ? b->mNumberChannels : 1;
-		goTapData(st->ctx, (float *)b->mData, (int)(b->mDataByteSize / (sizeof(float) * ch)), ch);
+		goTapData(st->ctx, (float *)b->mData, (int)(b->mDataByteSize / (sizeof(float) * ch)), ch, st->rate);
 	}
 	return noErr;
 }
@@ -38,7 +53,10 @@ void ta_stop(void *p) {
 		AudioDeviceStop(st->agg, st->proc);
 		AudioDeviceDestroyIOProcID(st->agg, st->proc);
 	}
-	if (st->agg) AudioHardwareDestroyAggregateDevice(st->agg);
+	if (st->agg) {
+		AudioObjectRemovePropertyListener(st->agg, &rateAddr, rateChanged, st);
+		AudioHardwareDestroyAggregateDevice(st->agg);
+	}
 	if (st->tap) AudioHardwareDestroyProcessTap(st->tap);
 	free(st);
 }
@@ -89,6 +107,12 @@ void *ta_start(uintptr_t ctx, ta_info *info) {
 		CFRelease(uid);
 		s = AudioHardwareCreateAggregateDevice((__bridge CFDictionaryRef)desc, &st->agg);
 		if (s != noErr) { fail(info, "create aggregate device", s); st->agg = 0; ta_stop(st); return NULL; }
+
+		Float64 aggRate = 0;
+		size = sizeof aggRate;
+		if (AudioObjectGetPropertyData(st->agg, &rateAddr, 0, NULL, &size, &aggRate) == noErr && aggRate > 0) info->rate = aggRate;
+		st->rate = info->rate;
+		AudioObjectAddPropertyListener(st->agg, &rateAddr, rateChanged, st);
 
 		s = AudioDeviceCreateIOProcID(st->agg, ioproc, st, &st->proc);
 		if (s != noErr) { fail(info, "create io proc", s); st->proc = NULL; ta_stop(st); return NULL; }
